@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-MmadApplication<MMAD>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.MMAD.MMAD.MmadApplication",
+            "projectName": "MMAD",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
