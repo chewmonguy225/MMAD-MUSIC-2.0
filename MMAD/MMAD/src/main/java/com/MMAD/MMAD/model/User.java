@@ -38,24 +38,50 @@ public class User implements Serializable{
 
     public User() {}
 
-    //public User(String username, String password,)
-
-
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
     
-
-    public String getUsername(){
+    public String getUsername() {
         return username;
     }
 
-    public void setUsername(String username){
+    public void setUsername(String username) {
         this.username = username;
     }
 
-    public String getPassword(){
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password){
+    public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean addFriend(User friend) {
+        if (friend != null) {
+            throw new IllegalArgumentException("Friend cannot be null.");
+        }
+        if (!friendList.contains(friend)) {
+            friendList.add(friend);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public boolean removeFriend(User friend) {
+        if (friend != null) {
+            throw new IllegalArgumentException("Friend cannot be null.");
+        }
+        else {
+            return friendList.remove(friend);
+        }
+    }
+
+    public Set<User> getFriends() { 
+        return new HashSet<>(this.friendList);
     }
 }
