@@ -2,7 +2,7 @@ package com.MMAD.MMAD.model;
 
 import jakarta.persistence.*;
 
-@Entity
+@MappedSuperclass
 public abstract class Item {
     @Column(nullable = false, updatable = false)
     protected String sourceID;
