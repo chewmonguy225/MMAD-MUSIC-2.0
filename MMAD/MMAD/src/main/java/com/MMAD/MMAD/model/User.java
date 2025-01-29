@@ -30,18 +30,19 @@ public class User implements Serializable{
     @JoinTable(name = "user_friends",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id"))
-    private Set<User> friendList = new HashSet<User>(); // Initialize to avoid nulls
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL) // Cascade all operations from User to Playlist
+    private Set<User> friendList = new HashSet<User>(); 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL) 
     private List<Playlist> playlists = new ArrayList<Playlist>(); 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL) // Cascade all operations from User to Review
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL) 
     private List<Review> reviews = new ArrayList<Review>(); 
 
     public User() {}
 
-    //public User(String username, String password,)
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 
-
-    
 
     public String getUsername(){
         return username;
