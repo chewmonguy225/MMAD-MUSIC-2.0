@@ -1,4 +1,4 @@
-package com.MMAD.MMAD.Service;
+package com.MMAD.MMAD.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
