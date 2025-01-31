@@ -44,7 +44,7 @@ public class User implements Serializable{
 
 
     /**
-     * Empty constructor for hibernate.
+     * Empty constructor for JPA.
      */
     public User() {} 
 
