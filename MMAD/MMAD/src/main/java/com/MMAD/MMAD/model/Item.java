@@ -4,17 +4,15 @@ import jakarta.persistence.*;
 
 @MappedSuperclass
 public abstract class Item {
-    protected String imageURL;
-    
-    //@Column(nullable = false, updatable = false)
-    protected String source_id;
-    
-    protected String name;
-    
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, updatable = false)
     protected int id;
-
+    protected String source_id;
+    protected String name;
+    @Column(nullable = true)
+    protected String imageURL;
+   
     public Item() {}
 
     public Item(String source_id, String name) {
@@ -34,11 +32,44 @@ public abstract class Item {
         this.name = name;
     }
 
-    public String getImageURL() {
+   public String getImageURL() {
         return imageURL;
     }
 
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
     }
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getSource_id() {
+        return source_id;
+    }
+
+    public void setSource_id(String source_id) {
+        this.source_id = source_id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String toString(){
+        return "Artist{"+
+            "id="+id+
+            ", source_id="+source_id+'\''+
+            ", name="+name+'\''+
+            ", imageURL="+imageURL+'\''+
+            '}';
+    }
+    
 }

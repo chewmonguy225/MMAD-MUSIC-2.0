@@ -33,9 +33,9 @@ public class ArtistResource {
     }
 
     @GetMapping("/find/{id}")
-    public Artist getArtistById(@PathVariable("id") int id){
+    public ResponseEntity<Artist> getArtistById(@PathVariable("id") int id){
         Artist artist = artistService.findArtistById(id);
-        return artist;
+        return new ResponseEntity<>(artist, HttpStatus.OK);
     }
 
     @PostMapping("/add")

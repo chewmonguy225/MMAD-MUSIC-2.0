@@ -1,4 +1,4 @@
-package com.MMAD.MMAD.model;
+/*package com.MMAD.MMAD.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -84,4 +84,4 @@ public class User implements Serializable{
     public Set<User> getFriends() { 
         return new HashSet<>(this.friendList);
     }
-}
+}*/
