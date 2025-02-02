@@ -8,11 +8,15 @@ public abstract class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, updatable = false)
     protected int id;
+    
+    @Column(name = "source_id", nullable = false)
     protected String source_id;
+    
     protected String name;
+    
     @Column(nullable = true)
     protected String imageURL;
-   
+
     public Item() {}
 
     public Item(String source_id, String name) {
@@ -32,13 +36,14 @@ public abstract class Item {
         this.name = name;
     }
 
-   public String getImageURL() {
+    public String getImageURL() {
         return imageURL;
     }
 
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
     }
+
     public int getId() {
         return id;
     }
