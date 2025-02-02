@@ -1,6 +1,8 @@
 package com.MMAD.MMAD.model;
 
-@Entity
+import jakarta.persistence.Entity;
+
+//@Entity
 public class Album extends Item {
     private Artist artist;
 

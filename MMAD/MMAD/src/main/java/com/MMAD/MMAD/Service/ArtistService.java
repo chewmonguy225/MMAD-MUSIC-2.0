@@ -27,4 +27,8 @@ public class ArtistService {
     public Artist findArtistById(int id){
         return artistRepo.findArtistById(id).orElseThrow(()-> new ElementNotFoundException("Artist: "+id+" not found"));
     }
+
+    public List<Artist> findAllArtists(){
+        return artistRepo.findAll();
+    }
 }
