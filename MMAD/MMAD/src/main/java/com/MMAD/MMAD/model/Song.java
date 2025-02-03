@@ -7,13 +7,13 @@ public class Song extends Item{
     private Album album;
     private Artist artist;
 
-    public Song(String sourceID, String name, Artist artist, Album album){
-        super(sourceID, name);
+    public Song(String source_id, String name, Artist artist, Album album){
+        super(source_id, name);
         this.artist = artist;
         this.album = album;
     }
-    public Song(int id,String sourceID, String name, Artist artist, Album album){
-        super(id, sourceID, name);
+    public Song(int id,String source_id, String name, Artist artist, Album album){
+        super(id, source_id, name);
         this.artist = artist;
         this.album = album;
     }

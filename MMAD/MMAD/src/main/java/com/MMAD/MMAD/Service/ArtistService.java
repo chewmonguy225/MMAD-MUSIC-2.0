@@ -21,17 +21,17 @@ public class ArtistService {
         return artistRepo.findArtistById(id).orElseThrow(() -> new RuntimeException("Artist not found"));
     }
 
-    public Optional<Artist> findArtistBySource_id(String source_id) {
+    /*public Optional<Artist> findArtistBySource_id(String source_id) {
         return artistRepo.findArtistBySource_id(source_id);
-    }
+    }*/
 
     public Artist addArtist(Artist artist) {
-        Optional<Artist> existingArtist = findArtistBySource_id(artist.getSource_id());
-        if (existingArtist.isPresent()) {
-            return existingArtist.get();
-        } else {
+        //Optional<Artist> existingArtist = findArtistBySource_id(artist.getSource_id());
+        //if (existingArtist.isPresent()) {
+          //  return existingArtist.get();
+        //} else {
             return artistRepo.save(artist);
-        }
+    //    }
     }
 
     public void deleteArtist(int id){
