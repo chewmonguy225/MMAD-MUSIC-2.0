@@ -40,8 +40,13 @@ public class ArtistResource {
 
     @PostMapping("/add")
     public ResponseEntity<Artist> addArtist(@RequestBody Artist artist){
-        Artist newArtist = artistService.addArtist(artist);
-        return new ResponseEntity<>(newArtist, HttpStatus.CREATED);
+        try{
+            Artist newArtist = artistService.addArtist(artist);
+            return new ResponseEntity<>(newArtist, HttpStatus.CREATED);
+        } catch(RuntimeException e) {
+            return new ResponseEntity<>(newArtist, HttpStatus.OK);
+        }
+        
     }
 
     @GetMapping("/test")
