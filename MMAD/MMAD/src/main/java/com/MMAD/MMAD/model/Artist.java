@@ -9,16 +9,16 @@ public class Artist extends Item {
         super();
     }
 
-    public Artist(String source_id, String name) {
-        super(source_id, name);
+    public Artist(String sourceId, String name) {
+        super(sourceId, name);
     }
 
-    public Artist(String imageURL, String source_id, String name) {
-        super(imageURL, source_id, name);
+    public Artist(String imageURL, String sourceId, String name) {
+        super(imageURL, sourceId, name);
     }
 
-    public Artist(int id, String source_id, String name) {
-        super(id, source_id, name);
+    public Artist(int id, String sourceId, String name) {
+        super(id, sourceId, name);
     }
 
     public void setID(int id) {

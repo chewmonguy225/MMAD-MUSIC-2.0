@@ -10,7 +10,7 @@ public abstract class Item {
     protected int id;
     
     @Column(name = "source_id", nullable = false)
-    protected String source_id;
+    protected String sourceId;
     
     protected String name;
     
@@ -19,20 +19,20 @@ public abstract class Item {
 
     public Item() {}
 
-    public Item(String source_id, String name) {
-        this.source_id = source_id;
+    public Item(String sourceId, String name) {
+        this.sourceId = sourceId;
         this.name = name;
     }
 
-    public Item(String imageURL, String source_id, String name) {
+    public Item(String imageURL, String sourceId, String name) {
         this.imageURL = imageURL;
-        this.source_id = source_id;
+        this.sourceId = sourceId;
         this.name = name;
     }
 
-    public Item(int id, String source_id, String name) {
+    public Item(int id, String sourceId, String name) {
         this.id = id;
-        this.source_id = source_id;
+        this.sourceId = sourceId;
         this.name = name;
     }
 
@@ -52,12 +52,12 @@ public abstract class Item {
         this.id = id;
     }
 
-    public String getSource_id() {
-        return source_id;
+    public String getSourceId() {
+        return sourceId;
     }
 
-    public void setSource_id(String source_id) {
-        this.source_id = source_id;
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId;
     }
 
     public String getName() {
@@ -71,7 +71,7 @@ public abstract class Item {
     public String toString(){
         return "Artist{"+
             "id="+id+
-            ", source_id="+source_id+'\''+
+            ", sourceId="+sourceId+'\''+
             ", name="+name+'\''+
             ", imageURL="+imageURL+'\''+
             '}';

@@ -2,6 +2,7 @@ package com.MMAD.MMAD.resource;
 
 import java.util.List;
 
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +38,15 @@ public class ArtistResource {
         Artist artist = artistService.findArtistById(id);
         return new ResponseEntity<>(artist, HttpStatus.OK);
     }
-
+    
+    @GetMapping("/findSource/{source_id}")
+    public ResponseEntity<Artist> getArtistBySourceId(@PathVariable("source_id") String sourceId){
+        Optional<Artist> artist = artistService.findArtistBySourceId(sourceId);
+        if(artist.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(artist.get(), HttpStatus.OK);
+    }
     @PostMapping("/add")
     public ResponseEntity<Artist> addArtist(@RequestBody Artist artist){
         try{
