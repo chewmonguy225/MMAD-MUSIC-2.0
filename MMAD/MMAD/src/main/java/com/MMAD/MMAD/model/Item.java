@@ -2,22 +2,37 @@ package com.MMAD.MMAD.model;
 
 import jakarta.persistence.*;
 
-@Entity
+@MappedSuperclass
 public abstract class Item {
-    @Column(nullable = false, updatable = false)
-    protected String sourceID;
-    protected String name;
-    protected String imageURL;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
     protected int id;
+    
+    @Column(name = "source_id", nullable = false)
+    protected String sourceId;
+    
+    protected String name;
+    
+    @Column(nullable = true)
+    protected String imageURL;
 
-    public Item(){}
+    public Item() {}
 
-    public Item(String sourceID, String name) {
-        this.sourceID = sourceID;
-        this.id = -1;
+    public Item(String sourceId, String name) {
+        this.sourceId = sourceId;
+        this.name = name;
+    }
+
+    public Item(String imageURL, String sourceId, String name) {
+        this.imageURL = imageURL;
+        this.sourceId = sourceId;
+        this.name = name;
+    }
+
+    public Item(int id, String sourceId, String name) {
+        this.id = id;
+        this.sourceId = sourceId;
         this.name = name;
     }
 
@@ -37,12 +52,12 @@ public abstract class Item {
         this.id = id;
     }
 
-    public String getSourceID() {
-        return sourceID;
+    public String getSourceId() {
+        return sourceId;
     }
 
-    public void setSourceID(String sourceID) {
-        this.sourceID = sourceID;
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId;
     }
 
     public String getName() {
@@ -53,9 +68,13 @@ public abstract class Item {
         this.name = name;
     }
 
-    public Item(int id, String sourceID, String name) {
-        this.id = id;
-        this.sourceID = sourceID;
-        this.name = name;
+    public String toString(){
+        return "Artist{"+
+            "id="+id+
+            ", sourceId="+sourceId+'\''+
+            ", name="+name+'\''+
+            ", imageURL="+imageURL+'\''+
+            '}';
     }
+    
 }

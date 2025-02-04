@@ -1,4 +1,8 @@
 package com.MMAD.MMAD.model;
+
+import jakarta.persistence.Entity;
+
+//@Entity
 public class Album extends Item {
     private Artist artist;
 
@@ -14,19 +18,6 @@ public class Album extends Item {
 
     public Artist artist(){
         return this.artist;
-    }
-    
-    @Override
-    public String getName(){
-        return this.name;
-    }
-    @Override
-    public String getSourceID(){
-        return this.sourceID;
-    }
-    @Override
-    public int getID(){
-        return this.id;
     }
 
     public void setID(int id){
