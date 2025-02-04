@@ -44,7 +44,7 @@ public class ArtistResource {
             Artist newArtist = artistService.addArtist(artist);
             return new ResponseEntity<>(newArtist, HttpStatus.CREATED);
         } catch(RuntimeException e) {
-            return new ResponseEntity<>(newArtist, HttpStatus.OK);
+            return new ResponseEntity<>(artist, HttpStatus.OK);
         }
         
     }
