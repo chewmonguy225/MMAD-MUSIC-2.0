@@ -1,4 +1,4 @@
-package com.MMAD.MMAD;
+package com.MMAD.MMAD.resource;
 
 import java.util.List;
 
