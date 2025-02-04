@@ -11,5 +11,5 @@ import com.MMAD.MMAD.model.Artist;
 public interface ArtistRepo extends JpaRepository<Artist, Integer> {
     void deleteArtistById(int id);
     Optional<Artist> findArtistById(int id);
-    //Optional<Artist> findArtistBySource_id(String source_id);
+    Optional<Artist> findArtistBySourceId(String sourceId);
 }
