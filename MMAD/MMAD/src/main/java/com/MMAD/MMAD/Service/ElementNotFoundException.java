@@ -1,4 +1,4 @@
-package com.MMAD.MMAD.Service;
+package com.MMAD.MMAD.service;
 
 public class ElementNotFoundException extends RuntimeException {
     public ElementNotFoundException (String s){

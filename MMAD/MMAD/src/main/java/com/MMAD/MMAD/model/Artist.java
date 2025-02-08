@@ -1,9 +1,17 @@
 package com.MMAD.MMAD.model;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Artist extends Item {
+    // Define relationships if any
+    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Album> albums;
 
     public Artist() {
         super();
