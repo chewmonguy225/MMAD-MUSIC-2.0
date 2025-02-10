@@ -14,7 +14,6 @@ import com.MMAD.MMAD.model.User;
 
 
 
-
 @RestController
 @RequestMapping("/user")
 public class UserResource {
@@ -25,16 +24,27 @@ public class UserResource {
     }
 
 
-    @GetMapping("/find")
+    @GetMapping("/find/id")
     public ResponseEntity<User> getUserById(@RequestParam("id") Long id) {
         try {
-            User user = userService.findUserById(id);
+            User user = userService.findUserById(id).orElseThrow(() -> new RuntimeException("User not found"));
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }
     }
 
+
+    @GetMapping("/find/username")
+    public ResponseEntity<User> getUserByUsername(@RequestParam("username") String username) {
+        try {
+            User user = userService.findUserByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+    
 
     @PostMapping("/add")
     public ResponseEntity<User> addUser(@RequestBody User user) {

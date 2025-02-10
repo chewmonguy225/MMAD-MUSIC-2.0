@@ -18,8 +18,8 @@ public class UserService {
     }
 
 
-    public User findUserById(Long id) {
-        return userRepo.findUserById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    public Optional<User> findUserById(Long id) {
+        return userRepo.findUserById(id);
     }
 
 
