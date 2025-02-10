@@ -28,6 +28,11 @@ public class UserService {
     }
 
 
+    public Optional<User> findUserByUsernameAndPassword(String username, String password) {
+        return userRepo.findUserByUsernameAndPassword(username, password);
+    }
+
+
     public User addUser(User user) {
         Optional<User> existingUser = findUserByUsername(user.getUsername());
         if (existingUser.isPresent()) {
@@ -36,5 +41,36 @@ public class UserService {
             return userRepo.save(user);
         }
     }
+
+
+    public User updateUser(User user) {
+        Optional<User> existingUser = findUserById(user.getId());
+        if (existingUser.isPresent()) {
+            return userRepo.save(user);
+        } else {
+            throw new RuntimeException("User does not exist");
+        }
+    }
+
+
+    public void deleteUserByUsernameAndPassword(String username, String password) {
+        Optional<User> existingUser = findUserByUsernameAndPassword(username, password);
+        if (existingUser.isPresent()) {
+            userRepo.deleteByUsernameAndPassword(username, password);
+        } else {
+            throw new RuntimeException("User does not exist");
+        }
+    }
+
+
+    public void deleteUserById(Long id) {
+        Optional<User> existingUser = findUserById(id);
+        if (existingUser.isPresent()) {
+            userRepo.deleteUserById(id);
+        } else {
+            throw new RuntimeException("User does not exist");
+        }
+    }
+
 
 }

@@ -44,6 +44,17 @@ public class UserResource {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+
+    @GetMapping("/login")
+    public ResponseEntity<User> login(@RequestParam("username") String username, @RequestParam("password") String password) {
+        try {
+            User user = userService.findUserByUsernameAndPassword(username, password).orElseThrow(() -> new RuntimeException("User not found"));
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
     
 
     @PostMapping("/add")
@@ -54,6 +65,39 @@ public class UserResource {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+
+    @GetMapping("/delete/id")
+    public ResponseEntity<String> deleteUserById(@RequestParam("id") Long id) {
+        try {
+            userService.deleteUserById(id);
+            return ResponseEntity.ok().body("User deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+    @GetMapping("/delete/username")
+    public ResponseEntity<String> deleteUserByUsernameAndPassword(@RequestParam("username") String username, @RequestParam("password") String password) {
+        try {
+            userService.deleteUserByUsernameAndPassword(username, password);
+            return ResponseEntity.ok().body("User deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/update")
+    public ResponseEntity<User> updateUser(@RequestBody User user) {
+        try {
+            return ResponseEntity.ok().body(userService.addUser(user));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+    
     
 
 }
