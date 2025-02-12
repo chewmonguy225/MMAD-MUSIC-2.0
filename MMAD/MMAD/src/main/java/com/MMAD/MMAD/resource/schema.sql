@@ -8,6 +8,7 @@ USE MMAD;
 DROP TABLE IF EXISTS User;
 
 CREATE TABLE User (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(255) PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
 );
@@ -68,12 +69,11 @@ CREATE TABLE Review (
     CONSTRAINT rating CHECK (rating >= 0 AND rating <= 5)
 );
 
-DROP TABLE IF EXISTS user_friend;
+DROP TABLE IF EXISTS user_friends;
 
-CREATE TABLE user_friend (
-    username VARCHAR(255) NOT NULL,
-    friend_username VARCHAR(255) NOT NULL,
-    PRIMARY KEY (username, friend_username),
-    FOREIGN KEY (username) REFERENCES User(username),
-    FOREIGN KEY (friend_username) REFERENCES User(username)
+CREATE TABLE user_friends (
+    user_id BIGINT NOT NULL,
+    friend_id BIGINT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES User(id),
+    FOREIGN KEY (friend_id) REFERENCES User(id)
 );
