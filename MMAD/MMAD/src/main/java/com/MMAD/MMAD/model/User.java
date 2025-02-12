@@ -1,12 +1,17 @@
 package com.MMAD.MMAD.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 
 @Entity
 public class User implements Serializable{
@@ -21,11 +26,11 @@ public class User implements Serializable{
 
     private String password;
 
-    // @ManyToMany
-    // @JoinTable(name = "user_friends",
-    //         joinColumns = @JoinColumn(name = "user_id"),
-    //         inverseJoinColumns = @JoinColumn(name = "friend_id"))
-    // private Set<User> friendList = new HashSet<User>(); 
+    @ManyToMany
+    @JoinTable(name = "user_friends",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id"))
+    private Set<User> friendList = new HashSet<User>(); 
 
     // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL) 
     // private List<Playlist> playlists = new ArrayList<Playlist>(); 
@@ -59,20 +64,20 @@ public class User implements Serializable{
      * @param friend The user to be added as a friend.
      * @throws IllegalArgumentException if the friend is already a friend, or if the friend is the user itself, or if the friend is null.
      */
-    // public void addFriend(User friend) {
-    //     if (friendList.contains(friend)) {
-    //         throw new IllegalArgumentException("User is already a friend");
-    //     }
-    //     else if (friend == this) {
-    //         throw new IllegalArgumentException("Cannot add self as a friend");
-    //     }
-    //     else if (friend == null) {
-    //         throw new IllegalArgumentException("Friend cannot be null");
-    //     }
-    //     else {
-    //         friendList.add(friend);
-    //     }
-    // }
+    public void addFriend(User friend) {
+        if (friendList.contains(friend)) {
+            throw new IllegalArgumentException("User is already a friend");
+        }
+        else if (friend == this) {
+            throw new IllegalArgumentException("Cannot add self as a friend");
+        }
+        else if (friend == null) {
+            throw new IllegalArgumentException("Friend cannot be null");
+        }
+        else {
+            friendList.add(friend);
+        }
+    }
 
 
     /**
@@ -81,20 +86,20 @@ public class User implements Serializable{
      * @param friend The user to be removed as a friend.
      * @throws IllegalArgumentException if the friend is not a friend, or if the friend is the user itself, or if the friend is null.
      */
-    // public void removeFriend(User friend) {
-    //     if (!friendList.contains(friend)) {
-    //         throw new IllegalArgumentException("User is not a friend");
-    //     }
-    //     else if (friend == this) {
-    //         throw new IllegalArgumentException("Cannot remove self as a friend");
-    //     }
-    //     else if (friend == null) {
-    //         throw new IllegalArgumentException("Friend cannot be null");
-    //     }
-    //     else {
-    //         friendList.remove(friend);
-    //     }
-    // }
+    public void removeFriend(User friend) {
+        if (!friendList.contains(friend)) {
+            throw new IllegalArgumentException("User is not a friend");
+        }
+        else if (friend == this) {
+            throw new IllegalArgumentException("Cannot remove self as a friend");
+        }
+        else if (friend == null) {
+            throw new IllegalArgumentException("Friend cannot be null");
+        }
+        else {
+            friendList.remove(friend);
+        }
+    }
 
 
     /**
@@ -151,5 +156,10 @@ public class User implements Serializable{
 
     public void setPassword(String password){
         this.password = password;
+    }
+
+
+    public Set<User> getFriendsList() {
+        return friendList;
     }
 } 

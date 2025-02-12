@@ -33,32 +33,12 @@ public class UserService {
     }
 
 
-    public User addUser(User user) {
+    public User createUser(User user) {
         Optional<User> existingUser = findUserByUsername(user.getUsername());
         if (existingUser.isPresent()) {
             throw new RuntimeException("User already exists");
         } else {
             return userRepo.save(user);
-        }
-    }
-
-
-    public User updateUser(User user) {
-        Optional<User> existingUser = findUserById(user.getId());
-        if (existingUser.isPresent()) {
-            return userRepo.save(user);
-        } else {
-            throw new RuntimeException("User does not exist");
-        }
-    }
-
-
-    public void deleteUserByUsernameAndPassword(String username, String password) {
-        Optional<User> existingUser = findUserByUsernameAndPassword(username, password);
-        if (existingUser.isPresent()) {
-            userRepo.deleteByUsernameAndPassword(username, password);
-        } else {
-            throw new RuntimeException("User does not exist");
         }
     }
 
@@ -71,6 +51,29 @@ public class UserService {
             throw new RuntimeException("User does not exist");
         }
     }
+
+
+    // public Optional<User> addFriend(User user, User friend) {
+    //     Optional<User> existingUser = findUserById(user.getId());
+    //     Optional<User> existingFriend = findUserById(friend.getId());
+    //     if (existingUser.isPresent() && existingFriend.isPresent()) {
+    //         userRepo.addFriend(user, friend);
+    //         return findUserById(user.getId());
+    //     } else {
+    //         throw new RuntimeException("User does not exist");
+    //     }
+    // }
+
+
+    // public void removeFriend(User user, User friend) {
+    //     Optional<User> existingUser = findUserById(user.getId());
+    //     Optional<User> existingFriend = findUserById(friend.getId());
+    //     if (existingUser.isPresent() && existingFriend.isPresent()) {
+    //         userRepo.deleteUserById(friend.getId());
+    //     } else {
+    //         throw new RuntimeException("User does not exist");
+    //     }
+    // }
 
 
 }

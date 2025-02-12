@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.MMAD.MMAD.Service.UserService;
 import com.MMAD.MMAD.model.User;
 
+import jakarta.transaction.Transactional;
+
 
 
 @RestController
@@ -57,17 +59,18 @@ public class UserResource {
     }
     
 
-    @PostMapping("/add")
+    @PostMapping("/create")
     public ResponseEntity<User> addUser(@RequestBody User user) {
         try {
-            return ResponseEntity.ok().body(userService.addUser(user));
+            return ResponseEntity.ok().body(userService.createUser(user));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }
     }
 
 
-    @GetMapping("/delete/id")
+    @Transactional
+    @GetMapping("/delete")
     public ResponseEntity<String> deleteUserById(@RequestParam("id") Long id) {
         try {
             userService.deleteUserById(id);
@@ -78,26 +81,17 @@ public class UserResource {
     }
 
 
-    @GetMapping("/delete/username")
-    public ResponseEntity<String> deleteUserByUsernameAndPassword(@RequestParam("username") String username, @RequestParam("password") String password) {
-        try {
-            userService.deleteUserByUsernameAndPassword(username, password);
-            return ResponseEntity.ok().body("User deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-
-    @PostMapping("/update")
-    public ResponseEntity<User> updateUser(@RequestBody User user) {
-        try {
-            return ResponseEntity.ok().body(userService.addUser(user));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
-        }
-    }
+    // @GetMapping("/friends/add")
+    // public ResponseEntity<User> addFriend(@RequestParam("id") Long id, @RequestParam("friendId") Long friendId) {
+    //     try {
+    //         User user = userService.findUserById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    //         User friend = userService.findUserById(friendId).orElseThrow(() -> new RuntimeException("Friend not found"));
+    //         return ResponseEntity.ok().body(userService.addFriend(user, friend).orElseThrow(() -> new RuntimeException("User not found")));
+    //     } catch (Exception e) {
+    //         return ResponseEntity.badRequest().body(null);
+    //     }
+    // }
     
-    
+
 
 }
