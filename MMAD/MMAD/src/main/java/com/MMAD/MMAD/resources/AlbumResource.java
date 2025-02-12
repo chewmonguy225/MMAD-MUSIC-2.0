@@ -1,8 +1,14 @@
 package com.MMAD.MMAD.resources;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.MMAD.MMAD.model.Album;
 import com.MMAD.MMAD.service.AlbumService;
 
 @RestController
@@ -12,6 +18,12 @@ public class AlbumResource {
 
     public AlbumResource(AlbumService albumService) {
         this.albumService = albumService;
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity findAllAlbums(){
+        List<Album> albums  = albumService.findAllAlbums();
+       return new ResponseEntity<>(albums, HttpStatus.OK);
     }
 
     @RequestMapping("/test")
