@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.MMAD.MMAD.Service.UserService;
 import com.MMAD.MMAD.model.User;
+import com.MMAD.MMAD.service.UserService;
 
 import jakarta.transaction.Transactional;
 
