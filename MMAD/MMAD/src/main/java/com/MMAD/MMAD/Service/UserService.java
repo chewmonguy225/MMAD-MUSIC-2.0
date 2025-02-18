@@ -1,13 +1,18 @@
 package com.MMAD.MMAD.service;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
 import com.MMAD.MMAD.model.User;
 import com.MMAD.MMAD.repo.UserRepo;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+
 @Service
+@Transactional
 public class UserService {
 
     private final UserRepo userRepo;
@@ -53,16 +58,13 @@ public class UserService {
     }
 
 
-    // public Optional<User> addFriend(User user, User friend) {
-    //     Optional<User> existingUser = findUserById(user.getId());
-    //     Optional<User> existingFriend = findUserById(friend.getId());
-    //     if (existingUser.isPresent() && existingFriend.isPresent()) {
-    //         userRepo.addFriend(user, friend);
-    //         return findUserById(user.getId());
-    //     } else {
-    //         throw new RuntimeException("User does not exist");
-    //     }
-    // }
+    public void addFriend(Long userId, Long friendId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        Set<User> friendList = user.getFriendsList();
+        User friend = userRepo.findById(friendId).orElseThrow(() -> new EntityNotFoundException("Friend not found"));
+        friendList.add(friend);
+        userRepo.updateFriendList(userId, friendList);
+    }
 
 
     // public void removeFriend(User user, User friend) {
