@@ -59,11 +59,30 @@ public class UserService {
 
 
     public void addFriend(Long userId, Long friendId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
-        Set<User> friendList = user.getFriendsList();
-        User friend = userRepo.findById(friendId).orElseThrow(() -> new EntityNotFoundException("Friend not found"));
-        friendList.add(friend);
-        userRepo.updateFriendList(userId, friendList);
+
+        try {
+            User user = userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+            Set<User> friendList = user.getFriendsList();
+            User friend = userRepo.findById(friendId).orElseThrow(() -> new EntityNotFoundException("Friend not found"));
+            friendList.add(friend);
+            updateFriendList(userId, friendList);
+        } catch (Exception e) {
+            System.err.println("Error adding friend: " + e.getMessage());
+            throw new RuntimeException("Error adding friend");}
+    }
+
+
+    @Transactional
+    void updateFriendList(Long userId, Set<User> newFriendList) {
+        Optional<User> userOptional = userRepo.findById(userId); 
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.getFriendsList().clear(); // Remove existing friends
+            user.getFriendsList().addAll(newFriendList); // Add new friends
+            userRepo.save(user); // Save the changes
+        } else {
+            throw new EntityNotFoundException("User not found");
+        }
     }
 
 

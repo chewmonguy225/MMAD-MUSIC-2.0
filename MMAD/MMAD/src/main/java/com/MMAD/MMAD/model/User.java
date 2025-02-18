@@ -32,7 +32,7 @@ public class User implements Serializable{
     @JoinTable(name = "user_friends",
                 joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
                 inverseJoinColumns = @JoinColumn(name = "friend_id", referencedColumnName = "id"))
-    private Set<User> friendList = new HashSet<User>(); 
+    private Set<User> friendList = new HashSet<>(); 
 
     // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL) 
     // private List<Playlist> playlists = new ArrayList<Playlist>(); 

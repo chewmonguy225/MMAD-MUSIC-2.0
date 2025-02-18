@@ -80,16 +80,17 @@ public class UserResource {
         }
     }
 
-
-    @GetMapping("/friends/add")
+    @Transactional
+    @PostMapping("/friends/add")
     public ResponseEntity<String> addFriend(@RequestParam("id") Long id, @RequestParam("friendId") Long friendId) {
         try {
-            userService.findUserById(id).orElseThrow(() -> new RuntimeException("User not found"));
-            userService.findUserById(friendId).orElseThrow(() -> new RuntimeException("Friend not found"));
+            User user = userService.findUserById(id).orElseThrow(() -> new RuntimeException("User not found"));
+            User friend = userService.findUserById(friendId).orElseThrow(() -> new RuntimeException("Friend not found"));
             userService.addFriend(id, friendId);
             return ResponseEntity.ok().body("User added successfully");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
+            System.err.println("Error adding friend: " + e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
     
