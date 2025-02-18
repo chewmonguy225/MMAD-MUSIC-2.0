@@ -14,33 +14,30 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "album")
 public class Album extends Item { 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "artist_id", nullable = false)
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    private Artist artist;
+    //@ManyToOne(fetch = FetchType.LAZY)
+    //@JoinColumn(name = "artist_id", nullable = false)
+    //@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @Column(name = "artist_id", nullable = false)
+    private int artistID;
 
     public Album(){super();}
 
-    public Album(String sourceID, String name, Artist artist){
+    public Album(String sourceID, String name, int artistID){
         super(sourceID, name);
-        this.artist = artist;
+        this.artistID = artistID;
     }
 
-    public Album(int id, String sourceID, String name, Artist artist){
+    public Album(int id, String sourceID, String name, int artistID){
         super(id, sourceID, name);
-        this.artist = artist;
-    }
-
-    public Artist artist(){
-        return this.artist;
+        this.artistID = artistID;
     }
 
     public void setID(int id){
         this.id = id;
     }
 
-    public Artist getArtist(){
-        return this.artist;
+    public int getArtist(){
+        return this.artistID;
     }
 
 }
