@@ -12,10 +12,5 @@ public interface UserRepo extends JpaRepository<User, Long> {
     void deleteUserById(Long id);
     void deleteByUsernameAndPassword(String username, String password);
     Optional<User> findUserByUsernameAndPassword(String username, String password);
-    
-    // @Modifying
-    // @Transactional
-    // @Query("UPDATE User u SET u.friendList = :friendList WHERE u.id = :userId")
-    // void updateFriendList(@Param("userId") Long userId, @Param("friendList") Set<User> friendList);
-
+   
 }

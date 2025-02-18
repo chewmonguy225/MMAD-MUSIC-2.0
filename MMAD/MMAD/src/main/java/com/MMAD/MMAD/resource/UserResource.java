@@ -1,5 +1,7 @@
 package com.MMAD.MMAD.resource;
 
+import java.util.Set;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,7 @@ import jakarta.transaction.Transactional;
 @RequestMapping("/user")
 public class UserResource {
     private final UserService userService;
+
 
     public UserResource(UserService userService){
         this.userService = userService;
@@ -70,7 +73,7 @@ public class UserResource {
 
 
     @Transactional
-    @GetMapping("/delete")
+    @PostMapping("/delete")
     public ResponseEntity<String> deleteUserById(@RequestParam("id") Long id) {
         try {
             userService.deleteUserById(id);
@@ -91,6 +94,18 @@ public class UserResource {
         } catch (Exception e) {
             System.err.println("Error adding friend: " + e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+    @GetMapping("/friends")
+    public ResponseEntity<Set<User>> getFriendList(@RequestParam("id") Long id) {
+        try {
+            Set<User> friends = userService.getFriendList(id);
+            return new ResponseEntity<>(friends, HttpStatus.OK);
+        } catch (Exception e) {
+            System.err.println("Error retrieving friends list: " + e.getMessage());
+            return ResponseEntity.badRequest().body(null);
         }
     }
     
