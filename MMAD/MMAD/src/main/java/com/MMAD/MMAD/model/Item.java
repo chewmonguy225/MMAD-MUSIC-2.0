@@ -15,7 +15,7 @@ public abstract class Item {
     protected String name;
     
     @Column(nullable = true)
-    protected String imageURL = "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png";
+    protected String imageURL;
 
     public Item() {}
 

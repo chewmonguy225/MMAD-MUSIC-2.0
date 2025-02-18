@@ -8,7 +8,6 @@ USE MMAD;
 DROP TABLE IF EXISTS User;
 
 CREATE TABLE User (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(255) PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
 );
@@ -41,7 +40,7 @@ CREATE TABLE Song (
     name VARCHAR(255) NOT NULL,
     imageurl VARCHAR(255) DEFAULT 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png',
     album_id INT NOT NULL,
-    FOREIGN KEY (album_id) REFERENCES Album(id),
+    FOREIGN KEY (album_id) REFERENCES Album(id)
     artist_id INT NOT NULL,
     FOREIGN KEY (artist_id) REFERENCES Artist(id)
 );
@@ -49,19 +48,19 @@ CREATE TABLE Song (
 DROP TABLE IF EXISTS Playlist;
 
 CREATE TABLE Playlist (
-    user_id BIGINT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES User(id),
+    username VARCHAR(255) NOT NULL,
+    FOREIGN KEY (username) REFERENCES User(username)
     song_id INT NOT NULL,
     FOREIGN KEY (song_id) REFERENCES Song(id),
-    PRIMARY KEY (user_id, song_id)
+    PRIMARY KEY (username, song_id)
 );
 
 DROP TABLE IF EXISTS Review;
 
 CREATE TABLE Review (
     id VARCHAR(255) PRIMARY KEY,
-    user_id BIGINT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES User(id),
+    username VARCHAR(255) NOT NULL,
+    FOREIGN KEY (username) REFERENCES User(username)
     rating INT NOT NULL,
     text VARCHAR(255) NOT NULL,
     song_id INT NOT NULL,
@@ -69,11 +68,12 @@ CREATE TABLE Review (
     CONSTRAINT rating CHECK (rating >= 0 AND rating <= 5)
 );
 
-DROP TABLE IF EXISTS user_friends;
+DROP TABLE IF EXISTS user_friend;
 
-CREATE TABLE user_friends (
-    user_id BIGINT NOT NULL,
-    friend_id BIGINT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES User(id),
-    FOREIGN KEY (friend_id) REFERENCES User(id)
+CREATE TABLE user_friend (
+    username VARCHAR(255) NOT NULL,
+    friend_username VARCHAR(255) NOT NULL,
+    PRIMARY KEY (username, friend_username),
+    FOREIGN KEY (username) REFERENCES User(username),
+    FOREIGN KEY (friend_username) REFERENCES User(username)
 );

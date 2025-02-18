@@ -14,9 +14,9 @@ import jakarta.persistence.OneToMany;
 @Entity
 public class Artist extends Item {
     // Define relationships if any
-    //@OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    //@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    //private List<Album> albums;
+    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    private List<Album> albums;
 
     public Artist() {
         super();
