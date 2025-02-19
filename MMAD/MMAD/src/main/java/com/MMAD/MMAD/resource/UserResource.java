@@ -21,14 +21,26 @@ import jakarta.transaction.Transactional;
 @RestController
 @RequestMapping("/user")
 public class UserResource {
+
     private final UserService userService;
 
 
+    /**
+     * Constructor for UserResource.
+     * 
+     * @param userService The UserService to be used.
+     */
     public UserResource(UserService userService){
         this.userService = userService;
     }
 
 
+    /**
+     * Get a user by their id.
+     * 
+     * @param id The id of the user to be retrieved.
+     * @return The user with the given id.
+     */
     @GetMapping("/find/id")
     public ResponseEntity<User> getUserById(@RequestParam("id") Long id) {
         try {
@@ -40,6 +52,12 @@ public class UserResource {
     }
 
 
+    /**
+     * Get a user by their username.
+     * 
+     * @param username The username of the user to be retrieved.
+     * @return The user with the given username.
+     */
     @GetMapping("/find/username")
     public ResponseEntity<User> getUserByUsername(@RequestParam("username") String username) {
         try {
@@ -51,6 +69,13 @@ public class UserResource {
     }
 
 
+    /**
+     * Get a user by their username and password.
+     * 
+     * @param username The username of the user to be retrieved.
+     * @param password The password of the user to be retrieved.
+     * @return The user with the given username and password.
+     */
     @GetMapping("/login")
     public ResponseEntity<User> login(@RequestParam("username") String username, @RequestParam("password") String password) {
         try {
@@ -62,6 +87,12 @@ public class UserResource {
     }
     
 
+    /**
+     * Create a new user.
+     * 
+     * @param user The user to be created.
+     * @return The created user.
+     */
     @PostMapping("/create")
     public ResponseEntity<User> addUser(@RequestBody User user) {
         try {
@@ -72,6 +103,12 @@ public class UserResource {
     }
 
 
+    /**
+     * Delete a user by their id.
+     * 
+     * @param id The id of the user to be deleted.
+     * @return A message indicating the success of the deletion.
+     */
     @Transactional
     @PostMapping("/delete")
     public ResponseEntity<String> deleteUserById(@RequestParam("id") Long id) {
@@ -83,6 +120,14 @@ public class UserResource {
         }
     }
 
+
+    /**
+     * Add a friend to a user's friend list.
+     * 
+     * @param id The id of the user to add a friend to.
+     * @param friendId The id of the friend to be added.
+     * @return A message indicating the success of the addition.
+     */
     @Transactional
     @PostMapping("/friends/add")
     public ResponseEntity<String> addFriend(@RequestParam("id") Long id, @RequestParam("friendId") Long friendId) {
@@ -98,6 +143,12 @@ public class UserResource {
     }
 
 
+    /**
+     * Get the friends list of a user.
+     * 
+     * @param id The id of the user whose friends list is being retrieved.
+     * @return A Set of User objects which are in friends list of the user with the provided id.
+     */
     @GetMapping("/friends")
     public ResponseEntity<Set<User>> getFriendList(@RequestParam("id") Long id) {
         try {
@@ -108,6 +159,24 @@ public class UserResource {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+
+    /**
+     * Remove all friends from a user's friend list.
+     * 
+     * @param id The id of the user to remove a friend from.
+     * @return A message indicating the success of the removal.
+     */
+    @PostMapping("/friends/removeAll")
+    public ResponseEntity<String> removeAllFriends(@RequestParam("id") Long id) {
+        try {
+            userService.removeAllFriends(id);
+            return ResponseEntity.ok().body("All friends removed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    
     
 
 

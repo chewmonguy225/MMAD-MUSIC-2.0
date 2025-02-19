@@ -18,26 +18,66 @@ public class UserService {
     private final UserRepo userRepo;
 
 
+    /**
+     * Constructor for UserService.
+     * 
+     * @param userRepo The UserRepo to be used.
+     * @throws RuntimeException if the userRepo is null.
+     */
     public UserService(UserRepo userRepo) {
-        this.userRepo = userRepo;
+        try {
+            this.userRepo = userRepo;
+        } catch (Exception e) {
+            System.err.println("Error creating UserService: " + e.getMessage());
+            throw new RuntimeException("Error creating UserService");
+        }
     }
 
 
+    /**
+     * Get a user by their id.
+     * 
+     * @param id The id of the user to be retrieved.
+     * @return An Optional object containing the user with the given id if exists. If not found, isPresent() will return false.
+     * @throws RuntimeException if the user does not exist.
+     */
     public Optional<User> findUserById(Long id) {
         return userRepo.findUserById(id);
     }
 
 
+    /**
+     * Get a user by their username.
+     * 
+     * @param username The username of the user to be retrieved.
+     * @return An Optional object containing the user with the given username if exists. If not found, isPresent() will return false.
+     * @throws RuntimeException if the user does not exist.
+     */
     public Optional<User> findUserByUsername(String username) {
         return userRepo.findUserByUsername(username);
     }
 
 
+    /**
+     * Get a user by their username and password.
+     * 
+     * @param username The username of the user to be retrieved.
+     * @param password The password of the user to be retrieved.
+     * @return An Optional object containing the user with the given username and password if exists. If not found, isPresent() will return false.
+     * @throws RuntimeException if the user does not exist.
+     */
     public Optional<User> findUserByUsernameAndPassword(String username, String password) {
         return userRepo.findUserByUsernameAndPassword(username, password);
     }
 
 
+    /**
+     * Create a new user.
+     * 
+     * @param user The user to be created.
+     * @return The created User object.
+     * @throws RuntimeException if the user already exists.
+     */
     public User createUser(User user) {
         Optional<User> existingUser = findUserByUsername(user.getUsername());
         if (existingUser.isPresent()) {
@@ -48,6 +88,12 @@ public class UserService {
     }
 
 
+    /**
+     * Delete a user by id.
+     * 
+     * @param id The id of the user to be deleted.
+     * @throws RuntimeException if the user does not exist.
+     */
     public void deleteUserById(Long id) {
         Optional<User> existingUser = findUserById(id);
         if (existingUser.isPresent()) {
@@ -58,6 +104,13 @@ public class UserService {
     }
 
 
+    /**
+     * Adds a friend to the user's friend list.
+     * 
+     * @param userId The id of the user to add a friend to.
+     * @param friendId The id of the friend to be added.
+     * @throws IllegalArgumentException if the friend is already a friend, or if the friend is the user itself, or if the friend is null.
+     */
     public void addFriend(Long userId, Long friendId) {
 
         try {
@@ -83,21 +136,70 @@ public class UserService {
     }
 
 
+    /**
+     * Get the friend list of a user.
+     * 
+     * @param userId The id of the user whose friend list is to be retrieved.
+     * @return A set of User objects representing the friends of the user.
+     * @throws RuntimeException if the user does not exist.
+     */
     public Set<User> getFriendList(Long userId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
-        return user.getFriendsList();
+        try {
+            User user = userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+            return user.getFriendsList();
+        } catch (Exception e) {
+            System.err.println("Error getting friend list: " + e.getMessage());
+            throw new RuntimeException("Error getting friend list");
+        }
     }
 
 
-    // public void removeFriend(User user, User friend) {
-    //     Optional<User> existingUser = findUserById(user.getId());
-    //     Optional<User> existingFriend = findUserById(friend.getId());
-    //     if (existingUser.isPresent() && existingFriend.isPresent()) {
-    //         userRepo.deleteUserById(friend.getId());
-    //     } else {
-    //         throw new RuntimeException("User does not exist");
-    //     }
-    // }
+    /**
+     * Removes a friend from the user's friend list.
+     * 
+     * @param userId The id of the user to remove a friend from.
+     * @param friendId The id of the friend to be removed.
+     * @throws IllegalArgumentException if the friend is not a friend, or if the friend is the user itself, or if the friend is null.
+     */
+    public void removeFriend(Long userId, Long friendId) {
+        try {
+            User user = userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+            Set<User> friendList = user.getFriendsList();
+            User friend = userRepo.findById(friendId).orElseThrow(() -> new EntityNotFoundException("Friend not found"));
+            if (!friendList.contains(friend)) {
+                throw new IllegalArgumentException("User is not a friend");
+            } 
+            else if (friend == user) {
+                throw new IllegalArgumentException("Cannot remove self as a friend");
+            } 
+            else if (friend == null) {
+                throw new IllegalArgumentException("Friend cannot be null");
+            }
+            else {
+                friendList.remove(friend);
+                userRepo.save(user);
+            }
+        } catch (Exception e) {
+            System.err.println("Error removing friend: " + e.getMessage());
+            throw new RuntimeException("Error removing friend");
+        }
+    }
 
 
+    /**
+     * Remove all friends from a user's friend list.
+     * 
+     * @param userId The id of the user whose friends are to be removed.
+     * @throws RuntimeException if the user does not exist.
+     */
+    public void removeAllFriends(Long userId) {
+        try {
+            User user = userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+            user.getFriendsList().clear();
+            userRepo.save(user);
+        } catch (Exception e) {
+            System.err.println("Error removing all friends: " + e.getMessage());
+            throw new RuntimeException("Error removing all friends");
+        }
+    }
 }
