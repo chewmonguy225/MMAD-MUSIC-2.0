@@ -1,7 +1,7 @@
 export abstract class Item{
     constructor(
         protected id: number = 0,
-        protected sourceId: String = "",
+        protected sourceID: String = "",
         protected name: String,
         protected imageURL: String = "default.jpg") { }
 
@@ -14,7 +14,7 @@ export abstract class Item{
     }
 
     getSourceId(): string {
-        return `${this.sourceId}`;
+        return `${this.sourceID}`;
     }
 
     getName(): string {

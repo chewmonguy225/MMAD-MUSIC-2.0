@@ -14,4 +14,6 @@ export class ArtistService {
   getArtistWithId(id: number): Observable<any> {
     return this.http.get(`${this.apiUrl}${id}`);
   }
+
+  
 }
