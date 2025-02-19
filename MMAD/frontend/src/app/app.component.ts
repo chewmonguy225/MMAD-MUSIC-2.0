@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { ArtistComponent } from './component/artist/artist.component';
 import { HeaderComponent } from './header/header.component';
 
+
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, HeaderComponent, ArtistComponent],
