@@ -113,7 +113,7 @@ public class UserResource {
     @PostMapping("/delete")
     public ResponseEntity<String> deleteUserById(@RequestParam("id") Long id) {
         try {
-            userService.deleteUserById(id);
+            userService.deleteUser(id);
             return ResponseEntity.ok().body("User deleted successfully");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

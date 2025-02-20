@@ -94,10 +94,13 @@ public class UserService {
      * @param id The id of the user to be deleted.
      * @throws RuntimeException if the user does not exist.
      */
-    public void deleteUserById(Long id) {
+    public void deleteUser(Long id) {
         Optional<User> existingUser = findUserById(id);
         if (existingUser.isPresent()) {
-            userRepo.deleteUserById(id);
+            User user = existingUser.get();
+            userRepo.deleteUserFromFriends(id); // Remove the user from all friend lists
+            user.getFriendsList().clear(); // Clear the user's friend list
+            userRepo.delete(user);
         } else {
             throw new RuntimeException("User does not exist");
         }
@@ -194,7 +197,15 @@ public class UserService {
      */
     public void removeAllFriends(Long userId) {
         try {
-            User user = userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+            // User user = userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+            // user.getFriendsList().clear();
+            // userRepo.save(user);
+            User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+            Set<User> friends = user.getFriendsList();
+            for (User friend : friends) {
+                friend.getFriendsList().remove(user);
+                userRepo.save(friend);
+            }
             user.getFriendsList().clear();
             userRepo.save(user);
         } catch (Exception e) {

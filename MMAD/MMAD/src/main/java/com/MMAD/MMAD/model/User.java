@@ -61,50 +61,6 @@ public class User implements Serializable{
 
 
     /**
-     * Adds a friend to the user's friend list.
-     *
-     * @param friend The user to be added as a friend.
-     * @throws IllegalArgumentException if the friend is already a friend, or if the friend is the user itself, or if the friend is null.
-     */
-    public void addFriend(User friend) {
-        if (friendList.contains(friend)) {
-            throw new IllegalArgumentException("User is already a friend");
-        }
-        else if (friend == this) {
-            throw new IllegalArgumentException("Cannot add self as a friend");
-        }
-        else if (friend == null) {
-            throw new IllegalArgumentException("Friend cannot be null");
-        }
-        else {
-            friendList.add(friend);
-        }
-    }
-
-
-    /**
-     * Removes a friend from the user's friend list.
-     *
-     * @param friend The user to be removed as a friend.
-     * @throws IllegalArgumentException if the friend is not a friend, or if the friend is the user itself, or if the friend is null.
-     */
-    public void removeFriend(User friend) {
-        if (!friendList.contains(friend)) {
-            throw new IllegalArgumentException("User is not a friend");
-        }
-        else if (friend == this) {
-            throw new IllegalArgumentException("Cannot remove self as a friend");
-        }
-        else if (friend == null) {
-            throw new IllegalArgumentException("Friend cannot be null");
-        }
-        else {
-            friendList.remove(friend);
-        }
-    }
-
-
-    /**
      * 
      * Getters and setters for all attributes below.
      * Validation is done in the setters.
@@ -134,8 +90,6 @@ public class User implements Serializable{
             throw new IllegalArgumentException("Username cannot contain special characters");
         }
         else {
-            // ** NOTE: In order to check if the username is already taken, we need a repo method that queries the User table *
-            // **       We need to do that here. once all validation done we set username below
             this.username = username;
         }
     }
