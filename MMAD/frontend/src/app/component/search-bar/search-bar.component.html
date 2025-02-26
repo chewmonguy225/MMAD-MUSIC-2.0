@@ -1,0 +1,7 @@
+<!-- Search Bar -->
+<div>
+    <input type="text" [value]="searchQuery" (input)="onSearchInput($event)" placeholder="Search for an artist..." />
+    <button (click)="searchArtist()">Search</button>
+
+    <app-artist *ngIf="item" [item]="item"></app-artist>
+</div>

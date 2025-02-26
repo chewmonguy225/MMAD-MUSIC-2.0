@@ -1,0 +1,9 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<div class="card">
+  <img [src]="item?.getImageURL()" alt="Artist Image" style="width:100%">
+  <h1>{{ item?.getName() }}</h1>
+  <a href="#" (click)="onSpotifyClick()"><i class="fa fa-spotify"></i></a> <!-- Calls the method when clicked -->
+  <a href="#"><i class="fa fa-apple"></i></a>
+</div>
+
