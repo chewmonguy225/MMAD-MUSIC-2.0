@@ -29,14 +29,11 @@ public class SpotifyResource {
 
     @GetMapping("/search/artist/{artistName}")
     public ResponseEntity<List<Artist>> searchArtist(@PathVariable String artistName) {
-        // Call the service to get the items
         List<Item> items = spotifyService.searchItem(artistName, "artist");
 
-        // Convert the List<Item> to List<Artist> if you're sure that the list only
-        // contains Artist objects
         List<Artist> artists = items.stream()
-                .filter(item -> item instanceof Artist) // Ensure it's an instance of Artist
-                .map(item -> (Artist) item) // Cast it to Artist
+                .filter(item -> item instanceof Artist) 
+                .map(item -> (Artist) item) 
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(artists);
