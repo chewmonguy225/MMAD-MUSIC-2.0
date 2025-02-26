@@ -19,7 +19,7 @@ public class ArtistService {
         this.artistRepo = artistRepo;
     }
 
-    public Artist findArtistById(int id) {
+    public Artist findArtistById(Long id) {
         return artistRepo.findArtistById(id).orElseThrow(() -> new RuntimeException("Artist not found"));
     }
 
@@ -36,7 +36,7 @@ public class ArtistService {
         }
     }
 
-    public void deleteArtist(int id){
+    public void deleteArtist(Long id){
         artistRepo.deleteById(id);
     }
 

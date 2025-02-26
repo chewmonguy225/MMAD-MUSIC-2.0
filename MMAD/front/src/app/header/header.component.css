@@ -1,0 +1,53 @@
+header {
+    display: flex;
+    padding-inline: 16px;
+    padding-block: 16px;
+    background-color: #fe7614;
+    color: white;
+    align-items: center;
+    justify-content: space-between;
+
+    h1,
+    h2,
+    h3,
+    p,
+    span,
+    div {
+        font-family: Georgia, 'Times New Roman', Times, serif;
+    }
+
+
+
+    nav {
+        display: flex;
+        justify-content: flex-start;
+        gap: 20px;
+        align-items: center;
+        width: 100%;
+        font-size: 25px;
+
+        >span {
+            cursor: pointer;
+
+            &:hover {
+                color: #777
+            }
+        }
+    }
+
+    nav:nth-of-type(2) {
+        display: flex;
+        justify-content: flex-end;
+        gap: 20px;
+        align-items: center;
+        width: 100%;
+
+        >span {
+            cursor: pointer;
+
+            &:hover {
+                color: #777
+            }
+        }
+    }
+}

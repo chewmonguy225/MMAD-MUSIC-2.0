@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository;
 import com.MMAD.MMAD.model.Artist;
 
 @Repository
-public interface ArtistRepo extends JpaRepository<Artist, Integer> {
-    void deleteArtistById(int id);
-    Optional<Artist> findArtistById(int id);
+public interface ArtistRepo extends JpaRepository<Artist, Long> {
+    void deleteArtistById(Long id);
+    Optional<Artist> findArtistById(Long id);
     Optional<Artist> findArtistBySourceId(String sourceId);
 }
