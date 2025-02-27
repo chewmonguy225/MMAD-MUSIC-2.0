@@ -7,6 +7,6 @@ import com.MMAD.MMAD.model.Album;
 
 @Repository
 public interface AlbumRepo extends JpaRepository<Album, Integer> {
-    void deleteAlbumById(int id);
+    void deleteAlbumById(Long id);
 
 }

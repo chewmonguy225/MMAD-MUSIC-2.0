@@ -7,7 +7,7 @@ public abstract class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, updatable = false)
-    protected int id;
+    protected Long id;
     
     @Column(name = "source_id", nullable = false)
     protected String sourceId;
@@ -30,7 +30,7 @@ public abstract class Item {
         this.name = name;
     }
 
-    public Item(int id, String sourceId, String name) {
+    public Item(Long id, String sourceId, String name) {
         this.id = id;
         this.sourceId = sourceId;
         this.name = name;
@@ -44,11 +44,11 @@ public abstract class Item {
         this.imageURL = imageURL;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

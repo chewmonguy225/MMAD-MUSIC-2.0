@@ -59,7 +59,6 @@ public class SpotifyService {
         }
     }
 
-
     //type: artist or artist,track (for artist and track) or artist,track,album etc.
     public List<Item> searchItem(String itemName, String type) {
         List<Item> itemList = new ArrayList<>();

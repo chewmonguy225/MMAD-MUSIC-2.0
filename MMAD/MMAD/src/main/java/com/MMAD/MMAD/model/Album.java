@@ -18,25 +18,25 @@ public class Album extends Item {
     //@JoinColumn(name = "artist_id", nullable = false)
     //@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @Column(name = "artist_id", nullable = false)
-    private int artistID;
+    private Long artistID;
 
     public Album(){super();}
 
-    public Album(String sourceID, String name, int artistID){
+    public Album(String sourceID, String name, Long artistID){
         super(sourceID, name);
         this.artistID = artistID;
     }
 
-    public Album(int id, String sourceID, String name, int artistID){
+    public Album(Long id, String sourceID, String name, Long artistID){
         super(id, sourceID, name);
         this.artistID = artistID;
     }
 
-    public void setID(int id){
+    public void setID(Long id){
         this.id = id;
     }
 
-    public int getArtist(){
+    public Long getArtist(){
         return this.artistID;
     }
 

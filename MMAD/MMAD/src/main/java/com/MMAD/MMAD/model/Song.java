@@ -4,29 +4,29 @@ import jakarta.persistence.Entity;
 
 //@Entity
 public class Song extends Item{
-    private int albumID;
-    private int artistID;
+    private Long albumID;
+    private Long artistID;
 
-    public Song(String sourceId, String name, int artistID, int albumID){
+    public Song(String sourceId, String name, Long artistID, Long albumID){
         super(sourceId, name);
         this.artistID = artistID;
         this.albumID = albumID;
     }
-    public Song(int id,String sourceId, String name, int artistID, int albumID){
+    public Song(Long id,String sourceId, String name, Long artistID, Long albumID){
         super(id, sourceId, name);
         this.artistID = artistID;
         this.albumID = albumID;
     }
 
-    public void setID(int id){
+    public void setID(Long id){
         this.id = id;
     }
 
-    public int getAlbum(){
+    public Long getAlbum(){
         return this.albumID;
     }
 
-    public int getArtist(){
+    public Long getArtist(){
         return this.artistID;
     }
 }
