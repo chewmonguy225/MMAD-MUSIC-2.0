@@ -30,11 +30,11 @@ public class Artist extends Item {
         super(imageURL, sourceId, name);
     }
 
-    public Artist(int id, String sourceId, String name) {
+    public Artist(Long id, String sourceId, String name) {
         super(id, sourceId, name);
     }
 
-    public void setID(int id) {
+    public void setID(Long id) {
         this.id = id;
     }
 }

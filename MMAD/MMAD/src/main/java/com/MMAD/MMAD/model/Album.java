@@ -14,19 +14,20 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "album")
 public class Album extends Item { 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "artist_id", nullable = false)
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    private Artist artist;
+    //@ManyToOne(fetch = FetchType.LAZY)
+    //@JoinColumn(name = "artist_id", nullable = false)
+    //@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @Column(name = "artist_id", nullable = false)
+    private Long artistID;
 
     public Album(){super();}
 
-    public Album(String sourceID, String name, Artist artist){
+    public Album(String sourceID, String name, Long artistID){
         super(sourceID, name);
         this.artist = artist;
     }
 
-    public Album(int id, String sourceID, String name, Artist artist){
+    public Album(Long id, String sourceID, String name, Long artistID){
         super(id, sourceID, name);
         this.artist = artist;
     }
@@ -35,12 +36,12 @@ public class Album extends Item {
         return this.artist;
     }
 
-    public void setID(int id){
+    public void setID(Long id){
         this.id = id;
     }
 
-    public Artist getArtist(){
-        return this.artist;
+    public Long getArtist(){
+        return this.artistID;
     }
 
 }
