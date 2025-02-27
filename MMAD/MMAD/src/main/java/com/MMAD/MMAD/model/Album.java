@@ -1,14 +1,7 @@
 package com.MMAD.MMAD.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -24,16 +17,16 @@ public class Album extends Item {
 
     public Album(String sourceID, String name, Long artistID){
         super(sourceID, name);
-        this.artist = artist;
+        this.artistID = artistID;
     }
 
     public Album(Long id, String sourceID, String name, Long artistID){
         super(id, sourceID, name);
-        this.artist = artist;
+        this.artistID = artistID;
     }
 
-    public Artist artist(){
-        return this.artist;
+    public Long artist(){
+        return this.artistID;
     }
 
     public void setID(Long id){

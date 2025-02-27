@@ -1,6 +1,10 @@
 package com.MMAD.MMAD.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public abstract class Item {
@@ -15,7 +19,7 @@ public abstract class Item {
     protected String name;
     
     @Column(nullable = true)
-    protected String imageURL;
+    protected String imageURL = "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png";;
 
     public Item() {}
 

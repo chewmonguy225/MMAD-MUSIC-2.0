@@ -1,16 +1,10 @@
 package com.MMAD.MMAD.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.JoinColumn;
 
 @Entity
 public class Playlist {
@@ -57,14 +51,14 @@ public class Playlist {
     }
 
 
-    public Set<Long> getSongIDs() {
-        return songIDs;
-    }
+    // public Set<Long> getSongIDs() {
+    //     return songIDs;
+    // }
 
 
-    public void setSongs(Set<Long> songIDs) {
-        this.songIDs = songIDs;
-    }
+    // public void setSongs(Set<Long> songIDs) {
+    //     this.songIDs = songIDs;
+    // }
 
 
     public User getUser() {
