@@ -5,10 +5,12 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.MMAD.MMAD.model.Album;
+import com.MMAD.MMAD.model.Artist;
 import com.MMAD.MMAD.service.AlbumService;
 
 @RestController
@@ -20,10 +22,10 @@ public class AlbumResource {
         this.albumService = albumService;
     }
 
-    @GetMapping("/all")
-    public ResponseEntity findAllAlbums(){
-        List<Album> albums  = albumService.findAllAlbums();
-       return new ResponseEntity<>(albums, HttpStatus.OK);
+    @GetMapping("/find/{id}")
+    public ResponseEntity<Album> getArtistById(@PathVariable("id") Long id){
+        Album album = albumService.findAlbumById(id);
+        return new ResponseEntity<>(album, HttpStatus.OK);
     }
 
     @RequestMapping("/test")

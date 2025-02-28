@@ -15,7 +15,11 @@ public class AlbumService {
     @Autowired
     public AlbumService(AlbumRepo albumRepo) {
         this.albumRepo = albumRepo;
-    } 
+    }
+
+    public Album findAlbumById(Long id) {
+        return albumRepo.findById(id).orElseThrow(() -> new RuntimeException("Album not found"));
+    }
 
     public List<Album> findAllAlbums(){
         return albumRepo.findAll();
