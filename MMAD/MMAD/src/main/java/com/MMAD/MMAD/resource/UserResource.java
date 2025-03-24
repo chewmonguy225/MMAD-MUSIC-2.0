@@ -1,21 +1,16 @@
 package com.MMAD.MMAD.resource;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.MMAD.MMAD.exception.UserNotFoundException;
 import com.MMAD.MMAD.model.User;
 import com.MMAD.MMAD.service.UserService;
 
@@ -29,20 +24,14 @@ public class UserResource {
 
     private final UserService userService;
 
-    private final ModelMapper modelMapper;
-
-    private record UserDTO (String username, List<Long> friendIds, List<Long> playlists) {};
-
 
     /**
      * Constructor for UserResource.
      * 
      * @param userService The UserService to be used.
-     * @param modelMapper the ModelMapper to be used.
      */
-    public UserResource(UserService userService, ModelMapper modelMapper){
+    public UserResource(UserService userService){
         this.userService = userService;
-        this.modelMapper = modelMapper;
     }
 
 
@@ -52,17 +41,14 @@ public class UserResource {
      * @param id The id of the user to be retrieved.
      * @return The user with the given id.
      */
-    @GetMapping("/id/{id}")
-    public UserDTO getUserById(@PathVariable("id") Long id) {
-
+    @GetMapping("/find/id")
+    public ResponseEntity<User> getUserById(@RequestParam("id") Long id) {
         try {
             User user = userService.findUserById(id).orElseThrow(() -> new RuntimeException("User not found"));
-            return modelMapper.map(user, UserDTO.class);
-        } 
-        catch (UserNotFoundException ex) {
-            throw new UserNotFoundException(ex.getMessage());
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
         }
-
     }
 
 
@@ -72,13 +58,13 @@ public class UserResource {
      * @param username The username of the user to be retrieved.
      * @return The user with the given username.
      */
-    @GetMapping("/username/{username}")
-    public UserDTO getUserByUsername(@RequestParam("username") String username) {
+    @GetMapping("/find/username")
+    public ResponseEntity<User> getUserByUsername(@RequestParam("username") String username) {
         try {
             User user = userService.findUserByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
-            return modelMapper.map(user, UserDTO.class);
-        } catch (UserNotFoundException ex) {
-            throw new UserNotFoundException(ex.getMessage());
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
         }
     }
 
@@ -88,15 +74,15 @@ public class UserResource {
      * 
      * @param username The username of the user to be retrieved.
      * @param password The password of the user to be retrieved.
-     * @return The UserDTO if login was successful
+     * @return The user with the given username and password.
      */
     @GetMapping("/login")
-    public UserDTO login(@RequestParam("username") String username, @RequestParam("password") String password) {
+    public ResponseEntity<User> login(@RequestParam("username") String username, @RequestParam("password") String password) {
         try {
             User user = userService.findUserByUsernameAndPassword(username, password).orElseThrow(() -> new RuntimeException("User not found"));
-            return modelMapper.map(user, UserDTO.class);
-        } catch (UserNotFoundException ex) {
-            throw new UserNotFoundException(ex.getMessage());
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
         }
     }
     
@@ -149,7 +135,7 @@ public class UserResource {
             User user = userService.findUserById(id).orElseThrow(() -> new RuntimeException("User not found"));
             User friend = userService.findUserById(friendId).orElseThrow(() -> new RuntimeException("Friend not found"));
             userService.addFriend(id, friendId);
-            return ResponseEntity.ok().body("Friend added successfully");
+            return ResponseEntity.ok().body("User added successfully");
         } catch (Exception e) {
             System.err.println("Error adding friend: " + e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -167,11 +153,6 @@ public class UserResource {
     public ResponseEntity<Set<User>> getFriendList(@RequestParam("id") Long id) {
         try {
             Set<User> friends = userService.getFriendList(id);
-
-            Set<UserDTO> friendDTOs = new HashSet<>();
-            for(User user: friends){
-                friendDTOs.add(modelMapper.map(user, UserDTO.class));
-            }
             return new ResponseEntity<>(friends, HttpStatus.OK);
         } catch (Exception e) {
             System.err.println("Error retrieving friends list: " + e.getMessage());
