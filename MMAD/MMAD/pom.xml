@@ -54,11 +54,18 @@
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		    <dependency>
+				<groupId>org.mapstruct</groupId>
+				<artifactId>mapstruct</artifactId>
+				<version>1.5.3.Final</version>
+			</dependency>
 		
     	<!--<dependency>
       		<groupId>se.michaelthelin.spotify</groupId>
@@ -69,14 +76,12 @@
     	<dependency>
       		<groupId>junit</groupId>
       		<artifactId>junit</artifactId>
-      		<version>4.13.2</version>
       		<scope>test</scope>
     	</dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>2.0.7</version>
     </dependency>
 	</dependencies>
 

@@ -5,7 +5,10 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
+import com.MMAD.MMAD.exception.UserNotFoundException;
 import com.MMAD.MMAD.model.User;
+import com.MMAD.MMAD.model.UserDTO;
+import com.MMAD.MMAD.model.UserDTOMapper;
 import com.MMAD.MMAD.repo.UserRepo;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -16,6 +19,7 @@ import jakarta.transaction.Transactional;
 public class UserService {
 
     private final UserRepo userRepo;
+    private final UserDTOMapper userDTOMapper;
 
 
     /**
@@ -24,9 +28,10 @@ public class UserService {
      * @param userRepo The UserRepo to be used.
      * @throws RuntimeException if the userRepo is null.
      */
-    public UserService(UserRepo userRepo) {
+    public UserService(UserRepo userRepo, UserDTOMapper userDTOMapper) {
         try {
             this.userRepo = userRepo;
+            this.userDTOMapper = userDTOMapper;
         } catch (Exception e) {
             System.err.println("Error creating UserService: " + e.getMessage());
             throw new RuntimeException("Error creating UserService");
@@ -38,11 +43,13 @@ public class UserService {
      * Get a user by their id.
      * 
      * @param id The id of the user to be retrieved.
-     * @return An Optional object containing the user with the given id if exists. If not found, isPresent() will return false.
-     * @throws RuntimeException if the user does not exist.
+     * @return UserDTO object
+     * @throws UserNotFoundException if the user does not exist.
      */
-    public Optional<User> findUserById(Long id) {
-        return userRepo.findUserById(id);
+    public UserDTO findUserById(Long id) {
+        return userRepo.findUserById(id)
+                .map(userDTOMapper::apply)
+                .orElseThrow(() -> new UserNotFoundException("user with id id [%s] not found".formatted(id)));
     }
 
 
@@ -51,10 +58,12 @@ public class UserService {
      * 
      * @param username The username of the user to be retrieved.
      * @return An Optional object containing the user with the given username if exists. If not found, isPresent() will return false.
-     * @throws RuntimeException if the user does not exist.
+     * @throws UserNotFoundException if the user does not exist.
      */
-    public Optional<User> findUserByUsername(String username) {
-        return userRepo.findUserByUsername(username);
+    public UserDTO findUserByUsername(String username) {
+        return userRepo.findUserByUsername(username)
+                .map(userDTOMapper::apply) 
+                .orElseThrow(() -> new UserNotFoundException("user with id id [%s] not found".formatted(username)));
     }
 
 
@@ -79,7 +88,7 @@ public class UserService {
      * @throws RuntimeException if the user already exists.
      */
     public User createUser(User user) {
-        Optional<User> existingUser = findUserByUsername(user.getUsername());
+        Optional<User> existingUser = userRepo.findUserByUsername(user.getUsername());
         if (existingUser.isPresent()) {
             throw new RuntimeException("User already exists");
         } else {
@@ -95,7 +104,7 @@ public class UserService {
      * @throws RuntimeException if the user does not exist.
      */
     public void deleteUser(Long id) {
-        Optional<User> existingUser = findUserById(id);
+        Optional<User> existingUser = userRepo.findUserById(id);
         if (existingUser.isPresent()) {
             User user = existingUser.get();
             userRepo.deleteUserFromFriends(id); // Remove the user from all friend lists
@@ -133,7 +142,7 @@ public class UserService {
                 friendList.add(friend);
                 userRepo.save(user);
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             System.err.println("Error adding friend: " + e.getMessage());
             throw new RuntimeException("Error adding friend");}
     }
@@ -182,7 +191,7 @@ public class UserService {
                 friendList.remove(friend);
                 userRepo.save(user);
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             System.err.println("Error removing friend: " + e.getMessage());
             throw new RuntimeException("Error removing friend");
         }

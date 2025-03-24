@@ -5,6 +5,7 @@ import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.MMAD.MMAD.model.User;
+import com.MMAD.MMAD.model.UserDTO;
 import com.MMAD.MMAD.service.UserService;
 
 import jakarta.transaction.Transactional;
@@ -41,10 +43,10 @@ public class UserResource {
      * @param id The id of the user to be retrieved.
      * @return The user with the given id.
      */
-    @GetMapping("/find/id")
-    public ResponseEntity<User> getUserById(@RequestParam("id") Long id) {
+    @GetMapping("/id/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable("id") Long id) {
         try {
-            User user = userService.findUserById(id).orElseThrow(() -> new RuntimeException("User not found"));
+            UserDTO user = userService.findUserById(id);
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
@@ -58,10 +60,10 @@ public class UserResource {
      * @param username The username of the user to be retrieved.
      * @return The user with the given username.
      */
-    @GetMapping("/find/username")
-    public ResponseEntity<User> getUserByUsername(@RequestParam("username") String username) {
+    @GetMapping("/username/{username}")
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable("username") String username) {
         try {
-            User user = userService.findUserByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+            UserDTO user = userService.findUserByUsername(username);
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
@@ -110,8 +112,8 @@ public class UserResource {
      * @return A message indicating the success of the deletion.
      */
     @Transactional
-    @PostMapping("/delete")
-    public ResponseEntity<String> deleteUserById(@RequestParam("id") Long id) {
+    @PostMapping("/delete/{id}")
+    public ResponseEntity<String> deleteUserById(@PathVariable("id") Long id) {
         try {
             userService.deleteUser(id);
             return ResponseEntity.ok().body("User deleted successfully");
@@ -132,8 +134,8 @@ public class UserResource {
     @PostMapping("/friends/add")
     public ResponseEntity<String> addFriend(@RequestParam("id") Long id, @RequestParam("friendId") Long friendId) {
         try {
-            User user = userService.findUserById(id).orElseThrow(() -> new RuntimeException("User not found"));
-            User friend = userService.findUserById(friendId).orElseThrow(() -> new RuntimeException("Friend not found"));
+            userService.findUserById(id);
+            userService.findUserById(friendId);
             userService.addFriend(id, friendId);
             return ResponseEntity.ok().body("User added successfully");
         } catch (Exception e) {
@@ -149,8 +151,8 @@ public class UserResource {
      * @param id The id of the user whose friends list is being retrieved.
      * @return A Set of User objects which are in friends list of the user with the provided id.
      */
-    @GetMapping("/friends")
-    public ResponseEntity<Set<User>> getFriendList(@RequestParam("id") Long id) {
+    @GetMapping("/friends/{id}")
+    public ResponseEntity<Set<User>> getFriendList(@PathVariable("id") Long id) {
         try {
             Set<User> friends = userService.getFriendList(id);
             return new ResponseEntity<>(friends, HttpStatus.OK);
@@ -167,8 +169,8 @@ public class UserResource {
      * @param id The id of the user to remove a friend from.
      * @return A message indicating the success of the removal.
      */
-    @PostMapping("/friends/removeAll")
-    public ResponseEntity<String> removeAllFriends(@RequestParam("id") Long id) {
+    @PostMapping("/friends/removeAll/{id}")
+    public ResponseEntity<String> removeAllFriends(@PathVariable("id") Long id) {
         try {
             userService.removeAllFriends(id);
             return ResponseEntity.ok().body("All friends removed successfully");

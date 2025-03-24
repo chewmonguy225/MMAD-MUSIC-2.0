@@ -52,13 +52,26 @@ public class User implements Serializable{
 
 
     /**
-     * Constructor taking all parameters. 
+     * Constructor
      * id, friendList, playlists & reviews are all initialized automatically.
      * 
      * @param username The user's username.
      * @param password The user's password.
      */
     public User(String username, String password) { 
+        this.username = username;
+        this.password = password;
+    }
+
+    /**
+     * Constructor taking all parameters. 
+     * id, friendList, playlists & reviews are all initialized automatically.
+     * 
+     * @param username The user's username.
+     * @param password The user's password.
+     */
+    public User(Long id, String username, String password) { 
+        this.id = id;
         this.username = username;
         this.password = password;
     }
@@ -121,5 +134,9 @@ public class User implements Serializable{
 
     public Set<User> getFriendsList() {
         return friendList;
+    }
+
+    public List<Playlist> getPlaylists() {
+        return playlists;
     }
 } 
