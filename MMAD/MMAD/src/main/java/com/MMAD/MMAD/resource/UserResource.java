@@ -1,18 +1,16 @@
 package com.MMAD.MMAD.resource;
 
-import java.util.Set;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.MMAD.MMAD.model.User;
 import com.MMAD.MMAD.model.UserDTO;
 import com.MMAD.MMAD.service.UserService;
 
@@ -79,9 +77,9 @@ public class UserResource {
      * @return The user with the given username and password.
      */
     @GetMapping("/login")
-    public ResponseEntity<User> login(@RequestParam("username") String username, @RequestParam("password") String password) {
+    public ResponseEntity<UserDTO> login(@RequestParam("username") String username, @RequestParam("password") String password) {
         try {
-            User user = userService.findUserByUsernameAndPassword(username, password).orElseThrow(() -> new RuntimeException("User not found"));
+            UserDTO user = userService.findUserByUsernameAndPassword(username, password);
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
@@ -93,12 +91,12 @@ public class UserResource {
      * Create a new user.
      * 
      * @param user The user to be created.
-     * @return The created user.
+     * @return The created user DTO if successful.
      */
     @PostMapping("/create")
-    public ResponseEntity<User> addUser(@RequestBody User user) {
+    public ResponseEntity<UserDTO> addUser(@RequestParam("username") String username, @RequestParam("password") String password) {
         try {
-            return ResponseEntity.ok().body(userService.createUser(user));
+            return ResponseEntity.ok().body(userService.createUser(username, password));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }
@@ -152,9 +150,9 @@ public class UserResource {
      * @return A Set of User objects which are in friends list of the user with the provided id.
      */
     @GetMapping("/friends/{id}")
-    public ResponseEntity<Set<User>> getFriendList(@PathVariable("id") Long id) {
+    public ResponseEntity<List<UserDTO>> getFriendList(@PathVariable("id") Long id) {
         try {
-            Set<User> friends = userService.getFriendList(id);
+            List<UserDTO> friends = userService.getFriendList(id);
             return new ResponseEntity<>(friends, HttpStatus.OK);
         } catch (Exception e) {
             System.err.println("Error retrieving friends list: " + e.getMessage());

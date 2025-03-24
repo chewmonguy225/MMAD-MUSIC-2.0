@@ -6,6 +6,4 @@ public record UserDTO(
     String username,
     List<String> friends,
     List<Long> playlists
-) {
-    
-}
+) {}

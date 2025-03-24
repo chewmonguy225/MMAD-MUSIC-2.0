@@ -1,7 +1,9 @@
 package com.MMAD.MMAD.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import jakarta.transaction.Transactional;
 public class UserService {
 
     private final UserRepo userRepo;
+    
     private final UserDTOMapper userDTOMapper;
 
 
@@ -26,15 +29,16 @@ public class UserService {
      * Constructor for UserService.
      * 
      * @param userRepo The UserRepo to be used.
-     * @throws RuntimeException if the userRepo is null.
+     * @throws RuntimeException if the userRepo or userDTOMapper are null
      */
     public UserService(UserRepo userRepo, UserDTOMapper userDTOMapper) {
-        try {
+        if(userRepo == null){
+            throw new RuntimeException("userRepo cannot be null");
+        } else if(userDTOMapper == null){
+            throw new RuntimeException("userDTOMapper cannot be null");
+        } else {
             this.userRepo = userRepo;
             this.userDTOMapper = userDTOMapper;
-        } catch (Exception e) {
-            System.err.println("Error creating UserService: " + e.getMessage());
-            throw new RuntimeException("Error creating UserService");
         }
     }
 
@@ -43,13 +47,13 @@ public class UserService {
      * Get a user by their id.
      * 
      * @param id The id of the user to be retrieved.
-     * @return UserDTO object
+     * @return UserDTO object for the found user if succussful
      * @throws UserNotFoundException if the user does not exist.
      */
     public UserDTO findUserById(Long id) {
         return userRepo.findUserById(id)
                 .map(userDTOMapper::apply)
-                .orElseThrow(() -> new UserNotFoundException("user with id id [%s] not found".formatted(id)));
+                .orElseThrow(() -> new UserNotFoundException("user with id [%s] not found".formatted(id)));
     }
 
 
@@ -57,13 +61,13 @@ public class UserService {
      * Get a user by their username.
      * 
      * @param username The username of the user to be retrieved.
-     * @return An Optional object containing the user with the given username if exists. If not found, isPresent() will return false.
+     * @return UserDTO object for the found user if succussful
      * @throws UserNotFoundException if the user does not exist.
      */
     public UserDTO findUserByUsername(String username) {
         return userRepo.findUserByUsername(username)
                 .map(userDTOMapper::apply) 
-                .orElseThrow(() -> new UserNotFoundException("user with id id [%s] not found".formatted(username)));
+                .orElseThrow(() -> new UserNotFoundException("user with username [%s] not found".formatted(username)));
     }
 
 
@@ -72,11 +76,13 @@ public class UserService {
      * 
      * @param username The username of the user to be retrieved.
      * @param password The password of the user to be retrieved.
-     * @return An Optional object containing the user with the given username and password if exists. If not found, isPresent() will return false.
-     * @throws RuntimeException if the user does not exist.
+     * @return UserDTO object for the found user if succussful
+     * @throws UserNotFoundException if the user does not exist.
      */
-    public Optional<User> findUserByUsernameAndPassword(String username, String password) {
-        return userRepo.findUserByUsernameAndPassword(username, password);
+    public UserDTO findUserByUsernameAndPassword(String username, String password) {
+        return userRepo.findUserByUsernameAndPassword(username, password)
+                .map(userDTOMapper::apply) 
+                .orElseThrow(() -> new UserNotFoundException("credentials do not match"));
     }
 
 
@@ -87,12 +93,14 @@ public class UserService {
      * @return The created User object.
      * @throws RuntimeException if the user already exists.
      */
-    public User createUser(User user) {
-        Optional<User> existingUser = userRepo.findUserByUsername(user.getUsername());
+    public UserDTO createUser(String username, String password) {
+        Optional<User> existingUser = userRepo.findUserByUsername(username);
         if (existingUser.isPresent()) {
             throw new RuntimeException("User already exists");
         } else {
-            return userRepo.save(user);
+            User newUser = new User(username, password);
+            userRepo.save(newUser);
+            return userDTOMapper.apply(newUser);
         }
     }
 
@@ -155,10 +163,13 @@ public class UserService {
      * @return A set of User objects representing the friends of the user.
      * @throws RuntimeException if the user does not exist.
      */
-    public Set<User> getFriendList(Long userId) {
+    public List<UserDTO> getFriendList(Long userId) {
         try {
-            User user = userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
-            return user.getFriendsList();
+            User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+            return user.getFriendsList()
+                    .stream()
+                    .map(userDTOMapper::apply)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             System.err.println("Error getting friend list: " + e.getMessage());
             throw new RuntimeException("Error getting friend list");
@@ -206,9 +217,6 @@ public class UserService {
      */
     public void removeAllFriends(Long userId) {
         try {
-            // User user = userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
-            // user.getFriendsList().clear();
-            // userRepo.save(user);
             User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
             Set<User> friends = user.getFriendsList();
             for (User friend : friends) {
