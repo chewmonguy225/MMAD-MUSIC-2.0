@@ -1,12 +1,14 @@
 package com.MMAD.MMAD.resource;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -77,8 +79,11 @@ public class UserResource {
      * @return The user with the given username and password.
      */
     @GetMapping("/login")
-    public ResponseEntity<UserDTO> login(@RequestParam("username") String username, @RequestParam("password") String password) {
+    public ResponseEntity<UserDTO> login(@RequestBody Map<String, String> credentials) {
         try {
+            String username = credentials.get("username");
+            String password = credentials.get("password");
+
             UserDTO user = userService.findUserByUsernameAndPassword(username, password);
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (Exception e) {
