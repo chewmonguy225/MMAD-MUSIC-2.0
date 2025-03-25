@@ -78,7 +78,7 @@ public class UserResource {
      * @param password The password of the user to be retrieved.
      * @return The user with the given username and password.
      */
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<UserDTO> login(@RequestBody Map<String, String> credentials) {
         try {
             String username = credentials.get("username");
@@ -99,8 +99,11 @@ public class UserResource {
      * @return The created user DTO if successful.
      */
     @PostMapping("/create")
-    public ResponseEntity<UserDTO> addUser(@RequestParam("username") String username, @RequestParam("password") String password) {
+    public ResponseEntity<UserDTO> addUser(@RequestBody Map<String, String> credentials) {
         try {
+            String username = credentials.get("username");
+            String password = credentials.get("password");
+
             return ResponseEntity.ok().body(userService.createUser(username, password));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
