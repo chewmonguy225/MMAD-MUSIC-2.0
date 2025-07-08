@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.MMAD.MMAD.model.UserDTO;
+import com.MMAD.MMAD.model.User.UserDTO;
 import com.MMAD.MMAD.service.UserService;
 
 import jakarta.transaction.Transactional;

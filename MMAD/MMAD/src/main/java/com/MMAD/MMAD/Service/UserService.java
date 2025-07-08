@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.MMAD.MMAD.exception.UserNotFoundException;
-import com.MMAD.MMAD.model.User;
-import com.MMAD.MMAD.model.UserDTO;
-import com.MMAD.MMAD.model.UserDTOMapper;
+import com.MMAD.MMAD.model.User.User;
+import com.MMAD.MMAD.model.User.UserDTO;
+import com.MMAD.MMAD.model.User.UserDTOMapper;
 import com.MMAD.MMAD.repo.UserRepo;
 
 import jakarta.persistence.EntityNotFoundException;

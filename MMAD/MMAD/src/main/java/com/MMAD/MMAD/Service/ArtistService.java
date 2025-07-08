@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.MMAD.MMAD.model.Artist;
+import com.MMAD.MMAD.model.Item.Artist;
 import com.MMAD.MMAD.repo.ArtistRepo;
 
 @Service

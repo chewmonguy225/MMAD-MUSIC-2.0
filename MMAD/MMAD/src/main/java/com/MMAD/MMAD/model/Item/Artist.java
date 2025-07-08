@@ -1,4 +1,4 @@
-package com.MMAD.MMAD.model;
+package com.MMAD.MMAD.model.Item;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

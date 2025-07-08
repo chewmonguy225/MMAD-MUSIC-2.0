@@ -1,11 +1,13 @@
-package com.MMAD.MMAD.model;
+package com.MMAD.MMAD.model.Item;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "album")
+@DiscriminatorValue("ALBUM")
 public class Album extends Item { 
     //@ManyToOne(fetch = FetchType.LAZY)
     //@JoinColumn(name = "artist_id", nullable = false)

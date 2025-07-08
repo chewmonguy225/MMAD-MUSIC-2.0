@@ -1,0 +1,15 @@
+<div class="star-rating">
+  <span
+    *ngFor="let star of stars"
+    (click)="setRating(star)"
+    [class.filled]="star <= rating"
+    style="cursor: pointer; font-size: 1.5em;"
+  >
+    ★
+  </span>
+</div>
+
+<textarea [(ngModel)]="reviewText" placeholder="Write your review..."></textarea>
+
+<button (click)="submit()" [disabled]="!reviewText.trim()">Submit</button>
+<button (click)="cancel.emit()">Cancel</button>

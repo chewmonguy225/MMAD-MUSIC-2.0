@@ -11,10 +11,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
 
-import com.MMAD.MMAD.model.Artist;
-import com.MMAD.MMAD.model.Album;
-import com.MMAD.MMAD.model.Song;
-import com.MMAD.MMAD.model.Item;
+import com.MMAD.MMAD.model.Item.Album;
+import com.MMAD.MMAD.model.Item.Artist;
+import com.MMAD.MMAD.model.Item.Item;
+import com.MMAD.MMAD.model.Item.Song;
 
 @Service
 public class SpotifyService {

@@ -1,4 +1,4 @@
-package com.MMAD.MMAD.model;
+package com.MMAD.MMAD.model.User;
 
 import java.io.Serializable;
 import java.util.Objects;

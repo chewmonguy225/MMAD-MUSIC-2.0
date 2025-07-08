@@ -1,0 +1,12 @@
+.star-rating {
+  font-size: 2rem;
+  color: gray;
+  cursor: pointer;
+  user-select: none;
+}
+.star-rating span {
+  padding: 0 5px;
+}
+.star-rating span.filled {
+  color: gold;
+}

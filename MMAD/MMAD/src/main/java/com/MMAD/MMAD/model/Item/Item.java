@@ -1,25 +1,26 @@
-package com.MMAD.MMAD.model;
+package com.MMAD.MMAD.model.Item;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "item_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class Item {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, updatable = false)
     protected Long id;
-    
+
     @Column(name = "source_id", nullable = false)
     protected String sourceId;
-    
+
     protected String name;
-    
+
     @Column(nullable = true)
-    protected String imageURL = "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png";;
+    protected String imageURL = "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png";
+
+    // Constructors
 
     public Item() {}
 
@@ -40,13 +41,7 @@ public abstract class Item {
         this.name = name;
     }
 
-    public String getImageURL() {
-        return imageURL;
-    }
-
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
-    }
+    // Getters and Setters
 
     public Long getId() {
         return id;
@@ -72,13 +67,23 @@ public abstract class Item {
         this.name = name;
     }
 
-    public String toString(){
-        return "Artist{"+
-            "id="+id+
-            ", sourceId="+sourceId+'\''+
-            ", name="+name+'\''+
-            ", imageURL="+imageURL+'\''+
-            '}';
+    public String getImageURL() {
+        return imageURL;
     }
-    
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
+
+    // toString
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "id=" + id +
+                ", sourceId='" + sourceId + '\'' +
+                ", name='" + name + '\'' +
+                ", imageURL='" + imageURL + '\'' +
+                '}';
+    }
 }

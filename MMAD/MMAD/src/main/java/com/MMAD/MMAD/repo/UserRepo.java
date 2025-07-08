@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.MMAD.MMAD.model.User;
+import com.MMAD.MMAD.model.User.User;
 
 
 public interface UserRepo extends JpaRepository<User, Long> {

@@ -1,4 +1,5 @@
-package com.MMAD.MMAD.model;
+package com.MMAD.MMAD.model.Item;
+
 public class Song extends Item{
     private Long albumID;
     private Long artistID;
@@ -8,7 +9,7 @@ public class Song extends Item{
         this.artistID = artistID;
         this.albumID = albumID;
     }
-    public Song(Long id,String sourceId, String name, Long artistID, Long albumID){
+    public Song(Long id, String sourceId, String name, Long artistID, Long albumID){
         super(id, sourceId, name);
         this.artistID = artistID;
         this.albumID = albumID;

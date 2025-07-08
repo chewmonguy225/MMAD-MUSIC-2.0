@@ -13,9 +13,9 @@ import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.MMAD.MMAD.exception.UserNotFoundException;
-import com.MMAD.MMAD.model.User;
-import com.MMAD.MMAD.model.UserDTO;
-import com.MMAD.MMAD.model.UserDTOMapper;
+import com.MMAD.MMAD.model.User.User;
+import com.MMAD.MMAD.model.User.UserDTO;
+import com.MMAD.MMAD.model.User.UserDTOMapper;
 import com.MMAD.MMAD.repo.UserRepo;
 import com.MMAD.MMAD.service.UserService;
 

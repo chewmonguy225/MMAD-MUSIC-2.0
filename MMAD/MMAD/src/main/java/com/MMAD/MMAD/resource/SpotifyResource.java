@@ -3,7 +3,6 @@ package com.MMAD.MMAD.resource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.MMAD.MMAD.model.Artist;
 import com.MMAD.MMAD.service.SpotifyService;
 
 import org.springframework.http.ResponseEntity;
@@ -13,10 +12,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.MMAD.MMAD.model.Artist;
-import com.MMAD.MMAD.model.Album;
-import com.MMAD.MMAD.model.Song;
-import com.MMAD.MMAD.model.Item;
+import com.MMAD.MMAD.model.Item.Album;
+import com.MMAD.MMAD.model.Item.Artist;
+import com.MMAD.MMAD.model.Item.Item;
+import com.MMAD.MMAD.model.Item.Song;
 
 @RestController
 @RequestMapping("/spotify")
