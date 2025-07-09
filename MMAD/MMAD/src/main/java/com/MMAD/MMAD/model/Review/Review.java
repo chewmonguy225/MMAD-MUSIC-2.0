@@ -1,65 +1,71 @@
 package com.MMAD.MMAD.model.Review;
 
-import com.MMAD.MMAD.model.User.User;
-import com.MMAD.MMAD.model.Item.Item;
-import jakarta.persistence.*;
+import com.MMAD.MMAD.model.Item.Item; // Import the base Item class
+import com.MMAD.MMAD.model.User.User; // Import the User class
+import com.MMAD.MMAD.model.User.UserDTO;
 
-import java.sql.Timestamp;
+import jakarta.persistence.*;
+import java.time.LocalDateTime; // Use java.time.LocalDateTime for modern timestamp handling
 
 @Entity
-@Table(name = "review")
+@Table(name = "reviews") // Matches the plural table name in SQL schema
 public class Review {
 
-    @EmbeddedId
-    private ReviewId id;
-
-    @ManyToOne
-    @MapsId("username")
-    @JoinColumn(name = "username")
-    private User user;
+    @Id // Denotes the primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generated ID, matches BIGINT PRIMARY KEY AUTO_INCREMENT
+    private Long id;
 
     @Column(name = "rating", nullable = false)
     private int rating;
 
-    @Column(name = "text", nullable = false)
-    private String text;
+    @Column(name = "description", columnDefinition = "TEXT", nullable = false) // Use TEXT for potentially longer descriptions
+    private String description;
 
-    @Column(name = "created_at", nullable = false)
-    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+    @ManyToOne // Many reviews can belong to one Item
+    @JoinColumn(name = "item_id", nullable = false) // Foreign key column in 'reviews' table linking to 'items.id'
+    private Item item; // The Item entity being reviewed
 
-    @Transient
-    private Item item; // not stored in DB, used in logic layer
+    @ManyToOne // Many reviews can belong to one User
+    @JoinColumn(name = "user_id", nullable = false) // Foreign key column in 'reviews' table linking to 'users.id'
+    private User user; // The User entity who wrote the review
 
-    public Review() {}
+    @Column(name = "created_at", updatable = false) // updatable=false as it's set once on creation
+    private LocalDateTime createdAt;
 
-    public Review(User user, Item item, int rating, String text) {
-        this.user = user;
-        this.item = item;
-        this.rating = rating;
-        this.text = text;
-        this.createdAt = new Timestamp(System.currentTimeMillis());
-        this.id = new ReviewId(user.getUsername(), item.getId(), item.getClass().getSimpleName());
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    // Default constructor
+    public Review() {
     }
 
-    // Getters and setters
+    // Constructor for creating a new review with relationships
+    public Review(int rating, String description, Item item, User user) {
+        this.rating = rating;
+        this.description = description;
+        this.item = item;
+        this.user = user;
+    }
 
-    public ReviewId getId() {
+    // Lifecycle callbacks for timestamps
+    @PrePersist // Called before the entity is first persisted
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now(); // Initialize updatedAt as well
+    }
+
+    @PreUpdate // Called before an entity is updated
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // Getters and Setters
+    public Long getId() {
         return id;
     }
 
-    public void setId(ReviewId id) {
+    public void setId(Long id) {
         this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-        if (id != null) {
-            id.setUsername(user.getUsername());
-        }
     }
 
     public int getRating() {
@@ -70,20 +76,12 @@ public class Review {
         this.rating = rating;
     }
 
-    public String getText() {
-        return text;
+    public String getDescription() {
+        return description;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Item getItem() {
@@ -92,9 +90,42 @@ public class Review {
 
     public void setItem(Item item) {
         this.item = item;
-        if (item != null && id != null) {
-            id.setItemId(item.getId());
-            id.setItemType(item.getClass().getSimpleName());
-        }
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) { // You generally won't call this manually if using @PrePersist
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) { // You generally won't call this manually if using @PreUpdate
+        this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "Review{" +
+                "id=" + id +
+                ", rating=" + rating +
+                ", description='" + description + '\'' +
+                ", item=" + (item != null ? item.getName() : "N/A") + // Display item's name
+                ", user=" + (user != null ? user.getUsername() : "N/A") + // Assuming User has getUsername()
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }

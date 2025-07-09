@@ -70,6 +70,12 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("user with username [%s] not found".formatted(username)));
     }
 
+    @Transactional
+    public Optional<User> getUserByUsername(String username) {
+        return userRepo.findUserByUsername(username);
+    }
+
+
 
     /**
      * Get a user by their username and password.

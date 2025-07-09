@@ -1,89 +1,69 @@
 package com.MMAD.MMAD.model.Item;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "items")
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "item_type", discriminatorType = DiscriminatorType.STRING)
-public abstract class Item {
+public class Item {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true, nullable = false)
+    private String sourceId;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(name = "image_url")
+    private String imageURL;
+
+
     @Column(nullable = false, updatable = false)
-    protected Long id;
+    private LocalDateTime createdAt;
 
-    @Column(name = "source_id", nullable = false)
-    protected String sourceId;
-
-    protected String name;
-
-    @Column(nullable = true)
-    protected String imageURL = "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png";
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
     // Constructors
-
-    public Item() {}
-
-    public Item(String sourceId, String name) {
-        this.sourceId = sourceId;
-        this.name = name;
+    public Item() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
-    public Item(String imageURL, String sourceId, String name) {
+    // Adjust constructor to remove itemType if you remove the field from Item
+    public Item(String sourceId, String name, String imageURL) {
+        this.sourceId = sourceId;
+        this.name = name;
         this.imageURL = imageURL;
-        this.sourceId = sourceId;
-        this.name = name;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
-    public Item(Long id, String sourceId, String name) {
-        this.id = id;
-        this.sourceId = sourceId;
-        this.name = name;
-    }
-
-    // Getters and Setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getSourceId() {
-        return sourceId;
-    }
-
-    public void setSourceId(String sourceId) {
-        this.sourceId = sourceId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getImageURL() {
-        return imageURL;
-    }
-
+    // Getters and Setters (adjust for itemType removal if you remove the field)
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getSourceId() { return sourceId; }
+    public void setSourceId(String sourceId) { this.sourceId = sourceId; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getImageURL() { return imageURL; }
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
+        this.updatedAt = LocalDateTime.now();
     }
 
-    // toString
 
-    @Override
-    public String toString() {
-        return "Item{" +
-                "id=" + id +
-                ", sourceId='" + sourceId + '\'' +
-                ", name='" + name + '\'' +
-                ", imageURL='" + imageURL + '\'' +
-                '}';
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 }

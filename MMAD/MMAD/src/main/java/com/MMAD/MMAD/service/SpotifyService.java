@@ -9,12 +9,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
-import com.MMAD.MMAD.model.Item.Album;
+//import com.MMAD.MMAD.model.Item.Album;
 import com.MMAD.MMAD.model.Item.Artist;
 import com.MMAD.MMAD.model.Item.Item;
-import com.MMAD.MMAD.model.Item.Song;
+//import com.MMAD.MMAD.model.Item.Song;
 
 @Service
 public class SpotifyService {
@@ -84,35 +85,19 @@ public class SpotifyService {
                 for (JsonNode artistNode : artistsNode) {
                     JsonNode imagesNode = artistNode.path("images");
                     String imageUrl = imagesNode.isArray() && imagesNode.size() > 0 ? imagesNode.get(0).path("url").asText() : "default_image_url";
-                    String id = artistNode.path("id").asText();
+                    String spotifyId = artistNode.path("id").asText(); // Spotify ID, maps to your sourceId
                     String name = artistNode.path("name").asText();
 
-                    Artist artist = new Artist(imageUrl, id, name);
+
+                    Artist artist = new Artist(spotifyId, name, imageUrl);
                     itemList.add(artist);
                 }
             }
-
-            // JsonNode albumNode = jsonResponse.path("album").path("items");
-            // if (albumNode.isArray()) {
-            //     for (JsonNode artistNode : albumNode) {
-            //         JsonNode imagesNode = artistNode.path("images");
-            //         String imageUrl = imagesNode.isArray() && imagesNode.size() > 0 ? imagesNode.get(0).path("url").asText() : "default_image_url";
-            //         String id = artistNode.path("id").asText();
-            //         String name = artistNode.path("name").asText();
-            //         Album album = new Album(id, name, );
-
-            //         public Album(String sourceID, String name, int artistID){
-            //             super(sourceID, name);
-            //             this.artistID = artistID;
-            //         }
-            //         itemList.add(artist);
-            //     }
-            // }
-
         } catch (Exception e) {
+            System.err.println("Error searching Spotify items: " + e.getMessage());
             e.printStackTrace();
-            return new ArrayList<>();
         }
         return itemList;
     }
+
 }

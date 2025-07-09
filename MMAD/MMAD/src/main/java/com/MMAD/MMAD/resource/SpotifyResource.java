@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.MMAD.MMAD.model.Item.Album;
+//import com.MMAD.MMAD.model.Item.Album;
 import com.MMAD.MMAD.model.Item.Artist;
 import com.MMAD.MMAD.model.Item.Item;
-import com.MMAD.MMAD.model.Item.Song;
+//import com.MMAD.MMAD.model.Item.Song;
 
 @RestController
 @RequestMapping("/spotify")

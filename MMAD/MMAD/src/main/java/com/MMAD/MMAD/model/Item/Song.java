@@ -1,29 +1,65 @@
-package com.MMAD.MMAD.model.Item;
+// package com.MMAD.MMAD.model.Item;
 
-public class Song extends Item{
-    private Long albumID;
-    private Long artistID;
+// import jakarta.persistence.DiscriminatorValue;
+// import jakarta.persistence.Entity;
+// import jakarta.persistence.JoinColumn;
+// import jakarta.persistence.ManyToOne;
+// import jakarta.persistence.Table;
 
-    public Song(String sourceId, String name, Long artistID, Long albumID){
-        super(sourceId, name);
-        this.artistID = artistID;
-        this.albumID = albumID;
-    }
-    public Song(Long id, String sourceId, String name, Long artistID, Long albumID){
-        super(id, sourceId, name);
-        this.artistID = artistID;
-        this.albumID = albumID;
-    }
+// @Entity
+// @Table(name = "songs")
+// @DiscriminatorValue("song")
+// public class Song extends Item {
 
-    public void setID(Long id){
-        this.id = id;
-    }
+//     @ManyToOne
+//     @JoinColumn(name = "album_item_id", referencedColumnName = "id")
+//     private Album album;
 
-    public Long getAlbum(){
-        return this.albumID;
-    }
+//     @ManyToOne
+//     @JoinColumn(name = "artist_item_id", referencedColumnName = "id")
+//     private Artist artist;
 
-    public Long getArtist(){
-        return this.artistID;
-    }
-}
+//     public Song(){
+//         super();
+//     }
+
+//     public Song(String sourceId, String name, Artist artist, Album album){
+//         super(sourceId, name);
+//         this.artist = artist;
+//         this.album = album;
+//     }
+
+//     public Song(String imageURL, String sourceId, String name, Artist artist, Album album){
+//         super(imageURL, sourceId, name);
+//         this.artist = artist;
+//         this.album = album;
+//     }
+
+//     public Album getAlbum(){
+//         return this.album;
+//     }
+
+//     public void setAlbum(Album album){
+//         this.album = album;
+//     }
+
+//     public Artist getArtist(){
+//         return this.artist;
+//     }
+
+//     public void setArtist(Artist artist){
+//         this.artist = artist;
+//     }
+
+//     @Override
+//     public String toString() {
+//         return "Song{" +
+//                 "id=" + getId() +
+//                 ", sourceId='" + getSourceId() + '\'' +
+//                 ", name='" + getName() + '\'' +
+//                 ", imageURL='" + getImageURL() + '\'' +
+//                 ", album=" + (album != null ? album.getName() : "N/A") +
+//                 ", artist=" + (artist != null ? artist.getName() : "N/A") +
+//                 '}';
+//     }
+// }
