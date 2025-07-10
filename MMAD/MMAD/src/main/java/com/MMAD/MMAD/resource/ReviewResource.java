@@ -27,6 +27,7 @@ public class ReviewResource {
         this.reviewService = reviewService;
     }
 
+    //CREATE
     /**
      * Endpoint to create a new review.
      * Requires userId, itemId, rating, and description in the request body.
@@ -60,10 +61,20 @@ public class ReviewResource {
         }
     }
 
-    /**
-     * Endpoint to get a single review by its primary ID.
-     */
-    @GetMapping("/{id}") // GET to /reviews/{id}
+    //READ
+    @GetMapping("/all") // Endpoint for getting all reviews
+    public ResponseEntity<?> getAllReviews() { 
+        try {
+            List<Review> reviews = reviewService.getAllReviews();
+            return new ResponseEntity<>(reviews, HttpStatus.OK); // This is ResponseEntity<List<Review>> (valid with ?)
+        } catch (Exception e) {
+            // General catch-all for unexpected server errors
+            // This is now ResponseEntity<String> (valid with ?)
+            return new ResponseEntity<>("Failed to retrieve all reviews: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR); // 500
+        }
+    }
+    
+    @GetMapping("find/{id}") // GET to /reviews/{id}
     public ResponseEntity<Review> getReviewById(@PathVariable("id") Long id) {
         try {
             Review review = reviewService.getReviewById(id);
@@ -79,7 +90,7 @@ public class ReviewResource {
     @GetMapping("/user/{userId}") // GET to /reviews/user/{userId}
     public ResponseEntity<List<Review>> getReviewsByUserId(@PathVariable("userId") Long userId) {
         try {
-            List<Review> reviews = reviewService.getReviewsByUserId(userId);
+            List<Review> reviews = reviewService.getReviewsByItemId(userId);
             return new ResponseEntity<>(reviews, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             // If the user itself is not found

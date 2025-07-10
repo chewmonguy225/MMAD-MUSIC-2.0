@@ -2,13 +2,13 @@ package com.MMAD.MMAD.resource.item;
 
 import com.MMAD.MMAD.model.Item.Item;
 import com.MMAD.MMAD.service.item.ItemService;
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException; // Keep this, as ItemService still throws it
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+// import java.util.Optional; // No longer needed for resource methods directly handling service calls that return Item
 
 @RestController
 @RequestMapping("/item")
@@ -18,17 +18,23 @@ public class ItemResource {
 
     public ItemResource(ItemService itemService) {
         this.itemService = itemService;
-    }   
+    }
 
     //CREATE
     @PostMapping("/add")
     public ResponseEntity<?> addItem(@RequestBody Item item) {
         try {
-            Item newItem = itemService.saveItem(item);
+            Item newItem = itemService.addItem(item);
             return new ResponseEntity<>(newItem, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
+            // Catches validation errors (e.g., sourceId empty/null) from service
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (RuntimeException e) {
+            // Catches "Item with source ID already exists" from service
+            // A more specific status code for conflicts
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT); // 409 Conflict
         } catch (Exception e) {
+            // Generic catch-all for other unexpected errors
             return new ResponseEntity<>("Failed to add item: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -41,37 +47,36 @@ public class ItemResource {
     }
 
     @GetMapping("/find/{id}")
-    public ResponseEntity<Item> getItemById(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getItemById(@PathVariable("id") Long id) { // <-- Changed return type to ResponseEntity<?>
         try {
-            // Get the Optional from the service
-            Optional<Item> optionalItem = itemService.getItemById(id);
-
-            // Unwrap the Optional:
-            // If the Optional contains an Item, return it with HttpStatus.OK.
-            // If it's empty, orElseThrow will throw EntityNotFoundException.
-            Item item = optionalItem.orElseThrow(() -> new EntityNotFoundException("Item not found with ID: " + id));
-
-            return new ResponseEntity<>(item, HttpStatus.OK); // Return the actual Item object
+            Item item = itemService.getItemById(id).get();
+            return new ResponseEntity<>(item, HttpStatus.OK); // This returns ResponseEntity<Item>
+        } catch (IllegalArgumentException e) {
+            // This now correctly returns ResponseEntity<String>
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST); // 400 Bad Request
         } catch (EntityNotFoundException e) {
-            // This catch block will now correctly handle the EntityNotFoundException
-            // thrown by orElseThrow() if the item is not found.
+            // This returns ResponseEntity<Void> (no body) for 404
             return ResponseEntity.notFound().build(); // 404 Not Found
+        } catch (Exception e) {
+            // This now correctly returns ResponseEntity<String>
+            return new ResponseEntity<>("Failed to find item by ID: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR); // 500 Internal Server Error
         }
     }
 
-
     @GetMapping("/findSource/{source_id}")
-    public ResponseEntity<?> getItemBySourceId(@PathVariable("source_id") String sourceId) { // Changed return type to
-                                                                                             // ResponseEntity<?>
+    public ResponseEntity<?> getItemBySourceId(@PathVariable("source_id") String sourceId) {
         try {
-            Item item = itemService.getItemBySourceId(sourceId)
-                    .orElseThrow(() -> new EntityNotFoundException("Item not found with Source ID: " + sourceId));
+            // *** FIX 2: itemService.getItemBySourceId now returns Item directly ***
+            Item item = itemService.getItemBySourceId(sourceId).get();
             return new ResponseEntity<>(item, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            // Catches sourceId validation errors (e.g., sourceId is empty/null)
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (EntityNotFoundException e) {
+            // Catches if the item is not found by Source ID
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            // Now this returns ResponseEntity<String>, which is compatible with
-            // ResponseEntity<?>
+            // Generic catch-all for other unexpected errors
             return new ResponseEntity<>("Failed to find item by Source ID: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -83,12 +88,17 @@ public class ItemResource {
         try {
             Item updatedItem = itemService.updateItem(id, itemDetails);
             return new ResponseEntity<>(updatedItem, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            // Corrected: Use ResponseEntity.notFound().build() for 404 with no body
-            return ResponseEntity.notFound().build();
         } catch (IllegalArgumentException e) {
+            // Catches ID validation errors, null details, sourceId validation
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (EntityNotFoundException e) {
+            // Catches if the item to update is not found
+            return ResponseEntity.notFound().build();
+        } catch (RuntimeException e) {
+            // Catches "Another item already exists with source ID" for duplicates during update
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT); // 409 Conflict
         } catch (Exception e) {
+            // Generic catch-all for other unexpected errors
             return new ResponseEntity<>("Failed to update item: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -98,12 +108,15 @@ public class ItemResource {
     public ResponseEntity<?> deleteItem(@PathVariable("id") Long id) {
         try {
             itemService.deleteItem(id);
-            // Corrected: Use ResponseEntity.noContent().build() for 204 No Content
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.noContent().build(); // 204 No Content
+        } catch (IllegalArgumentException e) {
+            // Catches ID validation errors
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (EntityNotFoundException e) {
-            // Corrected: Use ResponseEntity.notFound().build() for 404 with no body
+            // Catches if the item to delete is not found
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
+            // Generic catch-all for other unexpected errors
             return new ResponseEntity<>("Failed to delete item: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

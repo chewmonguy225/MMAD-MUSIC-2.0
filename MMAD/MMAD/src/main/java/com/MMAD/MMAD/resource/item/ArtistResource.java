@@ -18,7 +18,7 @@ import com.MMAD.MMAD.model.Item.Artist;
 import com.MMAD.MMAD.service.item.ArtistService; // Ensure this matches the updated service package
 
 @RestController
-@RequestMapping("/artist")
+@RequestMapping("item/artists")
 public class ArtistResource {
     private final ArtistService artistService;
 
@@ -53,14 +53,14 @@ public class ArtistResource {
         // The service method already throws EntityNotFoundException which Spring will
         // catch
         // and by default return 404. Or you can catch it explicitly.
-        Artist artist = artistService.getArtistById(id);
+        Artist artist = artistService.getArtistById(id).get();
         return new ResponseEntity<>(artist, HttpStatus.OK);
     }
 
     @GetMapping("/findSource/{source_id}")
     public ResponseEntity<Artist> getArtistBySourceId(@PathVariable("source_id") String sourceId) {
         try {
-            Artist artist = artistService.getArtistBySourceId(sourceId); // Service now throws exception
+            Artist artist = artistService.getArtistBySourceId(sourceId).get(); // Service now throws exception
             return new ResponseEntity<>(artist, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Return 404 if not found
