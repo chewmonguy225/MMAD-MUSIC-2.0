@@ -1,6 +1,9 @@
 package com.MMAD.MMAD.model.Review;
 
 import java.time.LocalDateTime; // Import if you use LocalDateTime in your Review entity
+import com.MMAD.MMAD.model.Item.Item;
+import com.MMAD.MMAD.model.User.User;
+import com.MMAD.MMAD.model.User.UserDTO;
 
 public class ReviewResponse {
     private Long id;
@@ -8,28 +11,24 @@ public class ReviewResponse {
     private String description; // Matches backend Review.description
 
     // Details for the associated Item (assuming you want to show name and ID)
-    private Long itemId;
-    private String itemName; // e.g., Item.name
+    private Item item;
 
     // Details for the associated User (assuming you want to show username and ID)
-    private Long userId;
-    private String username; // e.g., User.username
+    private UserDTO user;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     // Constructor to easily map from Review entity
     public ReviewResponse(Long id, int rating, String description,
-            Long itemId, String itemName,
-            Long userId, String username,
+            Item item,
+            UserDTO user,
             LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.rating = rating;
         this.description = description;
-        this.itemId = itemId;
-        this.itemName = itemName;
-        this.userId = userId;
-        this.username = username;
+        this.item = item;
+        this.user = user;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -64,36 +63,21 @@ public class ReviewResponse {
         this.description = description;
     }
 
-    public Long getItemId() {
-        return itemId;
+    public Item getItem() {
+        return item;
     }
 
-    public void setItemId(Long itemId) {
-        this.itemId = itemId;
+    public void setItem(Item item) {
+        this.item = item;
     }
 
-    public String getItemName() {
-        return itemName;
+
+    public UserDTO getUser() {
+        return user;
     }
 
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUsername(UserDTO user) {
+        this.user = user;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -1,7 +1,11 @@
 package com.MMAD.MMAD.resource;
 
+import com.MMAD.MMAD.model.Item.Item;
+import com.MMAD.MMAD.model.User.UserDTO;
 import com.MMAD.MMAD.model.Review.Review;
 import com.MMAD.MMAD.service.ReviewService;
+import com.MMAD.MMAD.service.item.ItemService;
+import com.MMAD.MMAD.service.UserService;
 import com.MMAD.MMAD.model.Review.ReviewRequest; // Import the new DTO
 import com.MMAD.MMAD.model.Review.ReviewResponse;
 import com.MMAD.MMAD.model.Review.UpdateReviewRequest;
@@ -21,10 +25,15 @@ import java.util.List;
 public class ReviewResource {
 
     private final ReviewService reviewService;
+    private final ItemService itemService;
+    private final UserService userService;
+
 
     // Constructor Injection (uncommented)
-    public ReviewResource(ReviewService reviewService) {
+    public ReviewResource(ReviewService reviewService, ItemService itemService, UserService userService) {
         this.reviewService = reviewService;
+        this.itemService = itemService;
+        this.userService = userService;
     }
 
     //CREATE
@@ -39,11 +48,11 @@ public class ReviewResource {
             // This line is already correct: savedReview is of type ReviewResponse
             Review review = reviewService.createReview(reviewRequest.getUsername(), reviewRequest.getItemId(),
                     reviewRequest.getRating(), reviewRequest.getDescription());
+            review.setItem(itemService.getItemById(reviewRequest.getItemId()).get());
+            UserDTO user = userService.findUserByUsername(reviewRequest.getUsername());
 
             ReviewResponse savedReview = new ReviewResponse(review.getId(), review.getRating(), review.getDescription()
-                , review.getItem().getId(), review.getItem().getName(),
-                review.getUser().getId(), review.getUser().getUsername(), 
-                review.getCreatedAt(), review.getUpdatedAt());
+                ,review.getItem() , user, review.getCreatedAt(), review.getUpdatedAt());
             // This line is now correct because savedReview is ReviewResponse
             return new ResponseEntity<>(savedReview, HttpStatus.CREATED);
         } catch (EntityNotFoundException e) {
