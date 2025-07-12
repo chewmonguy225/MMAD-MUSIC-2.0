@@ -21,7 +21,6 @@ public class Item {
     @Column(name = "image_url")
     private String imageURL;
 
-
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -44,23 +43,67 @@ public class Item {
     }
 
     // Getters and Setters (adjust for itemType removal if you remove the field)
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getSourceId() { return sourceId; }
-    public void setSourceId(String sourceId) { this.sourceId = sourceId; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getImageURL() { return imageURL; }
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getImageURL() {
+        return imageURL;
+    }
+
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
         this.updatedAt = LocalDateTime.now();
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public static Item fromDTO(ItemDTO dto) {
+        if (dto == null)
+            return null;
+
+        Item item = new Item();
+        item.setId(dto.getId());
+        item.setSourceId(dto.getSourceId());
+        item.setName(dto.getName());
+        item.setImageURL(dto.getImageURL());
+
+        return item;
+    }
 
     @PreUpdate
     protected void onUpdate() {

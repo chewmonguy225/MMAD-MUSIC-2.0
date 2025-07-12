@@ -1,9 +1,12 @@
 package com.MMAD.MMAD.service;
 
 import com.MMAD.MMAD.model.Review.Review;
+import com.MMAD.MMAD.model.Review.ReviewResponse;
 import com.MMAD.MMAD.model.Item.Item; // Ensure this path is correct
+import com.MMAD.MMAD.model.Item.ItemDTO;
 import com.MMAD.MMAD.model.User.User; // Ensure this path is correct
 import com.MMAD.MMAD.model.User.UserDTO;
+import com.MMAD.MMAD.model.User.UserDTOMapper;
 import com.MMAD.MMAD.repo.ReviewRepo; // Ensure this path is correct
 
 // Assuming you have these services for fetching User and Item entities
@@ -14,36 +17,40 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
 @Service
 public class ReviewService {
-
+    private final UserDTOMapper userDTOMapper;
     private final ReviewRepo reviewRepo;
     private final UserService userService;
     private final ItemService itemService;
 
     // Constructor injection: Spring will automatically provide instances of
     // ReviewRepo, UserService, and ItemService
-    public ReviewService(ReviewRepo reviewRepo, UserService userService, ItemService itemService) {
+    public ReviewService(ReviewRepo reviewRepo, UserService userService, ItemService itemService,
+            UserDTOMapper userDTOMapper) {
         this.reviewRepo = reviewRepo;
         this.userService = userService;
         this.itemService = itemService;
+        this.userDTOMapper = userDTOMapper;
     }
 
-// CREATE
+    // CREATE
 
     /**
      * Creates a new review for a given user and item.
-     * Throws IllegalArgumentException if input parameters are invalid or if user has already reviewed this item.
+     * Throws IllegalArgumentException if input parameters are invalid or if user
+     * has already reviewed this item.
      * Throws EntityNotFoundException if user or item does not exist.
      *
      * @param username    The username of the user writing the review.
      * @param itemId      The ID of the item being reviewed.
      * @param rating      The rating (e.g., 1-5).
      * @param description The review text.
-     * @return The newly created Review entity.
+     * @return The newly created Review'd DTO.
      */
     @Transactional
-    public Review createReview(String username, Long itemId, int rating, String description) {
+    public ReviewResponse createReview(String username, Long itemId, int rating, String description) {
         // Input Validation for parameters
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("Username cannot be null or empty.");
@@ -58,37 +65,44 @@ public class ReviewService {
             throw new IllegalArgumentException("Review description cannot be null or empty.");
         }
 
-
-        // Fetch User and Item entities to establish relationships
         User user = userService.getUserByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
 
-        // itemService.getItemById already throws EntityNotFoundException and handles ID validation
-        Item item = itemService.getItemById(itemId).get();
+        ItemDTO item = itemService.getItemById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("Item not found with ID: " + itemId));
 
-        // Check if the user has already reviewed this specific item to prevent duplicates
         if (reviewRepo.findByUserIdAndItemId(user.getId(), item.getId()).isPresent()) {
             throw new IllegalArgumentException(
                     "User '" + user.getUsername() + "' has already reviewed item '" + item.getName() + "'.");
         }
 
-        // Create the new Review entity
-        Review review = new Review(rating, description, item, user);
-        return reviewRepo.save(review); // Save the review to the database
-    }
+        Review review = new Review(rating, description, Item.fromDTO(item), user);
+        Review savedReview = reviewRepo.save(review);
 
+        // Convert to DTO and return
+        return ReviewResponse.fromEntity(savedReview);
+    }
 
     // READ
 
     /**
      * Retrieves all reviews in the system.
-     * @return A list of all Review entities.
+     * 
+     * @return A list of all Review DTO.
      */
     @Transactional(readOnly = true)
-    public List<Review> getAllReviews() {
-        return reviewRepo.findAll();
+    public List<ReviewResponse> getAllReviews() {
+        return reviewRepo.findAll().stream()
+                .map(review -> new ReviewResponse(
+                        review.getId(),
+                        review.getRating(),
+                        review.getDescription(),
+                        ItemDTO.fromEntity(review.getItem()),
+                        userDTOMapper.apply(review.getUser()),
+                        review.getCreatedAt(),
+                        review.getUpdatedAt()))
+                .toList();
     }
-      
 
     /**
      * Retrieves a review by its ID.
@@ -96,38 +110,43 @@ public class ReviewService {
      * @param id The ID of the review.
      * @return The Review entity.
      * @throws IllegalArgumentException If the review ID is invalid.
-     * @throws EntityNotFoundException If the review is not found.
+     * @throws EntityNotFoundException  If the review is not found.
      */
     @Transactional(readOnly = true)
-    public Review getReviewById(Long id) {
-        // Input Validation for ID
+    public ReviewResponse getReviewById(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Review ID cannot be null or non-positive for retrieval.");
         }
-        return reviewRepo.findById(id)
+
+        Review review = reviewRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Review not found with ID: " + id));
+
+        return ReviewResponse.fromEntity(review);
     }
 
     // /**
-    //  * Retrieves all reviews written by a specific user.
-    //  *
-    //  * @param userId The ID of the user.
-    //  * @return A list of reviews by the user.
-    //  * @throws IllegalArgumentException If the user ID is invalid.
-    //  * @throws EntityNotFoundException If the user does not exist.
-    //  */
+    // * Retrieves all reviews written by a specific user.
+    // *
+    // * @param userId The ID of the user.
+    // * @return A list of reviews by the user.
+    // * @throws IllegalArgumentException If the user ID is invalid.
+    // * @throws EntityNotFoundException If the user does not exist.
+    // */
     // @Transactional(readOnly = true)
     // public List<Review> getReviewsByUserId(Long userId) {
-    //     // Input Validation for User ID
-    //     if (userId == null || userId <= 0) {
-    //         throw new IllegalArgumentException("User ID cannot be null or non-positive for retrieving reviews.");
-    //     }
-    //     // Fetch User entity first to ensure it exists before querying reviews by it
-    //     // Assuming userService.getUserById returns Optional<User> or throws EntityNotFoundException
-    //     User user = userService.getUserById(userId)
-    //             .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
-        
-    //     return reviewRepo.findByUserId(userId);
+    // // Input Validation for User ID
+    // if (userId == null || userId <= 0) {
+    // throw new IllegalArgumentException("User ID cannot be null or non-positive
+    // for retrieving reviews.");
+    // }
+    // // Fetch User entity first to ensure it exists before querying reviews by it
+    // // Assuming userService.getUserById returns Optional<User> or throws
+    // EntityNotFoundException
+    // User user = userService.getUserById(userId)
+    // .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " +
+    // userId));
+
+    // return reviewRepo.findByUserId(userId);
     // }
 
     /**
@@ -136,24 +155,35 @@ public class ReviewService {
      * @param itemId The ID of the item.
      * @return A list of reviews for the item.
      * @throws IllegalArgumentException If the item ID is invalid.
-     * @throws EntityNotFoundException If the item does not exist.
+     * @throws EntityNotFoundException  If the item does not exist.
      */
     @Transactional(readOnly = true)
-    public List<Review> getReviewsByItemId(Long itemId) { // Uncommented and fixed
-        // Input Validation for Item ID
+    public List<ReviewResponse> getReviewsByItemId(Long itemId) {
         if (itemId == null || itemId <= 0) {
             throw new IllegalArgumentException("Item ID cannot be null or non-positive for retrieving reviews.");
         }
-        // Fetch Item entity first to ensure it exists before querying reviews by it
-        // itemService.getItemById already handles existence and ID validation
-        Item item = itemService.getItemById(itemId).get();
-        
-        // Assuming your ReviewRepo has a method like List<Review> findByItemId(Long itemId);
-        return reviewRepo.findByItemId(itemId);
+
+        // 1. Fetch the Item entity (or throw if not found)
+        ItemDTO item = itemService.getItemById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("Item not found with ID: " + itemId));
+
+        // 2. Fetch Reviews by Item ID
+        List<Review> reviews = reviewRepo.findByItemId(itemId);
+
+        // 3. Convert each Review → ReviewResponse
+        return reviews.stream()
+                .map(review -> new ReviewResponse(
+                        review.getId(),
+                        review.getRating(),
+                        review.getDescription(),
+                        item,
+                        userDTOMapper.apply(review.getUser()),
+                        review.getCreatedAt(),
+                        review.getUpdatedAt()))
+                .toList();
     }
 
-
-    //UPDATE
+    // UPDATE
 
     /**
      * Updates the rating and description of an existing review.
@@ -163,10 +193,10 @@ public class ReviewService {
      * @param newDescription The new description.
      * @return The updated Review entity.
      * @throws IllegalArgumentException If input parameters are invalid.
-     * @throws EntityNotFoundException If the review is not found.
+     * @throws EntityNotFoundException  If the review is not found.
      */
     @Transactional
-    public Review updateReview(Long reviewId, int newRating, String newDescription) {
+    public ReviewResponse updateReview(Long reviewId, int newRating, String newDescription) {
         // Input Validation for parameters
         if (reviewId == null || reviewId <= 0) {
             throw new IllegalArgumentException("Review ID cannot be null or non-positive for update.");
@@ -184,16 +214,17 @@ public class ReviewService {
         review.setRating(newRating);
         review.setDescription(newDescription);
 
-        return reviewRepo.save(review); // Save the updated review
+        ReviewResponse updatedReview = ReviewResponse.fromEntity(reviewRepo.save(review));
+        return updatedReview; // Save the updated review
     }
 
-    //DELETE
-       /**
+    // DELETE
+    /**
      * Deletes a review by its ID.
      *
      * @param reviewId The ID of the review to delete.
      * @throws IllegalArgumentException If the review ID is invalid.
-     * @throws EntityNotFoundException If the review is not found.
+     * @throws EntityNotFoundException  If the review is not found.
      */
     @Transactional
     public void deleteReview(Long reviewId) {

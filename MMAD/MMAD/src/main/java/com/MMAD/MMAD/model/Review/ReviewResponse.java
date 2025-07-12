@@ -1,17 +1,20 @@
 package com.MMAD.MMAD.model.Review;
 
 import java.time.LocalDateTime; // Import if you use LocalDateTime in your Review entity
-import com.MMAD.MMAD.model.Item.Item;
+import com.MMAD.MMAD.model.Item.ItemDTO;
 import com.MMAD.MMAD.model.User.User;
 import com.MMAD.MMAD.model.User.UserDTO;
+import com.MMAD.MMAD.model.User.UserDTOMapper;
 
 public class ReviewResponse {
+    private static final UserDTOMapper USER_MAPPER = new UserDTOMapper();
+
     private Long id;
     private int rating;
     private String description; // Matches backend Review.description
 
     // Details for the associated Item (assuming you want to show name and ID)
-    private Item item;
+    private ItemDTO item;
 
     // Details for the associated User (assuming you want to show username and ID)
     private UserDTO user;
@@ -21,7 +24,7 @@ public class ReviewResponse {
 
     // Constructor to easily map from Review entity
     public ReviewResponse(Long id, int rating, String description,
-            Item item,
+            ItemDTO item,
             UserDTO user,
             LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -63,20 +66,19 @@ public class ReviewResponse {
         this.description = description;
     }
 
-    public Item getItem() {
+    public ItemDTO getItem() {
         return item;
     }
 
-    public void setItem(Item item) {
+    public void setItem(ItemDTO item) {
         this.item = item;
     }
-
 
     public UserDTO getUser() {
         return user;
     }
 
-    public void setUsername(UserDTO user) {
+    public void setUser(UserDTO user) {
         this.user = user;
     }
 
@@ -95,4 +97,19 @@ public class ReviewResponse {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public static ReviewResponse fromEntity(Review review) {
+        if (review == null)
+            return null;
+
+        return new ReviewResponse(
+                review.getId(),
+                review.getRating(),
+                review.getDescription(),
+                ItemDTO.fromEntity(review.getItem()),
+                USER_MAPPER.apply(review.getUser()),
+                review.getCreatedAt(),
+                review.getUpdatedAt());
+    }
+
 }

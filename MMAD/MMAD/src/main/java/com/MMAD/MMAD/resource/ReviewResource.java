@@ -28,7 +28,6 @@ public class ReviewResource {
     private final ItemService itemService;
     private final UserService userService;
 
-
     // Constructor Injection (uncommented)
     public ReviewResource(ReviewService reviewService, ItemService itemService, UserService userService) {
         this.reviewService = reviewService;
@@ -36,57 +35,53 @@ public class ReviewResource {
         this.userService = userService;
     }
 
-    //CREATE
+    // CREATE
     /**
      * Endpoint to create a new review.
      * Requires userId, itemId, rating, and description in the request body.
      */
     @PostMapping("/add")
-    // --- FIX IS HERE: Change generic type from Review to ReviewResponse ---
     public ResponseEntity<ReviewResponse> createReview(@Valid @RequestBody ReviewRequest reviewRequest) {
         try {
-            // This line is already correct: savedReview is of type ReviewResponse
-            Review review = reviewService.createReview(reviewRequest.getUsername(), reviewRequest.getItemId(),
-                    reviewRequest.getRating(), reviewRequest.getDescription());
-            review.setItem(itemService.getItemById(reviewRequest.getItemId()).get());
-            UserDTO user = userService.findUserByUsername(reviewRequest.getUsername());
+            ReviewResponse savedReview = reviewService.createReview(
+                    reviewRequest.getUsername(),
+                    reviewRequest.getItemId(),
+                    reviewRequest.getRating(),
+                    reviewRequest.getDescription());
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedReview);
 
-            ReviewResponse savedReview = new ReviewResponse(review.getId(), review.getRating(), review.getDescription()
-                ,review.getItem() , user, review.getCreatedAt(), review.getUpdatedAt());
-            // This line is now correct because savedReview is ReviewResponse
-            return new ResponseEntity<>(savedReview, HttpStatus.CREATED);
         } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT); // 409
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // or send message
         } catch (IllegalStateException e) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); // 401
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         } catch (DataIntegrityViolationException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // 400
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         } catch (Exception e) {
             System.err.println("Unexpected error creating review: " + e.getMessage());
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // 500
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    //READ
-    @GetMapping("/all") // Endpoint for getting all reviews
-    public ResponseEntity<?> getAllReviews() { 
+    // READ
+    @GetMapping("/all")
+    public ResponseEntity<List<ReviewResponse>> getAllReviews() {
         try {
-            List<Review> reviews = reviewService.getAllReviews();
-            return new ResponseEntity<>(reviews, HttpStatus.OK); // This is ResponseEntity<List<Review>> (valid with ?)
+            List<ReviewResponse> reviews = reviewService.getAllReviews();
+            return new ResponseEntity<>(reviews, HttpStatus.OK);
         } catch (Exception e) {
-            // General catch-all for unexpected server errors
-            // This is now ResponseEntity<String> (valid with ?)
-            return new ResponseEntity<>("Failed to retrieve all reviews: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR); // 500
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null); // Or include a message body if needed
         }
     }
-    
+
     @GetMapping("find/{id}") // GET to /reviews/{id}
-    public ResponseEntity<Review> getReviewById(@PathVariable("id") Long id) {
+    public ResponseEntity<ReviewResponse> getReviewById(@PathVariable("id") Long id) {
         try {
-            Review review = reviewService.getReviewById(id);
+            ReviewResponse review = reviewService.getReviewById(id);
             return new ResponseEntity<>(review, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
@@ -96,16 +91,19 @@ public class ReviewResource {
     /**
      * Endpoint to get all reviews by a specific user.
      */
-    @GetMapping("/user/{userId}") // GET to /reviews/user/{userId}
-    public ResponseEntity<List<Review>> getReviewsByUserId(@PathVariable("userId") Long userId) {
-        try {
-            List<Review> reviews = reviewService.getReviewsByItemId(userId);
-            return new ResponseEntity<>(reviews, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            // If the user itself is not found
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
-        }
-    }
+    // @GetMapping("/user/{userId}")
+    // public ResponseEntity<List<ReviewResponse>>
+    // getReviewsByUserId(@PathVariable("userId") Long userId) {
+    // try {
+    // List<ReviewResponse> reviews = reviewService.getRe(userId);
+    // return ResponseEntity.ok(reviews); // 200 OK
+    // } catch (EntityNotFoundException e) {
+    // return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404
+    // } catch (Exception e) {
+    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); //
+    // 500
+    // }
+    // }
 
     // /**
     // * Endpoint to get all reviews for a specific item.
@@ -146,11 +144,11 @@ public class ReviewResource {
      * If user/item can be changed, you'd need a different DTO.
      */
     @PutMapping("/{id}") // PUT to /reviews/{id}
-    public ResponseEntity<Review> updateReview(
+    public ResponseEntity<ReviewResponse> updateReview(
             @PathVariable("id") Long id,
             @Valid @RequestBody UpdateReviewRequest updateRequest) { // <-- CHANGED METHOD SIGNATURE
         try {
-            Review updatedReview = reviewService.updateReview(
+            ReviewResponse updatedReview = reviewService.updateReview(
                     id,
                     updateRequest.getRating(),
                     updateRequest.getDescription());

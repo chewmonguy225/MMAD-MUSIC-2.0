@@ -1,6 +1,7 @@
 package com.MMAD.MMAD.resource.item;
 
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.persistence.EntityNotFoundException; // Import EntityNotFoundException
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.MMAD.MMAD.model.Item.Artist;
+import com.MMAD.MMAD.model.Item.Artist.Artist;
+import com.MMAD.MMAD.model.Item.Artist.ArtistDTO;
 import com.MMAD.MMAD.service.item.ArtistService; // Ensure this matches the updated service package
 
 @RestController
@@ -31,7 +33,7 @@ public class ArtistResource {
     public ResponseEntity<?> addArtist(@RequestBody Artist artist) {
         try {
             // Service method renamed to addArtist
-            Artist newArtist = artistService.addArtist(artist);
+            ArtistDTO newArtist = artistService.addArtist(artist);
             return new ResponseEntity<>(newArtist, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) { // Catch specific exceptions for better error messages
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -43,45 +45,59 @@ public class ArtistResource {
 
     // READ
     @GetMapping("/all")
-    public ResponseEntity<List<Artist>> getAllArtists() {
-        List<Artist> artists = artistService.getAllArtists();
+    public ResponseEntity<List<ArtistDTO>> getAllArtists() {
+        List<ArtistDTO> artists = artistService.getAllArtists();
         return new ResponseEntity<>(artists, HttpStatus.OK);
     }
 
     @GetMapping("/find/{id}")
-    public ResponseEntity<Artist> getArtistById(@PathVariable("id") Long id) {
-        // The service method already throws EntityNotFoundException which Spring will
-        // catch
-        // and by default return 404. Or you can catch it explicitly.
-        Artist artist = artistService.getArtistById(id).get();
-        return new ResponseEntity<>(artist, HttpStatus.OK);
-    }
-
-    @GetMapping("/findSource/{source_id}")
-    public ResponseEntity<Artist> getArtistBySourceId(@PathVariable("source_id") String sourceId) {
+    public ResponseEntity<?> getArtistById(@PathVariable("id") Long id) {
         try {
-            Artist artist = artistService.getArtistBySourceId(sourceId).get(); // Service now throws exception
-            return new ResponseEntity<>(artist, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Return 404 if not found
-        }
-    }
-    //
-
-    // UPDATE
-    @PutMapping("/update/{id}") // Now the ID is part of the URL path
-    public ResponseEntity<?> updateArtist(@PathVariable("id") Long id, @RequestBody Artist artist) {
-        try {
-            // The ID is now coming from the path variable, so no need to check
-            // artist.getId() here
-            Artist updatedArtist = artistService.updateArtist(id, artist); // Pass both ID and artist
-            return new ResponseEntity<>(updatedArtist, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            Optional<ArtistDTO> artistDtoOpt = artistService.getArtistById(id);
+            if (artistDtoOpt.isPresent()) {
+                return new ResponseEntity<>(artistDtoOpt.get(), HttpStatus.OK);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>("Failed to update artist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Failed to find artist by ID: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/findSource/{source_id}")
+    public ResponseEntity<?> getArtistBySourceId(@PathVariable("source_id") String sourceId) {
+        try {
+            Optional<ArtistDTO> artistDtoOpt = artistService.getArtistBySourceId(sourceId);
+            if (artistDtoOpt.isPresent()) {
+                return new ResponseEntity<>(artistDtoOpt.get(), HttpStatus.OK);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to find Artist by Source ID: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // UPDATE
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateArtist(@PathVariable("id") Long id, @RequestBody Artist artistDetails) {
+        try {
+            ArtistDTO updatedArtistDto = artistService.updateArtist(id, artistDetails);
+            return new ResponseEntity<>(updatedArtistDto, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update Artist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

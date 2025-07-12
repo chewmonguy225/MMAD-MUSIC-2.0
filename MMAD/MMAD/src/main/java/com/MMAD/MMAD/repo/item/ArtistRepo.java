@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.MMAD.MMAD.model.Item.Artist;
+import com.MMAD.MMAD.model.Item.Artist.Artist;
 
 @Repository
 public interface ArtistRepo extends JpaRepository<Artist, Long> {

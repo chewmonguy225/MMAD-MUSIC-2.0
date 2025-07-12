@@ -1,6 +1,8 @@
 // File: com/MMAD/MMAD/model/Item/Artist.java
 
-package com.MMAD.MMAD.model.Item;
+package com.MMAD.MMAD.model.Item.Artist;
+
+import com.MMAD.MMAD.model.Item.Item;
 
 // REMOVE THIS: import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -10,8 +12,9 @@ import jakarta.persistence.PrimaryKeyJoinColumn; // NEW IMPORT
 @Entity
 @Table(name = "artists")
 @PrimaryKeyJoinColumn(name = "id")
-public class Artist extends Item {
 
+public class Artist extends Item {
+    
     public Artist() {
         super();
     }

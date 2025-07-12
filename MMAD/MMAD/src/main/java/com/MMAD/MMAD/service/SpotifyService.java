@@ -12,10 +12,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.time.LocalDateTime;
 import java.util.*;
 
-//import com.MMAD.MMAD.model.Item.Album;
-import com.MMAD.MMAD.model.Item.Artist;
 import com.MMAD.MMAD.model.Item.Item;
+import com.MMAD.MMAD.model.Item.Album.Album;
 //import com.MMAD.MMAD.model.Item.Song;
+import com.MMAD.MMAD.model.Item.Artist.Artist;
 
 @Service
 public class SpotifyService {
@@ -45,7 +45,8 @@ public class SpotifyService {
 
             HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
 
-            ResponseEntity<String> response = restTemplate.exchange(TOKEN_URL, HttpMethod.POST, requestEntity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(TOKEN_URL, HttpMethod.POST, requestEntity,
+                    String.class);
 
             if (response.getStatusCode() != HttpStatus.OK) {
                 throw new RuntimeException("Failed to retrieve access token");
@@ -60,7 +61,8 @@ public class SpotifyService {
         }
     }
 
-    //type: artist or artist,track (for artist and track) or artist,track,album etc.
+    // type: artist or artist,track (for artist and track) or artist,track,album
+    // etc.
     public List<Item> searchItem(String itemName, String type) {
         List<Item> itemList = new ArrayList<>();
         try {
@@ -80,19 +82,48 @@ public class SpotifyService {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonResponse = objectMapper.readTree(response.getBody());
 
+            // ARTIST
             JsonNode artistsNode = jsonResponse.path("artists").path("items");
             if (artistsNode.isArray()) {
                 for (JsonNode artistNode : artistsNode) {
                     JsonNode imagesNode = artistNode.path("images");
-                    String imageUrl = imagesNode.isArray() && imagesNode.size() > 0 ? imagesNode.get(0).path("url").asText() : "default_image_url";
+                    String imageUrl = imagesNode.isArray() && imagesNode.size() > 0
+                            ? imagesNode.get(0).path("url").asText()
+                            : "default_image_url";
                     String spotifyId = artistNode.path("id").asText(); // Spotify ID, maps to your sourceId
                     String name = artistNode.path("name").asText();
-
 
                     Artist artist = new Artist(spotifyId, name, imageUrl);
                     itemList.add(artist);
                 }
             }
+
+            // ALBUMS
+            JsonNode albumsNode = jsonResponse.path("albums").path("items");
+            if (albumsNode.isArray()) {
+                for (JsonNode albumNode : albumsNode) {
+                    JsonNode imagesNode = albumNode.path("images");
+                    String imageUrl = imagesNode.isArray() && imagesNode.size() > 0
+                            ? imagesNode.get(0).path("url").asText()
+                            : "default_image_url";
+                    String spotifyId = albumNode.path("id").asText(); // Spotify ID, maps to your sourceId
+                    String name = albumNode.path("name").asText();
+
+                    List<Artist> albumArtistsList = new ArrayList<>();
+                    JsonNode albumArtistsNode = albumNode.path("artists");
+                    for (JsonNode albumArtistNode : albumArtistsNode) {
+                        String albumArtistSpotifyId = albumArtistNode.path("id").asText();
+                        String albumArtistName = albumArtistNode.path("name").asText();
+
+                        Artist albumArtist = new Artist(albumArtistSpotifyId, albumArtistName, "default_image_url");
+                        albumArtistsList.add(albumArtist);
+                    }   
+
+                    Album album = new Album(imageUrl,spotifyId , name, albumArtistsList);
+                    itemList.add(album);
+                }
+            }
+
         } catch (Exception e) {
             System.err.println("Error searching Spotify items: " + e.getMessage());
             e.printStackTrace();
