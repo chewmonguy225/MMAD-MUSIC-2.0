@@ -8,15 +8,20 @@ import com.MMAD.MMAD.model.User.User; // Ensure this path is correct
 import com.MMAD.MMAD.model.User.UserDTO;
 import com.MMAD.MMAD.model.User.UserDTOMapper;
 import com.MMAD.MMAD.repo.ReviewRepo; // Ensure this path is correct
+import org.springframework.data.domain.Sort;
 
 // Assuming you have these services for fetching User and Item entities
 import com.MMAD.MMAD.service.item.ItemService; // Ensure this path is correct
 
 import jakarta.persistence.EntityNotFoundException;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReviewService {
@@ -72,8 +77,7 @@ public class ReviewService {
                 .orElseThrow(() -> new EntityNotFoundException("Item not found with ID: " + itemId));
 
         if (reviewRepo.findByUserIdAndItemId(user.getId(), item.getId()).isPresent()) {
-            throw new IllegalArgumentException(
-                    "User '" + user.getUsername() + "' has already reviewed item '" + item.getName() + "'.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "UserAlreadyReviewed");
         }
 
         Review review = new Review(rating, description, Item.fromDTO(item), user);
@@ -88,19 +92,32 @@ public class ReviewService {
     /**
      * Retrieves all reviews in the system.
      * 
-     * @return A list of all Review DTO.
+     * @return A list of all Review DTO in order from most recent to oldest
      */
     @Transactional(readOnly = true)
     public List<ReviewResponse> getAllReviews() {
-        return reviewRepo.findAll().stream()
-                .map(review -> new ReviewResponse(
-                        review.getId(),
-                        review.getRating(),
-                        review.getDescription(),
-                        ItemDTO.fromEntity(review.getItem()),
-                        userDTOMapper.apply(review.getUser()),
-                        review.getCreatedAt(),
-                        review.getUpdatedAt()))
+        return reviewRepo.findAll(Sort.by(Sort.Direction.DESC, "createdAt")).stream()
+                .map(review -> {
+                    ItemDTO itemDto = ItemDTO.fromEntity(review.getItem());
+
+                    if (itemDto != null) {
+                        System.out.println("Mapping Review ID: " + review.getId() +
+                                ", Item type: " + itemDto.getClass().getSimpleName() +
+                                " (Name: " + itemDto.getName() + ")");
+                    } else {
+                        System.out.println("Mapping Review ID: " + review.getId() +
+                                ", Item is null or couldn't be mapped to a DTO.");
+                    }
+
+                    return new ReviewResponse(
+                            review.getId(),
+                            review.getRating(),
+                            review.getDescription(),
+                            itemDto,
+                            userDTOMapper.apply(review.getUser()),
+                            review.getCreatedAt(),
+                            review.getUpdatedAt());
+                })
                 .toList();
     }
 
@@ -124,30 +141,35 @@ public class ReviewService {
         return ReviewResponse.fromEntity(review);
     }
 
-    // /**
-    // * Retrieves all reviews written by a specific user.
-    // *
-    // * @param userId The ID of the user.
-    // * @return A list of reviews by the user.
-    // * @throws IllegalArgumentException If the user ID is invalid.
-    // * @throws EntityNotFoundException If the user does not exist.
-    // */
-    // @Transactional(readOnly = true)
-    // public List<Review> getReviewsByUserId(Long userId) {
-    // // Input Validation for User ID
-    // if (userId == null || userId <= 0) {
-    // throw new IllegalArgumentException("User ID cannot be null or non-positive
-    // for retrieving reviews.");
-    // }
-    // // Fetch User entity first to ensure it exists before querying reviews by it
-    // // Assuming userService.getUserById returns Optional<User> or throws
-    // EntityNotFoundException
-    // User user = userService.getUserById(userId)
-    // .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " +
-    // userId));
+    /**
+     * Retrieves all reviews written by a specific user.
+     *
+     * @param userId The ID of the user.
+     * @return A list of reviews by the user.
+     * @throws IllegalArgumentException If the user ID is invalid.
+     * @throws EntityNotFoundException  If the user does not exist.
+     */
+    @Transactional(readOnly = true)
+    public List<ReviewResponse> getReviewsByUsername(String username) {
 
-    // return reviewRepo.findByUserId(userId);
-    // }
+        // 1. Fetch the User entity (or throw if not found)
+        Optional <User> user = userService.getUserByUsername(username);
+
+        // 2. Fetch Reviews by User ID
+        List<Review> reviews = reviewRepo.findByUserId(user.get().getId());
+
+        // 3. Convert each Review → ReviewResponse
+        return reviews.stream()
+                .map(review -> new ReviewResponse(
+                        review.getId(),
+                        review.getRating(),
+                        review.getDescription(),
+                        ItemDTO.fromEntity(review.getItem()), // get and map item
+                        userDTOMapper.apply(user.get()), // same user for all reviews
+                        review.getCreatedAt(),
+                        review.getUpdatedAt()))
+                .toList();
+    }
 
     /**
      * Retrieves all reviews for a specific item.

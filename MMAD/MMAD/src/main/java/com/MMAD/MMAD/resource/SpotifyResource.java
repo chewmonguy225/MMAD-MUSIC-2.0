@@ -18,6 +18,8 @@ import com.MMAD.MMAD.model.Item.Album.AlbumDTO;
 //import com.MMAD.MMAD.model.Item.Song;
 import com.MMAD.MMAD.model.Item.Artist.Artist;
 import com.MMAD.MMAD.model.Item.Artist.ArtistDTO;
+import com.MMAD.MMAD.model.Item.Song.Song;
+import com.MMAD.MMAD.model.Item.Song.SongDTO;
 
 @RestController
 @RequestMapping("/spotify")
@@ -52,6 +54,19 @@ public class SpotifyResource {
                 .toList();
 
         return ResponseEntity.ok(albumDTOs);
+    }
+
+    @GetMapping("/search/song/{songName}")
+    public ResponseEntity<List<SongDTO>> searchSong(@PathVariable String songName) {
+        List<Item> items = spotifyService.searchItem(songName, "track");
+
+        List<SongDTO> songDTOs = items.stream()
+                .filter(item -> item instanceof Song)
+                .map(item -> (Song) item)
+                .map(SongDTO::fromEntity) // Convert Song → SongDTO
+                .toList();
+
+        return ResponseEntity.ok(songDTOs);
     }
 
 }

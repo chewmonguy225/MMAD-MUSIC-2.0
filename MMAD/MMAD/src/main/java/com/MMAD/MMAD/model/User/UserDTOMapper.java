@@ -12,16 +12,21 @@ public class UserDTOMapper implements Function<User, UserDTO> {
     public UserDTO apply(User user) {
         return new UserDTO(
             user.getUsername(),
-            user.getFriendsList()
+            user.getFollowing()
                 .stream()
                 .map(User::getUsername)
                 .collect(Collectors.toList()),
-            user.getPlaylists()     
+            user.getFollowers()
                 .stream()
-                .map(Playlist::getId) 
+                .map(User::getUsername)
+                .collect(Collectors.toList()),
+            user.getPlaylists()
+                .stream()
+                .map(Playlist::getId)
                 .collect(Collectors.toList())
         );
     }
+    
 
 
 

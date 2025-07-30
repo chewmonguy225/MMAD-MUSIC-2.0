@@ -1,8 +1,5 @@
 package com.MMAD.MMAD.resource;
 
-import com.MMAD.MMAD.model.Item.Item;
-import com.MMAD.MMAD.model.User.UserDTO;
-import com.MMAD.MMAD.model.Review.Review;
 import com.MMAD.MMAD.service.ReviewService;
 import com.MMAD.MMAD.service.item.ItemService;
 import com.MMAD.MMAD.service.UserService;
@@ -10,7 +7,6 @@ import com.MMAD.MMAD.model.Review.ReviewRequest; // Import the new DTO
 import com.MMAD.MMAD.model.Review.ReviewResponse;
 import com.MMAD.MMAD.model.Review.UpdateReviewRequest;
 
-import jakarta.validation.constraints.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid; // For validating @RequestBody
 import org.springframework.http.HttpStatus;
@@ -25,14 +21,10 @@ import java.util.List;
 public class ReviewResource {
 
     private final ReviewService reviewService;
-    private final ItemService itemService;
-    private final UserService userService;
 
     // Constructor Injection (uncommented)
-    public ReviewResource(ReviewService reviewService, ItemService itemService, UserService userService) {
+    public ReviewResource(ReviewService reviewService) {
         this.reviewService = reviewService;
-        this.itemService = itemService;
-        this.userService = userService;
     }
 
     // CREATE
@@ -91,19 +83,17 @@ public class ReviewResource {
     /**
      * Endpoint to get all reviews by a specific user.
      */
-    // @GetMapping("/user/{userId}")
-    // public ResponseEntity<List<ReviewResponse>>
-    // getReviewsByUserId(@PathVariable("userId") Long userId) {
-    // try {
-    // List<ReviewResponse> reviews = reviewService.getRe(userId);
-    // return ResponseEntity.ok(reviews); // 200 OK
-    // } catch (EntityNotFoundException e) {
-    // return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404
-    // } catch (Exception e) {
-    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); //
-    // 500
-    // }
-    // }
+    @GetMapping("/user/{username}")
+    public ResponseEntity<List<ReviewResponse>> getReviewsByUserId(@PathVariable("username") String username) {
+        try {
+            List<ReviewResponse> reviews = reviewService.getReviewsByUsername(username);
+            return ResponseEntity.ok(reviews); // 200 OK
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404
+        } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); //500
+     }
+    }
 
     // /**
     // * Endpoint to get all reviews for a specific item.

@@ -1,6 +1,7 @@
 package com.MMAD.MMAD.model.Item.Album;
 
 import com.MMAD.MMAD.model.Item.ItemDTO;
+import com.MMAD.MMAD.model.Item.Artist.Artist;
 import com.MMAD.MMAD.model.Item.Artist.ArtistDTO;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class AlbumDTO extends ItemDTO {
         this.artists = artists;
     }
 
-    // Getter & Setter
+    // Getters & Setters
     public List<ArtistDTO> getArtists() {
         return artists;
     }
@@ -29,10 +30,9 @@ public class AlbumDTO extends ItemDTO {
         this.artists = artists;
     }
 
-    // Static mapper from Album entity to AlbumDTO
+    // From Album entity to DTO
     public static AlbumDTO fromEntity(Album album) {
-        if (album == null)
-            return null;
+        if (album == null) return null;
 
         return new AlbumDTO(
                 album.getId(),
@@ -46,4 +46,27 @@ public class AlbumDTO extends ItemDTO {
                              .collect(Collectors.toList())
         );
     }
+
+    public static Album toEntity(AlbumDTO dto) {
+        if (dto == null) return null;
+    
+        // Convert ArtistDTOs to Artist entities using explicit lambda to avoid ambiguity
+        List<Artist> artistEntities = dto.getArtists() == null ? null :
+            dto.getArtists()
+               .stream()
+               .map(dtoArtist -> ArtistDTO.toEntity(dtoArtist))
+               .collect(Collectors.toList());
+    
+        // Use the constructor that includes imageURL
+        Album album = new Album(
+            dto.getImageURL(),
+            dto.getSourceId(),
+            dto.getName(),
+            artistEntities
+        );
+    
+        album.setId(dto.getId()); // Set ID for updates
+        return album;
+    }    
+    
 }

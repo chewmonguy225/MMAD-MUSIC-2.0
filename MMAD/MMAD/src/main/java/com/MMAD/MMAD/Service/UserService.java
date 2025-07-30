@@ -21,20 +21,12 @@ import jakarta.transaction.Transactional;
 public class UserService {
 
     private final UserRepo userRepo;
-    
     private final UserDTOMapper userDTOMapper;
 
-
-    /**
-     * Constructor for UserService.
-     * 
-     * @param userRepo The UserRepo to be used.
-     * @throws RuntimeException if the userRepo or userDTOMapper are null
-     */
     public UserService(UserRepo userRepo, UserDTOMapper userDTOMapper) {
-        if(userRepo == null){
+        if (userRepo == null) {
             throw new RuntimeException("userRepo cannot be null");
-        } else if(userDTOMapper == null){
+        } else if (userDTOMapper == null) {
             throw new RuntimeException("userDTOMapper cannot be null");
         } else {
             this.userRepo = userRepo;
@@ -42,31 +34,15 @@ public class UserService {
         }
     }
 
-
-    /**
-     * Get a user by their id.
-     * 
-     * @param id The id of the user to be retrieved.
-     * @return UserDTO object for the found user if succussful
-     * @throws UserNotFoundException if the user does not exist.
-     */
     public UserDTO findUserById(Long id) {
         return userRepo.findUserById(id)
                 .map(userDTOMapper::apply)
                 .orElseThrow(() -> new UserNotFoundException("user with id [%s] not found".formatted(id)));
     }
 
-
-    /**
-     * Get a user by their username.
-     * 
-     * @param username The username of the user to be retrieved.
-     * @return UserDTO object for the found user if succussful
-     * @throws UserNotFoundException if the user does not exist.
-     */
     public UserDTO findUserByUsername(String username) {
         return userRepo.findUserByUsername(username)
-                .map(userDTOMapper::apply) 
+                .map(userDTOMapper::apply)
                 .orElseThrow(() -> new UserNotFoundException("user with username [%s] not found".formatted(username)));
     }
 
@@ -75,30 +51,12 @@ public class UserService {
         return userRepo.findUserByUsername(username);
     }
 
-
-
-    /**
-     * Get a user by their username and password.
-     * 
-     * @param username The username of the user to be retrieved.
-     * @param password The password of the user to be retrieved.
-     * @return UserDTO object for the found user if succussful
-     * @throws UserNotFoundException if the user does not exist.
-     */
     public UserDTO findUserByUsernameAndPassword(String username, String password) {
         return userRepo.findUserByUsernameAndPassword(username, password)
-                .map(userDTOMapper::apply) 
+                .map(userDTOMapper::apply)
                 .orElseThrow(() -> new UserNotFoundException("credentials do not match"));
     }
 
-
-    /**
-     * Create a new user.
-     * 
-     * @param user The user to be created.
-     * @return The created User object.
-     * @throws RuntimeException if the user already exists.
-     */
     public UserDTO createUser(String username, String password) {
         Optional<User> existingUser = userRepo.findUserByUsername(username);
         if (existingUser.isPresent()) {
@@ -110,130 +68,164 @@ public class UserService {
         }
     }
 
-
-    /**
-     * Delete a user by id.
-     * 
-     * @param id The id of the user to be deleted.
-     * @throws RuntimeException if the user does not exist.
-     */
     public void deleteUser(Long id) {
-        Optional<User> existingUser = userRepo.findUserById(id);
+        Optional<User> existingUser = userRepo.findById(id);
         if (existingUser.isPresent()) {
             User user = existingUser.get();
-            userRepo.deleteUserFromFriends(id); // Remove the user from all friend lists
-            user.getFriendsList().clear(); // Clear the user's friend list
+
+            // Remove this user from other users' followers and following lists
+            user.getFollowers().forEach(follower -> {
+                follower.getFollowing().remove(user);
+                userRepo.save(follower);
+            });
+
+            user.getFollowing().forEach(followingUser -> {
+                followingUser.getFollowers().remove(user);
+                userRepo.save(followingUser);
+            });
+
+            user.getFollowers().clear();
+            user.getFollowing().clear();
+
             userRepo.delete(user);
         } else {
             throw new RuntimeException("User does not exist");
         }
     }
 
-
     /**
-     * Adds a friend to the user's friend list.
-     * 
-     * @param userId The id of the user to add a friend to.
-     * @param friendId The id of the friend to be added.
-     * @throws IllegalArgumentException if the friend is already a friend, or if the friend is the user itself, or if the friend is null.
+     * User 'username' follows the user 'toFollowUsername'
      */
-    public void addFriend(Long userId, Long friendId) {
-
+    public void followUser(String username, String toFollowUsername) {
         try {
-            User user = userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
-            Set<User> friendList = user.getFriendsList();
-            User friend = userRepo.findById(friendId).orElseThrow(() -> new EntityNotFoundException("Friend not found"));
-            if (friendList.contains(friend)) {
-                throw new IllegalArgumentException("User is already a friend");
-            } 
-            else if (friend == user) {
-                throw new IllegalArgumentException("Cannot add self as a friend");
-            } 
-            else if (friend == null) {
-                throw new IllegalArgumentException("Friend cannot be null");
+            if (username.equals(toFollowUsername)) {
+                throw new IllegalArgumentException("Cannot follow yourself");
             }
-            else {
-                friendList.add(friend);
-                userRepo.save(user);
+
+            User user = userRepo.findUserByUsername(username)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+            User toFollow = userRepo.findUserByUsername(toFollowUsername)
+                    .orElseThrow(() -> new EntityNotFoundException("User to follow not found"));
+
+            if (user.getFollowing().contains(toFollow)) {
+                throw new IllegalArgumentException("Already following this user");
             }
+
+            user.getFollowing().add(toFollow);
+            toFollow.getFollowers().add(user);
+
+            userRepo.save(user);
+            userRepo.save(toFollow);
+
         } catch (IllegalArgumentException e) {
-            System.err.println("Error adding friend: " + e.getMessage());
-            throw new RuntimeException("Error adding friend");}
+            System.err.println("Error following user: " + e.getMessage());
+            throw new RuntimeException("Error following user: " + e.getMessage());
+        }
     }
 
-
+    public void unfollowUser(String username, String toUnfollowUsername) {
+        try {
+            if (username.equals(toUnfollowUsername)) {
+                throw new IllegalArgumentException("Cannot unfollow yourself");
+            }
+    
+            User user = userRepo.findUserByUsername(username)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+    
+            User toUnfollow = userRepo.findUserByUsername(toUnfollowUsername)
+                    .orElseThrow(() -> new EntityNotFoundException("User to unfollow not found"));
+    
+            if (!user.getFollowing().contains(toUnfollow)) {
+                throw new IllegalArgumentException("Not following this user");
+            }
+    
+            user.getFollowing().remove(toUnfollow);
+            toUnfollow.getFollowers().remove(user);
+    
+            userRepo.save(user);
+            userRepo.save(toUnfollow);
+    
+        } catch (IllegalArgumentException e) {
+            System.err.println("Error unfollowing user: " + e.getMessage());
+            throw new RuntimeException("Error unfollowing user: " + e.getMessage());
+        }
+    }
+    
     /**
-     * Get the friend list of a user.
-     * 
-     * @param userId The id of the user whose friend list is to be retrieved.
-     * @return A set of User objects representing the friends of the user.
-     * @throws RuntimeException if the user does not exist.
+     * Get list of users the user is following.
      */
-    public List<UserDTO> getFriendList(Long userId) {
+    public List<UserDTO> getFollowing(Long userId) {
         try {
             User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-            return user.getFriendsList()
+            return user.getFollowing()
                     .stream()
                     .map(userDTOMapper::apply)
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            System.err.println("Error getting friend list: " + e.getMessage());
-            throw new RuntimeException("Error getting friend list");
+            System.err.println("Error getting following list: " + e.getMessage());
+            throw new RuntimeException("Error getting following list");
         }
     }
 
-
     /**
-     * Removes a friend from the user's friend list.
-     * 
-     * @param userId The id of the user to remove a friend from.
-     * @param friendId The id of the friend to be removed.
-     * @throws IllegalArgumentException if the friend is not a friend, or if the friend is the user itself, or if the friend is null.
+     * Get list of followers of the user.
      */
-    public void removeFriend(Long userId, Long friendId) {
+    public List<UserDTO> getFollowers(Long userId) {
         try {
-            User user = userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
-            Set<User> friendList = user.getFriendsList();
-            User friend = userRepo.findById(friendId).orElseThrow(() -> new EntityNotFoundException("Friend not found"));
-            if (!friendList.contains(friend)) {
-                throw new IllegalArgumentException("User is not a friend");
-            } 
-            else if (friend == user) {
-                throw new IllegalArgumentException("Cannot remove self as a friend");
-            } 
-            else if (friend == null) {
-                throw new IllegalArgumentException("Friend cannot be null");
-            }
-            else {
-                friendList.remove(friend);
-                userRepo.save(user);
-            }
-        } catch (IllegalArgumentException e) {
-            System.err.println("Error removing friend: " + e.getMessage());
-            throw new RuntimeException("Error removing friend");
-        }
-    }
-
-
-    /**
-     * Remove all friends from a user's friend list.
-     * 
-     * @param userId The id of the user whose friends are to be removed.
-     * @throws RuntimeException if the user does not exist.
-     */
-    public void removeAllFriends(Long userId) {
-        try {
-            User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-            Set<User> friends = user.getFriendsList();
-            for (User friend : friends) {
-                friend.getFriendsList().remove(user);
-                userRepo.save(friend);
-            }
-            user.getFriendsList().clear();
-            userRepo.save(user);
+            User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+            return user.getFollowers()
+                    .stream()
+                    .map(userDTOMapper::apply)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
-            System.err.println("Error removing all friends: " + e.getMessage());
-            throw new RuntimeException("Error removing all friends");
+            System.err.println("Error getting followers list: " + e.getMessage());
+            throw new RuntimeException("Error getting followers list");
         }
+    }
+
+    /**
+     * Searches for users whose usernames contain the given query string
+     * (case-insensitive).
+     */
+    public List<UserDTO> searchUsers(String query) {
+        List<User> users = userRepo.findByUsernameContainingIgnoreCase(query);
+        return users.stream()
+                .map(userDTOMapper::apply)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Remove all users that the given user is following.
+     */
+    public void removeAllFollowing(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        // Remove this user from the followers list of every followed user
+        for (User followedUser : user.getFollowing()) {
+            followedUser.getFollowers().remove(user);
+            userRepo.save(followedUser);
+        }
+
+        user.getFollowing().clear();
+        userRepo.save(user);
+    }
+
+    /**
+     * Remove all followers of the given user.
+     */
+    public void removeAllFollowers(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        // Remove this user from the following list of all its followers
+        for (User follower : user.getFollowers()) {
+            follower.getFollowing().remove(user);
+            userRepo.save(follower);
+        }
+
+        user.getFollowers().clear();
+        userRepo.save(user);
     }
 }

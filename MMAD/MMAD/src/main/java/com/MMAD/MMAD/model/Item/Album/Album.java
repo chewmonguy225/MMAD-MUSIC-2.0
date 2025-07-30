@@ -2,7 +2,6 @@ package com.MMAD.MMAD.model.Item.Album;
 
 import com.MMAD.MMAD.model.Item.Item;
 import com.MMAD.MMAD.model.Item.Artist.Artist;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;

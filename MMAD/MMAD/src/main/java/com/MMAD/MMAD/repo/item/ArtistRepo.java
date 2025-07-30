@@ -9,8 +9,8 @@ import com.MMAD.MMAD.model.Item.Artist.Artist;
 
 @Repository
 public interface ArtistRepo extends JpaRepository<Artist, Long> {
+    
     void deleteArtistById(Long id);
-    Optional<Artist> findById(Long id);
     Optional<Artist> findBySourceId(String sourceId);
     Optional<Artist> findByName(String name);
 }

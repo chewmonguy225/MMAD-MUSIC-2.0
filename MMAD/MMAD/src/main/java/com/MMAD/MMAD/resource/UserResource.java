@@ -18,24 +18,20 @@ import com.MMAD.MMAD.service.UserService;
 
 import jakarta.transaction.Transactional;
 
-
-
 @RestController
 @RequestMapping("/user")
 public class UserResource {
 
     private final UserService userService;
 
-
     /**
      * Constructor for UserResource.
      * 
      * @param userService The UserService to be used.
      */
-    public UserResource(UserService userService){
+    public UserResource(UserService userService) {
         this.userService = userService;
     }
-
 
     /**
      * Get a user by their id.
@@ -53,7 +49,6 @@ public class UserResource {
         }
     }
 
-
     /**
      * Get a user by their username.
      * 
@@ -69,7 +64,6 @@ public class UserResource {
             return ResponseEntity.badRequest().body(null);
         }
     }
-
 
     /**
      * Get a user by their username and password.
@@ -90,7 +84,6 @@ public class UserResource {
             return ResponseEntity.badRequest().body(null);
         }
     }
-    
 
     /**
      * Create a new user.
@@ -110,7 +103,6 @@ public class UserResource {
         }
     }
 
-
     /**
      * Delete a user by their id.
      * 
@@ -128,64 +120,141 @@ public class UserResource {
         }
     }
 
-
     /**
-     * Add a friend to a user's friend list.
+     * Follow a user (add to following list).
      * 
-     * @param id The id of the user to add a friend to.
-     * @param friendId The id of the friend to be added.
-     * @return A message indicating the success of the addition.
+     * @param username       The username of the user who wants to follow another
+     *                       user.
+     * @param followUsername The username of the user to be followed.
+     * @return A message indicating success.
      */
     @Transactional
-    @PostMapping("/friends/add")
-    public ResponseEntity<String> addFriend(@RequestParam("id") Long id, @RequestParam("friendId") Long friendId) {
+    @PostMapping("/follow")
+    public ResponseEntity<String> followUser(@RequestParam("username") String username,
+            @RequestParam("followUsername") String followUsername) {
         try {
-            userService.findUserById(id);
-            userService.findUserById(friendId);
-            userService.addFriend(id, friendId);
-            return ResponseEntity.ok().body("User added successfully");
+            userService.findUserByUsername(username);
+            userService.findUserByUsername(followUsername);
+            userService.followUser(username, followUsername); // this method must be updated to accept usernames
+            return ResponseEntity.ok("User followed successfully");
         } catch (Exception e) {
-            System.err.println("Error adding friend: " + e.getMessage());
+            System.err.println("Error following user: " + e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
+    @Transactional
+    @PostMapping("/unfollow")
+    public ResponseEntity<String> unfollowUser(@RequestParam("username") String username,
+            @RequestParam("unfollowUsername") String unfollowUsername) {
+        try {
+            userService.findUserByUsername(username);
+            userService.findUserByUsername(unfollowUsername);
+            userService.unfollowUser(username, unfollowUsername); // implement this in your service
+            return ResponseEntity.ok("User unfollowed successfully");
+        } catch (Exception e) {
+            System.err.println("Error unfollowing user: " + e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     /**
-     * Get the friends list of a user.
+     * Get list of users that the user is following.
      * 
-     * @param id The id of the user whose friends list is being retrieved.
-     * @return A Set of User objects which are in friends list of the user with the provided id.
+     * @param userId The id of the user.
+     * @return List of UserDTO representing the users being followed.
      */
-    @GetMapping("/friends/{id}")
-    public ResponseEntity<List<UserDTO>> getFriendList(@PathVariable("id") Long id) {
+    @GetMapping("/following/{userId}")
+    public ResponseEntity<List<UserDTO>> getFollowing(@PathVariable("userId") Long userId) {
         try {
-            List<UserDTO> friends = userService.getFriendList(id);
-            return new ResponseEntity<>(friends, HttpStatus.OK);
+            List<UserDTO> following = userService.getFollowing(userId);
+            return ResponseEntity.ok(following);
         } catch (Exception e) {
-            System.err.println("Error retrieving friends list: " + e.getMessage());
+            System.err.println("Error retrieving following list: " + e.getMessage());
             return ResponseEntity.badRequest().body(null);
         }
     }
 
+    /**
+     * Get list of followers of a user.
+     * 
+     * @param userId The id of the user.
+     * @return List of UserDTO representing the followers.
+     */
+    @GetMapping("/followers/{userId}")
+    public ResponseEntity<List<UserDTO>> getFollowers(@PathVariable("userId") Long userId) {
+        try {
+            List<UserDTO> followers = userService.getFollowers(userId);
+            return ResponseEntity.ok(followers);
+        } catch (Exception e) {
+            System.err.println("Error retrieving followers list: " + e.getMessage());
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
 
     /**
-     * Remove all friends from a user's friend list.
+     * Remove all followings of a user (stop following everyone).
      * 
-     * @param id The id of the user to remove a friend from.
-     * @return A message indicating the success of the removal.
+     * @param userId The id of the user.
+     * @return Success message.
      */
-    @PostMapping("/friends/removeAll/{id}")
-    public ResponseEntity<String> removeAllFriends(@PathVariable("id") Long id) {
+    @PostMapping("/following/removeAll/{userId}")
+    public ResponseEntity<String> removeAllFollowing(@PathVariable("userId") Long userId) {
         try {
-            userService.removeAllFriends(id);
-            return ResponseEntity.ok().body("All friends removed successfully");
+            userService.removeAllFollowing(userId);
+            return ResponseEntity.ok("All followings removed successfully");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    
-    
 
+    /**
+     * Remove all followers of a user (remove all followers).
+     * 
+     * @param userId The id of the user.
+     * @return Success message.
+     */
+    @PostMapping("/followers/removeAll/{userId}")
+    public ResponseEntity<String> removeAllFollowers(@PathVariable("userId") Long userId) {
+        try {
+            userService.removeAllFollowers(userId);
+            return ResponseEntity.ok("All followers removed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // --- NEW ENDPOINT FOR SEARCHING USERS ---
+    /**
+     * Searches for users whose usernames contain the given query string
+     * (case-insensitive).
+     *
+     * @param query The string to search for within usernames.
+     * @return A list of UserDTOs matching the search criteria.
+     */
+
+    // --- NEW ENDPOINT FOR SEARCHING USERS (Similar to removeAllFriends) ---
+    /**
+     * Searches for users whose usernames contain the given query string
+     * (case-insensitive).
+     *
+     * @param query The string to search for within usernames.
+     * @return A list of UserDTOs matching the search criteria.
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<UserDTO>> searchUsers(@RequestParam("query") String query) {
+        try {
+            List<UserDTO> users = userService.searchUsers(query);
+            // If no users are found, userService.searchUsers returns an empty list,
+            // which is a valid success response (HTTP 200 OK with an empty array).
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            // Catch any unexpected exceptions that might occur during the service call
+            // and return a bad request with the error message, similar to your template.
+            return ResponseEntity.badRequest().body(null); // Returning null body with badRequest indicates an error.
+                                                           // You might prefer to return e.getMessage() here
+                                                           // or a more specific error response.
+        }
+    }
 
 }

@@ -9,13 +9,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 import com.MMAD.MMAD.model.Item.Item;
 import com.MMAD.MMAD.model.Item.Album.Album;
 //import com.MMAD.MMAD.model.Item.Song;
 import com.MMAD.MMAD.model.Item.Artist.Artist;
+import com.MMAD.MMAD.model.Item.Song.Song;
 
 @Service
 public class SpotifyService {
@@ -121,6 +121,51 @@ public class SpotifyService {
 
                     Album album = new Album(imageUrl,spotifyId , name, albumArtistsList);
                     itemList.add(album);
+                }
+            }
+
+            //SONGS
+
+            JsonNode songsNode = jsonResponse.path("tracks").path("items");
+            if (songsNode.isArray()) {
+                for (JsonNode songNode : songsNode) {
+                    String sourceId = songNode.path("id").asText();
+                    String name = songNode.path("name").asText();
+                    String imageUrl;
+                //Album that song is a part of
+                    JsonNode songAlbumNode = songNode.path("album");
+                    String songAlbumName = songAlbumNode.path("name").asText();
+                    //Use album cover as song cover
+                    JsonNode imagesNode = songAlbumNode.path("images");
+                    imageUrl = imagesNode.isArray() && imagesNode.size() > 0
+                            ? imagesNode.get(0).path("url").asText()
+                            : "default_image_url";
+                    String songAlbumSpotifyId = songAlbumNode.path("id").asText();
+
+                    List<Artist> songAlbumArtistsList = new ArrayList<>();
+                    JsonNode songAlbumArtistsNode = songAlbumNode.path("artists");
+                    for (JsonNode songAlbumArtistNode : songAlbumArtistsNode) {
+                        String albumArtistSpotifyId = songAlbumArtistNode.path("id").asText();
+                        String albumArtistName = songAlbumArtistNode.path("name").asText();
+
+                        Artist albumArtist = new Artist(albumArtistSpotifyId, albumArtistName, "default_image_url");
+                        songAlbumArtistsList.add(albumArtist);
+                    }   
+                    Album album = new Album(imageUrl, songAlbumSpotifyId, songAlbumName, songAlbumArtistsList);
+
+                //Song's Artist because Song can have a featured artist that is not considered in the album object
+                    List<Artist> songArtistsList = new ArrayList<>();
+                    JsonNode songArtistsNode = songNode.path("artists");
+                    for (JsonNode songArtistNode : songArtistsNode) {
+                        String songArtistSpotifyId = songArtistNode.path("id").asText();
+                        String songArtistName = songArtistNode.path("name").asText();
+
+                        Artist songArtist = new Artist(songArtistSpotifyId, songArtistName, "default_image_url");
+                        songArtistsList.add(songArtist);
+                    }   
+                    
+                    Song song = new Song(sourceId, name, imageUrl, songArtistsList, album);
+                    itemList.add(song);
                 }
             }
 

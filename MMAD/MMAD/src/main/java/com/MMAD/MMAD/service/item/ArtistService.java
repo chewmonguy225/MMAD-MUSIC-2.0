@@ -50,6 +50,7 @@ public class ArtistService {
     }
 
     // READ
+    
     @Transactional(readOnly = true)
     public List<ArtistDTO> getAllArtists() {
         List<Artist> Artists = artistRepo.findAll();
@@ -141,4 +142,5 @@ public class ArtistService {
         }
         artistRepo.deleteById(id);
     }
+    
 }

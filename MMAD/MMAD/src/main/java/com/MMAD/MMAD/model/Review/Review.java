@@ -2,7 +2,6 @@ package com.MMAD.MMAD.model.Review;
 
 import com.MMAD.MMAD.model.Item.Item; // Import the base Item class
 import com.MMAD.MMAD.model.User.User; // Import the User class
-import com.MMAD.MMAD.model.User.UserDTO;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime; // Use java.time.LocalDateTime for modern timestamp handling
