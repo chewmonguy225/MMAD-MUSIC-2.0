@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS User;
 
 CREATE TABLE User (
     username VARCHAR(255) PRIMARY KEY,
-    password VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
 );
 
 DROP TABLE IF EXISTS Artist;
@@ -41,7 +41,7 @@ CREATE TABLE Song (
     name VARCHAR(255) NOT NULL,
     imageurl VARCHAR(255) DEFAULT 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png',
     album_id INT NOT NULL,
-    FOREIGN KEY (album_id) REFERENCES Album(id)
+    FOREIGN KEY (album_id) REFERENCES Album(id),
     artist_id INT NOT NULL,
     FOREIGN KEY (artist_id) REFERENCES Artist(id)
 );
@@ -50,7 +50,7 @@ DROP TABLE IF EXISTS Playlist;
 
 CREATE TABLE Playlist (
     username VARCHAR(255) NOT NULL,
-    FOREIGN KEY (username) REFERENCES User(username)
+    FOREIGN KEY (username) REFERENCES User(username),
     song_id INT NOT NULL,
     FOREIGN KEY (song_id) REFERENCES Song(id),
     PRIMARY KEY (username, song_id)
@@ -61,7 +61,7 @@ DROP TABLE IF EXISTS Review;
 CREATE TABLE Review (
     id VARCHAR(255) PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
-    FOREIGN KEY (username) REFERENCES User(username)
+    FOREIGN KEY (username) REFERENCES User(username),
     rating INT NOT NULL,
     text VARCHAR(255) NOT NULL,
     song_id INT NOT NULL,
