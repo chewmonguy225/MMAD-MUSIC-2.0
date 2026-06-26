@@ -1,0 +1,10 @@
+
+body {
+  background-color: powderblue;
+}
+main {
+  background-color: transparent;
+  margin-left: 80px; /* same as your fixed header width */
+  padding: 20px;     /* optional padding for spacing */
+  box-sizing: border-box;
+}

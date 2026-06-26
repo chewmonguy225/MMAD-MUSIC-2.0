@@ -1,0 +1,59 @@
+/* Container for username + stats on the same line, centered as a group */
+app-base-page p.stats-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;  /* center entire group horizontally */
+    gap: 1.5rem;              /* space between username and stats */
+    font-size: 1rem;
+    color: #444;
+    margin: 0;
+  }
+  
+  /* Username styles */
+  app-base-page p.stats-container .username {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;  /* prevent wrapping */
+  }
+  
+  /* Stats group */
+  app-base-page p.stats-container .stats {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    white-space: nowrap;  /* prevent wrapping */
+  }
+  
+  /* Buttons for followers/following */
+  button[mat-button] {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    font-weight: 500;
+    color: #0057e7;
+  }
+  
+  button[mat-button]:hover {
+    background-color: #e0f0ff;
+    border-color: #80caff;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+  }
+  
+  /* Responsive tweaks */
+  @media (max-width: 600px) {
+    app-base-page p.stats-container {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    app-base-page p.stats-container .stats {
+      justify-content: flex-start;
+      width: 100%;
+    }
+  }
+  

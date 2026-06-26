@@ -1,0 +1,110 @@
+/* src/app/component/review-viewer/review-viewer.component.css */
+
+.review-viewer-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 20px auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: #f9f9f9;
+  }
+  
+  
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  button {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    margin-bottom: 20px;
+  }
+  
+  button:hover:not(:disabled) {
+    background-color: #0056b3;
+  }
+  
+  button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .loading-indicator, .error-message, .no-reviews-message {
+    text-align: center;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 5px;
+  }
+  
+  .loading-indicator {
+    background-color: #e0f7fa;
+    color: #007bb6;
+    border: 1px solid #b2ebf2;
+  }
+  
+  .error-message {
+    background-color: #ffebee;
+    color: #d32f2f;
+    border: 1px solid #ef9a9a;
+  }
+  
+  .no-reviews-message {
+    background-color: #fffde7;
+    color: #fbc02d;
+    border: 1px solid #fff59d;
+  }
+  
+  .review-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .review-item {
+    background-color: #ffffff;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    padding: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .review-username {
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .review-rating {
+    font-weight: bold;
+    color: #28a745; /* Green for ratings */
+  }
+  
+  .review-description {
+    margin-bottom: 10px;
+    line-height: 1.5;
+    color: #444;
+  }
+  
+  .review-item-id {
+    font-size: 0.85em;
+    color: #777;
+    text-align: right;
+  }

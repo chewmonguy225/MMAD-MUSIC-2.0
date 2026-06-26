@@ -1,0 +1,29 @@
+<div class="review-viewer-container">
+    <h2>All Reviews</h2>
+  
+    <button (click)="viewAll()" [disabled]="isLoading">
+      {{ isLoading ? 'Loading...' : 'Refresh Reviews' }}
+    </button>
+  
+    <div *ngIf="isLoading" class="loading-indicator">
+      <p>Loading reviews...</p>
+    </div>
+  
+    <div *ngIf="errorMessage" class="error-message">
+      <p>{{ errorMessage }}</p>
+      <p>Please try again later.</p>
+    </div>
+  
+    <div *ngIf="!isLoading && reviews">
+      <div *ngIf="reviews.length > 0; else noReviews">
+        <ul class="review-list">
+          <li *ngFor="let review of reviews">
+            <app-review-card [review]="review"></app-review-card>
+          </li>
+        </ul>
+      </div>
+      <ng-template #noReviews>
+        <p class="no-reviews-message">No reviews found yet.</p>
+      </ng-template>
+    </div>
+  </div>

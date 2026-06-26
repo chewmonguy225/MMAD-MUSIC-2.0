@@ -1,0 +1,16 @@
+<app-base-page>
+  <p class="stats-container">
+    <span class="username">{{ user?.username }}</span>
+    <span class="stats">
+      Reviews: {{ reviews?.length || 0 }} |
+      <button mat-button (click)="openUserList('Followers', user?.followers || [])">
+        Followers: {{ user?.followers?.length || 0 }}
+      </button> |
+      <button mat-button (click)="openUserList('Following', user?.following || [])">
+        Following: {{ user?.following?.length || 0 }}
+      </button>
+    </span>
+  </p>
+
+  <app-review-viewer [reviews]="reviews"></app-review-viewer>
+</app-base-page>

@@ -1,0 +1,76 @@
+.item-card {
+  background-color: #ff95003d;
+  border-radius: 12px; /* Rounded corners for the card */
+  padding: 20px; /* Internal padding */
+  margin: 5px; /* Space between cards in the grid */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Slightly stronger shadow */
+  width: 250px; /* Fixed width for consistency, adjust as needed */
+  height: 320px; /* Fixed height for consistency, adjust as needed */
+  justify-content: space-between; /* Pushes content apart */
+}
+
+.image-container {
+  width: 150px; /* Size of the circular image container */
+  height: 150px;
+  border-radius: 50%; /* Makes the container circular */
+  overflow: hidden; /* Crucial: Hides parts of the image outside the circle */
+  margin-bottom: 20px;
+  display: flex; /* For centering the image if it's smaller */
+  justify-content: center;
+  align-items: center;
+  background-color: #333; /* Background for the circle if image doesn't fill */
+}
+
+.item-image {
+  width: 100%;       /* Make the image fill 100% width of its parent (.image-container) */
+  height: 100%;      /* Make the image fill 100% height of its parent (.image-container) */
+  object-fit: cover; /* Crucial: This property crops the image to fill the container while preserving aspect ratio */
+  display: block;    /* Removes any default inline spacing issues */
+  cursor: pointer;
+}
+
+.item-name {
+  color: white; /* White text for the name */
+  font-size: 28px; /* Larger, bolder name */
+  font-weight: bold;
+  margin: 0 0 20px 0; /* Adjust margins */
+  word-break: break-word; /* Prevents long names from overflowing */
+}
+
+.listen-button-container {
+    width: 100%; /* Make button container full width */
+    display: flex;
+    justify-content: center; /* Center the button */
+}
+
+.spotify-button {
+  background-color: #1DB954; /* Spotify green */
+  color: white;
+  border: none;
+  border-radius: 20px; /* Pill-shaped button */
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex; /* For icon alignment */
+  align-items: center;
+  gap: 8px; /* Space between text and icon */
+  transition: background-color 0.3s ease;
+}
+
+.spotify-button:hover {
+  background-color: #1ed760; /* Slightly lighter green on hover */
+}
+
+/* Styles for the grid layout in the search viewer */
+.item-list {
+  display: flex; /* Use flexbox for the list */
+  flex-wrap: wrap; /* Allow items to wrap to the next line */
+  justify-content: center; /* Center items in the container */
+  gap: 20px; /* Space between cards */
+  padding: 20px;
+}

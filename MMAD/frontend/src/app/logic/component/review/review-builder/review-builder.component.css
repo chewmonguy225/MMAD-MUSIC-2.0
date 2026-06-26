@@ -1,0 +1,67 @@
+.star-rating {
+  user-select: none;
+  color: #000000; /* Default star color */
+  margin-bottom: 12px;
+}
+
+.star-rating .filled {
+  color: #ffcc00; /* Bright gold for filled stars */
+  text-shadow: 0 0 5px #ffcc00;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.star-rating span:hover,
+.star-rating span:hover ~ span {
+  color: #ffa500; /* Orange on hover */
+  text-shadow: 0 0 8px #ffa500;
+}
+
+textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  font-size: 1em;
+  border: 2px solid #ffcc00;
+  border-radius: 8px;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  background: #fffbe6;
+  box-shadow: 0 0 10px #ffcc00aa inset;
+  margin-bottom: 15px;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #ffa500;
+  box-shadow: 0 0 15px #ffa500aa inset;
+}
+
+button {
+  background: linear-gradient(45deg, #ffcc00, #ff9900);
+  border: none;
+  border-radius: 25px;
+  color: #fff;
+  font-weight: bold;
+  padding: 12px 28px;
+  font-size: 1.1em;
+  cursor: pointer;
+  box-shadow: 0 4px 8px #ff9900aa;
+  transition: background 0.4s ease, transform 0.2s ease;
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  color: #666;
+}
+
+button:not(:disabled):hover {
+  background: linear-gradient(45deg, #ff9900, #ffcc00);
+  transform: scale(1.05);
+}
+
+button:not(:disabled):active {
+  transform: scale(0.95);
+}
