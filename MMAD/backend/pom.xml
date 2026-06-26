@@ -80,14 +80,6 @@
 		</dependency>
 
 		<dependency>
-<<<<<<< Updated upstream:MMAD/backend/pom.xml
-=======
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-
-		<!-- <dependency>
->>>>>>> Stashed changes:MMAD/MMAD/pom.xml
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>

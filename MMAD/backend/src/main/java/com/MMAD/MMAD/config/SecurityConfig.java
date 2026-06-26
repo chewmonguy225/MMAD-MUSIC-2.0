@@ -1,32 +1,44 @@
-package main.java.com.MMAD.MMAD.config;
-
-
-import java.util.List;
+package com.MMAD.MMAD.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
-public class CorsConfig {
+public class SecurityConfig {
+
+    private final CorsConfigurationSource corsConfigurationSource;
+
+    public SecurityConfig(CorsConfigurationSource corsConfigurationSource) {
+        this.corsConfigurationSource = corsConfigurationSource;
+    }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        CorsConfiguration configuration = new CorsConfiguration();
+        http
+            .csrf(csrf -> csrf.disable())
 
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
-        configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
+            .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+            .authorizeHttpRequests(auth -> auth
+                // allow public endpoints
+                .requestMatchers("/user/create", "/user/login", "spotify/**", "reviews/**").permitAll()
 
-        source.registerCorsConfiguration("/**", configuration);
+                // allow preflight requests (IMPORTANT for Angular)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-        return source;
+                   // everything under /user requires login
+                // everything else locked down
+                .anyRequest().authenticated()
+            )
+
+            .formLogin(form -> form.disable())
+            .httpBasic(httpBasic -> httpBasic.disable());
+
+        return http.build();
     }
 }

@@ -1,4 +1,4 @@
-package com.MMAD.MMAD;
+package com.MMAD.MMAD.config;
 
 import java.util.List;
 
