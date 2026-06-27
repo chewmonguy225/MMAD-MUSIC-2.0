@@ -1,11 +1,11 @@
 package com.MMAD.MMAD.Service.item;
 
-import com.MMAD.MMAD.model.item.Album.Album;
-import com.MMAD.MMAD.model.item.Album.AlbumDTO;
-import com.MMAD.MMAD.model.item.Artist.Artist;
-import com.MMAD.MMAD.model.item.Artist.ArtistDTO;
-import com.MMAD.MMAD.model.item.Song.Song;
-import com.MMAD.MMAD.model.item.Song.SongDTO;
+import com.MMAD.MMAD.dto.item.AlbumDTO;
+import com.MMAD.MMAD.dto.item.ArtistDTO;
+import com.MMAD.MMAD.dto.item.SongDTO;
+import com.MMAD.MMAD.model.item.Album;
+import com.MMAD.MMAD.model.item.Artist;
+import com.MMAD.MMAD.model.item.Song;
 import com.MMAD.MMAD.repo.item.SongRepo;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;

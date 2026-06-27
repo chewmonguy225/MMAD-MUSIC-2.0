@@ -1,4 +1,4 @@
-package com.MMAD.MMAD.resource.item;
+package com.MMAD.MMAD.Controller.item;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,15 +9,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.MMAD.MMAD.Service.item.AlbumService;
-import com.MMAD.MMAD.model.item.Album.Album;
-import com.MMAD.MMAD.model.item.Album.AlbumDTO;
+import com.MMAD.MMAD.dto.item.AlbumDTO;
+import com.MMAD.MMAD.model.item.Album;
 
 @RestController
 @RequestMapping("item/albums")
-public class AlbumResource {
+public class AlbumController {
     private final AlbumService albumService;
 
-    public AlbumResource(AlbumService albumService) {
+    public AlbumController(AlbumService albumService) {
         this.albumService = albumService;
     }
 

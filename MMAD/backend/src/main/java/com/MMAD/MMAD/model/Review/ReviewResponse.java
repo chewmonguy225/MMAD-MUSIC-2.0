@@ -2,9 +2,9 @@ package com.MMAD.MMAD.model.Review;
 
 import java.time.LocalDateTime; // Import if you use LocalDateTime in your Review entity
 
+import com.MMAD.MMAD.dto.item.ItemDTO;
 import com.MMAD.MMAD.model.User.UserDTO;
 import com.MMAD.MMAD.model.User.UserDTOMapper;
-import com.MMAD.MMAD.model.item.ItemDTO;
 
 public class ReviewResponse {
     private static final UserDTOMapper USER_MAPPER = new UserDTOMapper();

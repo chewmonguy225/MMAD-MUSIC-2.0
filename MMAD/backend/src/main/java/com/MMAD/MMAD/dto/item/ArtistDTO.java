@@ -1,5 +1,5 @@
-package com.MMAD.MMAD.model.item.Artist;
-import com.MMAD.MMAD.model.item.ItemDTO;
+package com.MMAD.MMAD.dto.item;
+import com.MMAD.MMAD.model.item.Artist;
 
 public class ArtistDTO extends ItemDTO {
 

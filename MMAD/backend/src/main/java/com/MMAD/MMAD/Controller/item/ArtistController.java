@@ -1,4 +1,4 @@
-package com.MMAD.MMAD.resource.item;
+package com.MMAD.MMAD.Controller.item;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,15 +16,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.MMAD.MMAD.Service.item.ArtistService; // Ensure this matches the updated service package
-import com.MMAD.MMAD.model.item.Artist.Artist;
-import com.MMAD.MMAD.model.item.Artist.ArtistDTO;
+import com.MMAD.MMAD.dto.item.ArtistDTO;
+import com.MMAD.MMAD.model.item.Artist;
 
 @RestController
 @RequestMapping("item/artists")
-public class ArtistResource {
+public class ArtistController {
     private final ArtistService artistService;
 
-    public ArtistResource(ArtistService artistService) {
+    public ArtistController(ArtistService artistService) {
         this.artistService = artistService;
     }
 

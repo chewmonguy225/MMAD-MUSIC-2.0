@@ -1,8 +1,8 @@
 
 package com.MMAD.MMAD.Service.item; // <--- IMPORTANT: Changed package here
 
-import com.MMAD.MMAD.model.item.Artist.Artist;
-import com.MMAD.MMAD.model.item.Artist.ArtistDTO;
+import com.MMAD.MMAD.dto.item.ArtistDTO;
+import com.MMAD.MMAD.model.item.Artist;
 import com.MMAD.MMAD.repo.item.ArtistRepo;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;

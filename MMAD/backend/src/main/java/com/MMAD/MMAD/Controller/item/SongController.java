@@ -1,4 +1,4 @@
-package com.MMAD.MMAD.resource.item;
+package com.MMAD.MMAD.Controller.item;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,16 +9,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.MMAD.MMAD.Service.item.SongService;
-import com.MMAD.MMAD.model.item.Song.Song;
-import com.MMAD.MMAD.model.item.Song.SongDTO;
+import com.MMAD.MMAD.dto.item.SongDTO;
+import com.MMAD.MMAD.model.item.Song;
 
 @RestController
 @RequestMapping("item/songs")
-public class SongResource {
+public class SongController {
 
     private final SongService songService;
 
-    public SongResource(SongService songService) {
+    public SongController(SongService songService) {
         this.songService = songService;
     }
 

@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.MMAD.MMAD.model.item.Song.Song;
+import com.MMAD.MMAD.model.item.Song;
 
 import java.util.List;
 import java.util.Optional;

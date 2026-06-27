@@ -1,24 +1,19 @@
 package com.MMAD.MMAD.Service;
 
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.MMAD.MMAD.model.item.Album.Album;
-import com.MMAD.MMAD.model.item.Artist.Artist;
-import com.MMAD.MMAD.model.item.Song.Song;
+import com.MMAD.MMAD.dto.item.AlbumDTO;
+import com.MMAD.MMAD.dto.item.ArtistDTO;
+import com.MMAD.MMAD.dto.item.ItemDTO;
+import com.MMAD.MMAD.dto.item.SongDTO;
+import com.MMAD.MMAD.model.item.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -32,17 +27,17 @@ public class SpotifyService {
     private static final String SEARCH_URL = "https://api.spotify.com/v1/search";
 
     private static final String CLIENT_ID = "39e68d74ea964fe8b12e4d03f28c817c";
-
     private static final String CLIENT_SECRET = "2e4bd1398d6e4e0aa43ed25e0116b4bf";
+
     private String accessToken;
 
     public SpotifyService() {
         this.accessToken = retrieveAccessToken();
     }
 
-    // -------------------------
+    // =========================
     // AUTH
-    // -------------------------
+    // =========================
     private String retrieveAccessToken() {
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -55,15 +50,13 @@ public class SpotifyService {
             MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
             body.add("grant_type", "client_credentials");
 
-            HttpEntity<MultiValueMap<String, String>> request =
-                    new HttpEntity<>(body, headers);
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
             ResponseEntity<String> response = restTemplate.exchange(
                     TOKEN_URL,
                     HttpMethod.POST,
                     request,
-                    String.class
-            );
+                    String.class);
 
             JsonNode json = objectMapper.readTree(response.getBody());
             return json.get("access_token").asText();
@@ -73,47 +66,45 @@ public class SpotifyService {
         }
     }
 
-    // -------------------------
-    // PUBLIC API
-    // -------------------------
-    public List<Artist> searchArtists(String query) {
-        JsonNode json = callSpotify(query, "artist");
-        return parseArtists(json);
+    // =========================
+    // MAIN SEARCH
+    // =========================
+    public List<ItemDTO> searchSpotify(String query, List<String> types) {
+
+        JsonNode json = callSpotify(query, types);
+
+        List<ItemDTO> results = new ArrayList<>();
+
+        if (types.contains("artist")) {
+            results.addAll(parseArtists(json));
+        }
+
+        return results;
     }
 
-    public List<Album> searchAlbums(String query) {
-        JsonNode json = callSpotify(query, "album");
-        return parseAlbums(json);
-    }
+    // =========================
+    // CALL SPOTIFY API
+    // =========================
+    private JsonNode callSpotify(String query, List<String> types) {
 
-    public List<Song> searchSongs(String query) {
-        JsonNode json = callSpotify(query, "track");
-        return parseSongs(json);
-    }
-
-    // -------------------------
-    // HTTP CALL
-    // -------------------------
-    private JsonNode callSpotify(String query, String type) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + accessToken);
             headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
-            HttpEntity<String> entity = new HttpEntity<>(headers);
+            String typeParam = String.join(",", types);
 
             String url = UriComponentsBuilder.fromUriString(SEARCH_URL)
                     .queryParam("q", query)
-                    .queryParam("type", type)
+                    .queryParam("type", typeParam)
                     .build()
                     .toUriString();
 
             ResponseEntity<String> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
-                    entity,
-                    String.class
-            );
+                    new HttpEntity<>(headers),
+                    String.class);
 
             return objectMapper.readTree(response.getBody());
 
@@ -122,79 +113,37 @@ public class SpotifyService {
         }
     }
 
-    // -------------------------
-    // PARSERS
-    // -------------------------
-
-    private List<Artist> parseArtists(JsonNode json) {
-        List<Artist> list = new ArrayList<>();
+    // =========================
+    // ARTIST MAPPING
+    // =========================
+    private List<ArtistDTO> parseArtists(JsonNode json) {
+        List<ArtistDTO> list = new ArrayList<>();
         JsonNode nodes = json.path("artists").path("items");
 
         for (JsonNode n : nodes) {
-
-            String id = n.path("id").asText();
-            String name = n.path("name").asText();
-            String image = extractImage(n);
-
-            list.add(new Artist(id, name, image));
+            list.add(mapArtist(n));
         }
 
         return list;
     }
 
-    private List<Album> parseAlbums(JsonNode json) {
-        List<Album> list = new ArrayList<>();
-        JsonNode nodes = json.path("albums").path("items");
-
-        for (JsonNode n : nodes) {
-
-            String id = n.path("id").asText();
-            String name = n.path("name").asText();
-            String image = extractImage(n);
-
-            list.add(new Album(image, id, name, new ArrayList<>()));
-        }
-
-        return list;
+    private ArtistDTO mapArtist(JsonNode n) {
+        return new ArtistDTO(
+                null,
+                n.path("id").asText(),
+                n.path("name").asText(),
+                extractImage(n)
+            );
     }
 
-    private List<Song> parseSongs(JsonNode json) {
-        List<Song> list = new ArrayList<>();
-        JsonNode nodes = json.path("tracks").path("items");
-
-        for (JsonNode n : nodes) {
-
-            String id = n.path("id").asText();
-            String name = n.path("name").asText();
-
-            JsonNode albumNode = n.path("album");
-            String image = extractImage(albumNode);
-
-            list.add(new Song(id, name, image, new ArrayList<>(), null));
-        }
-
-        return list;
-    }
-
-    // -------------------------
-    // HELPER (NO ?: LOGIC)
-    // -------------------------
     private String extractImage(JsonNode node) {
-
-        String image = "default";
 
         JsonNode images = node.path("images");
 
-        if (images.isArray()) {
-            if (images.size() > 0) {
-                JsonNode firstImage = images.get(0);
-
-                if (firstImage.has("url")) {
-                    image = firstImage.path("url").asText();
-                }
-            }
+        if (images.isArray() && images.size() > 0) {
+            return images.get(0).path("url").asText();
         }
 
-        return image;
+        return "default";
     }
 }

@@ -1,8 +1,8 @@
 // File: com/MMAD/MMAD/service/item/ItemService.java
 package com.MMAD.MMAD.Service.item;
 
+import com.MMAD.MMAD.dto.item.ItemDTO;
 import com.MMAD.MMAD.model.item.Item;
-import com.MMAD.MMAD.model.item.ItemDTO;
 import com.MMAD.MMAD.repo.item.ItemRepo;
 import jakarta.persistence.EntityNotFoundException; // Keep for update/delete/findById/etc. if needed
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.MMAD.MMAD.resource;
+package com.MMAD.MMAD.Controller;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +20,7 @@ import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/user")
-public class UserResource {
+public class UserController {
 
     private final UserService userService;
 
@@ -29,7 +29,7 @@ public class UserResource {
      * 
      * @param userService The UserService to be used.
      */
-    public UserResource(UserService userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 

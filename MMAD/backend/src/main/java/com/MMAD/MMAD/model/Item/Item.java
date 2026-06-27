@@ -3,6 +3,8 @@ package com.MMAD.MMAD.model.item;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import com.MMAD.MMAD.dto.item.ItemDTO;
+
 @Entity
 @Table(name = "items")
 @Inheritance(strategy = InheritanceType.JOINED)

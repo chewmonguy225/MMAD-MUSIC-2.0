@@ -26,7 +26,8 @@ public class SecurityConfig {
                     "/user/create",
                     "/user/login",
                     "/spotify/**",
-                    "/reviews/**"
+                    "/reviews/**",
+                    "/search/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             );

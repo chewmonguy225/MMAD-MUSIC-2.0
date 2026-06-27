@@ -6,12 +6,12 @@ import com.MMAD.MMAD.model.User.User; // Ensure this path is correct
 
 import com.MMAD.MMAD.model.User.UserDTOMapper;
 import com.MMAD.MMAD.model.item.Item;
-import com.MMAD.MMAD.model.item.ItemDTO;
 import com.MMAD.MMAD.repo.ReviewRepo; // Ensure this path is correct
 import org.springframework.data.domain.Sort;
 
 // Assuming you have these services for fetching User and Item entities
 import com.MMAD.MMAD.Service.item.ItemService; // Ensure this path is correct
+import com.MMAD.MMAD.dto.item.ItemDTO;
 
 import jakarta.persistence.EntityNotFoundException;
 

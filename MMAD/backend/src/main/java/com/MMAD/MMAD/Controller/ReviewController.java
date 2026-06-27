@@ -1,4 +1,4 @@
-package com.MMAD.MMAD.resource;
+package com.MMAD.MMAD.Controller;
 
 import com.MMAD.MMAD.Service.ReviewService;
 import com.MMAD.MMAD.model.Review.ReviewRequest; // Import the new DTO
@@ -16,12 +16,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reviews") // Changed to plural '/reviews' for RESTful convention
-public class ReviewResource {
+public class ReviewController {
 
     private final ReviewService reviewService;
 
     // Constructor Injection (uncommented)
-    public ReviewResource(ReviewService reviewService) {
+    public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
 

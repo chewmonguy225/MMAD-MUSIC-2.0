@@ -1,8 +1,8 @@
-package com.MMAD.MMAD.resource.item;
+package com.MMAD.MMAD.Controller.item;
 
 import com.MMAD.MMAD.Service.item.ItemService;
+import com.MMAD.MMAD.dto.item.ItemDTO;
 import com.MMAD.MMAD.model.item.Item;
-import com.MMAD.MMAD.model.item.ItemDTO;
 
 import jakarta.persistence.EntityNotFoundException; // Keep this, as ItemService still throws it
 import org.springframework.http.HttpStatus;
@@ -14,11 +14,11 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/item")
-public class ItemResource {
+public class ItemController {
 
     private final ItemService itemService;
 
-    public ItemResource(ItemService itemService) {
+    public ItemController(ItemService itemService) {
         this.itemService = itemService;
     }
 

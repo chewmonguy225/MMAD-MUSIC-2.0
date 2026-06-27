@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.MMAD.MMAD.model.item.Album.Album;
+import com.MMAD.MMAD.model.item.Album;
 
 @Repository
 public interface AlbumRepo extends JpaRepository<Album, Long> {

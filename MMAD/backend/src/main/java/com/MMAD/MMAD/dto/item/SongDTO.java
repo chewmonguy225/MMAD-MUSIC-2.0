@@ -1,12 +1,10 @@
-package com.MMAD.MMAD.model.item.Song;
+package com.MMAD.MMAD.dto.item;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.MMAD.MMAD.model.item.ItemDTO;
-import com.MMAD.MMAD.model.item.Album.AlbumDTO;
-import com.MMAD.MMAD.model.item.Artist.Artist;
-import com.MMAD.MMAD.model.item.Artist.ArtistDTO;
+import com.MMAD.MMAD.model.item.Artist;
+import com.MMAD.MMAD.model.item.Song;
 
 public class SongDTO extends ItemDTO {
 
