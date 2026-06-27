@@ -15,7 +15,7 @@ import java.time.LocalDateTime; // Make sure this is imported if used in entitie
         @JsonSubTypes.Type(value = AlbumDTO.class, name = "ALBUM"),
         @JsonSubTypes.Type(value = SongDTO.class, name = "SONG")
 })
-public abstract class ItemDTO { // Correct: it is abstract
+public abstract class ItemDTO { 
 
     private Long id;
     private String sourceId;

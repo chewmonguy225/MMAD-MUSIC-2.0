@@ -28,6 +28,7 @@ public class SecurityConfig {
                     "/spotify/**",
                     "/reviews/**",
                     "/search/**"
+                    
                 ).permitAll()
                 .anyRequest().authenticated()
             );

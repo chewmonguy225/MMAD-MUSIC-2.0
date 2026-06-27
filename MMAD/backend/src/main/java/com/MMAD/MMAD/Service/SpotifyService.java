@@ -35,9 +35,7 @@ public class SpotifyService {
         this.accessToken = retrieveAccessToken();
     }
 
-    // =========================
-    // AUTH
-    // =========================
+
     private String retrieveAccessToken() {
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -66,9 +64,6 @@ public class SpotifyService {
         }
     }
 
-    // =========================
-    // MAIN SEARCH
-    // =========================
     public List<ItemDTO> searchSpotify(String query, List<String> types) {
 
         JsonNode json = callSpotify(query, types);
@@ -82,9 +77,6 @@ public class SpotifyService {
         return results;
     }
 
-    // =========================
-    // CALL SPOTIFY API
-    // =========================
     private JsonNode callSpotify(String query, List<String> types) {
 
         try {
@@ -113,9 +105,6 @@ public class SpotifyService {
         }
     }
 
-    // =========================
-    // ARTIST MAPPING
-    // =========================
     private List<ArtistDTO> parseArtists(JsonNode json) {
         List<ArtistDTO> list = new ArrayList<>();
         JsonNode nodes = json.path("artists").path("items");
