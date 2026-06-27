@@ -1,11 +1,11 @@
-package com.MMAD.MMAD.model.Item.Album;
-
-import com.MMAD.MMAD.model.Item.Item;
-import com.MMAD.MMAD.model.Item.Artist.Artist;
+package com.MMAD.MMAD.model.item.Album;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.MMAD.MMAD.model.item.Item;
+import com.MMAD.MMAD.model.item.Artist.Artist;
 
 @Entity
 @Table(name = "albums")

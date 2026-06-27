@@ -8,9 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.MMAD.MMAD.model.Item.Song.Song;
-import com.MMAD.MMAD.model.Item.Song.SongDTO;
-import com.MMAD.MMAD.service.item.SongService;
+import com.MMAD.MMAD.Service.item.SongService;
+import com.MMAD.MMAD.model.item.Song.Song;
+import com.MMAD.MMAD.model.item.Song.SongDTO;
 
 @RestController
 @RequestMapping("item/songs")

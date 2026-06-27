@@ -17,7 +17,7 @@ import com.MMAD.MMAD.model.User.User;
 import com.MMAD.MMAD.model.User.UserDTO;
 import com.MMAD.MMAD.model.User.UserDTOMapper;
 import com.MMAD.MMAD.repo.UserRepo;
-import com.MMAD.MMAD.service.UserService;
+import com.MMAD.MMAD.Service.UserService;
 
 @Disabled
 @ExtendWith(MockitoExtension.class)

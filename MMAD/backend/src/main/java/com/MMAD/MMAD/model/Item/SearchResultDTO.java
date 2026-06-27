@@ -1,4 +1,4 @@
-package com.MMAD.MMAD.model.Item;
+package com.MMAD.MMAD.model.item;
 
 public class SearchResultDTO {
 

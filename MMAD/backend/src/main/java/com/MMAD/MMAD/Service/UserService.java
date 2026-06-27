@@ -1,4 +1,4 @@
-package com.MMAD.MMAD.service;
+package com.MMAD.MMAD.Service;
 
 import java.util.List;
 import java.util.Optional;

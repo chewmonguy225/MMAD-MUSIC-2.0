@@ -1,8 +1,6 @@
 package com.MMAD.MMAD.resource;
 
-import com.MMAD.MMAD.service.ReviewService;
-import com.MMAD.MMAD.service.item.ItemService;
-import com.MMAD.MMAD.service.UserService;
+import com.MMAD.MMAD.Service.ReviewService;
 import com.MMAD.MMAD.model.Review.ReviewRequest; // Import the new DTO
 import com.MMAD.MMAD.model.Review.ReviewResponse;
 import com.MMAD.MMAD.model.Review.UpdateReviewRequest;

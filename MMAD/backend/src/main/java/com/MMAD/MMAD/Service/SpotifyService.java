@@ -1,4 +1,4 @@
-package com.MMAD.MMAD.service;
+package com.MMAD.MMAD.Service;
 
 import java.util.ArrayList;
 import java.util.Base64;
@@ -16,9 +16,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.MMAD.MMAD.model.Item.Album.Album;
-import com.MMAD.MMAD.model.Item.Artist.Artist;
-import com.MMAD.MMAD.model.Item.Song.Song;
+import com.MMAD.MMAD.model.item.Album.Album;
+import com.MMAD.MMAD.model.item.Artist.Artist;
+import com.MMAD.MMAD.model.item.Song.Song;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

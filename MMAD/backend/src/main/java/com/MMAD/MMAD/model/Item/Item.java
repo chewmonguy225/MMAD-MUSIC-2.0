@@ -1,4 +1,4 @@
-package com.MMAD.MMAD.model.Item;
+package com.MMAD.MMAD.model.item;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

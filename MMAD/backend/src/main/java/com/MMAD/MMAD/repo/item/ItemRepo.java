@@ -1,9 +1,10 @@
 package com.MMAD.MMAD.repo.item;
 
-import com.MMAD.MMAD.model.Item.Item;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.MMAD.MMAD.model.item.Item;
+
 import java.util.Optional;
 
 

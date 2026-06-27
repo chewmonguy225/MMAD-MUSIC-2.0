@@ -8,9 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.MMAD.MMAD.model.Item.Album.Album;
-import com.MMAD.MMAD.model.Item.Album.AlbumDTO;
-import com.MMAD.MMAD.service.item.AlbumService;
+import com.MMAD.MMAD.Service.item.AlbumService;
+import com.MMAD.MMAD.model.item.Album.Album;
+import com.MMAD.MMAD.model.item.Album.AlbumDTO;
 
 @RestController
 @RequestMapping("item/albums")

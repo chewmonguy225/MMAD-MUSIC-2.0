@@ -1,17 +1,17 @@
-package com.MMAD.MMAD.service;
+package com.MMAD.MMAD.Service;
 
 import com.MMAD.MMAD.model.Review.Review;
 import com.MMAD.MMAD.model.Review.ReviewResponse;
-import com.MMAD.MMAD.model.Item.Item; // Ensure this path is correct
-import com.MMAD.MMAD.model.Item.ItemDTO;
 import com.MMAD.MMAD.model.User.User; // Ensure this path is correct
-import com.MMAD.MMAD.model.User.UserDTO;
+
 import com.MMAD.MMAD.model.User.UserDTOMapper;
+import com.MMAD.MMAD.model.item.Item;
+import com.MMAD.MMAD.model.item.ItemDTO;
 import com.MMAD.MMAD.repo.ReviewRepo; // Ensure this path is correct
 import org.springframework.data.domain.Sort;
 
 // Assuming you have these services for fetching User and Item entities
-import com.MMAD.MMAD.service.item.ItemService; // Ensure this path is correct
+import com.MMAD.MMAD.Service.item.ItemService; // Ensure this path is correct
 
 import jakarta.persistence.EntityNotFoundException;
 

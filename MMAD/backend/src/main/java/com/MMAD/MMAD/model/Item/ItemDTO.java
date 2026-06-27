@@ -1,12 +1,12 @@
 // src/main/java/com/MMAD/MMAD/model/Item/ItemDTO.java
-package com.MMAD.MMAD.model.Item;
+package com.MMAD.MMAD.model.item;
 
-import com.MMAD.MMAD.model.Item.Album.Album;
-import com.MMAD.MMAD.model.Item.Album.AlbumDTO;
-import com.MMAD.MMAD.model.Item.Artist.Artist;
-import com.MMAD.MMAD.model.Item.Artist.ArtistDTO;
-import com.MMAD.MMAD.model.Item.Song.Song;
-import com.MMAD.MMAD.model.Item.Song.SongDTO;
+import com.MMAD.MMAD.model.item.Album.Album;
+import com.MMAD.MMAD.model.item.Album.AlbumDTO;
+import com.MMAD.MMAD.model.item.Artist.Artist;
+import com.MMAD.MMAD.model.item.Artist.ArtistDTO;
+import com.MMAD.MMAD.model.item.Song.Song;
+import com.MMAD.MMAD.model.item.Song.SongDTO;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.time.LocalDateTime; // Make sure this is imported if used in entities

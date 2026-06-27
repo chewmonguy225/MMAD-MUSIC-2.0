@@ -1,8 +1,9 @@
 package com.MMAD.MMAD.resource.item;
 
-import com.MMAD.MMAD.model.Item.Item;
-import com.MMAD.MMAD.model.Item.ItemDTO;
-import com.MMAD.MMAD.service.item.ItemService;
+import com.MMAD.MMAD.Service.item.ItemService;
+import com.MMAD.MMAD.model.item.Item;
+import com.MMAD.MMAD.model.item.ItemDTO;
+
 import jakarta.persistence.EntityNotFoundException; // Keep this, as ItemService still throws it
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

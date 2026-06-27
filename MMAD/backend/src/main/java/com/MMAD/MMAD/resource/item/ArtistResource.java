@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.MMAD.MMAD.model.Item.Artist.Artist;
-import com.MMAD.MMAD.model.Item.Artist.ArtistDTO;
-import com.MMAD.MMAD.service.item.ArtistService; // Ensure this matches the updated service package
+import com.MMAD.MMAD.Service.item.ArtistService; // Ensure this matches the updated service package
+import com.MMAD.MMAD.model.item.Artist.Artist;
+import com.MMAD.MMAD.model.item.Artist.ArtistDTO;
 
 @RestController
 @RequestMapping("item/artists")

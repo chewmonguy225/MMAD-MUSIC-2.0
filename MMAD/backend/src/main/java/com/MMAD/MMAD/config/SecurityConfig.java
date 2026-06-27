@@ -17,21 +17,20 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
+    
         http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> {
-                })
-                .authorizeHttpRequests(auth -> auth
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource))
+            .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                        "/user/create",
-                        "/user/login",
-                        "/spotify/**",
-                        "/reviews/**"
+                    "/user/create",
+                    "/user/login",
+                    "/spotify/**",
+                    "/reviews/**"
                 ).permitAll()
                 .anyRequest().authenticated()
-                );
-
+            );
+    
         return http.build();
     }
 }

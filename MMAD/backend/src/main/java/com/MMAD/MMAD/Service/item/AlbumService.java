@@ -1,9 +1,9 @@
-package com.MMAD.MMAD.service.item;
+package com.MMAD.MMAD.Service.item;
 
-import com.MMAD.MMAD.model.Item.Album.Album;
-import com.MMAD.MMAD.model.Item.Artist.Artist;
-import com.MMAD.MMAD.model.Item.Artist.ArtistDTO;
-import com.MMAD.MMAD.model.Item.Album.AlbumDTO;
+import com.MMAD.MMAD.model.item.Album.Album;
+import com.MMAD.MMAD.model.item.Album.AlbumDTO;
+import com.MMAD.MMAD.model.item.Artist.Artist;
+import com.MMAD.MMAD.model.item.Artist.ArtistDTO;
 import com.MMAD.MMAD.repo.item.AlbumRepo;
 
 import jakarta.persistence.EntityNotFoundException;
