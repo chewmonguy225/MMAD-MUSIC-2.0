@@ -12,12 +12,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.MMAD.MMAD.exception.UserNotFoundException;
-import com.MMAD.MMAD.model.User.User;
-import com.MMAD.MMAD.model.User.UserDTO;
-import com.MMAD.MMAD.model.User.UserDTOMapper;
-import com.MMAD.MMAD.repo.UserRepo;
-import com.MMAD.MMAD.Service.UserService;
+import com.MMAD.Service.UserService;
+import com.MMAD.exception.UserNotFoundException;
+import com.MMAD.model.User.User;
+import com.MMAD.model.User.UserDTO;
+import com.MMAD.model.User.UserDTOMapper;
+import com.MMAD.repo.UserRepo;
 
 @Disabled
 @ExtendWith(MockitoExtension.class)
