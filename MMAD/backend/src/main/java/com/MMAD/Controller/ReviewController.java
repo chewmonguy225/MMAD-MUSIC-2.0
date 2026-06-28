@@ -84,7 +84,7 @@ public class ReviewController {
      * Endpoint to get all reviews by a specific user.
      */
     @GetMapping("/user/{username}")
-    public ResponseEntity<List<GetReviewResponse>> getReviewsByUserId(@PathVariable("username") String username) {
+    public ResponseEntity<List<GetReviewResponse>> getReviewsByUsername(@PathVariable("username") String username) {
         try {
             List<GetReviewResponse> reviews = reviewService.getReviewsByUsername(username);
             return ResponseEntity.ok(reviews); // 200 OK
