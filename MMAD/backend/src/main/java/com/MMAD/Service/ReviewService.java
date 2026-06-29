@@ -11,8 +11,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.MMAD.Service.item.ItemService;
 import com.MMAD.dto.item.ItemDTO;
+import com.MMAD.dto.review.GetReviewResponse;
+import com.MMAD.dto.review.ItemReviewResponse;
+import com.MMAD.dto.review.ItemReviewsResponse;
 import com.MMAD.model.Review.Review;
-import com.MMAD.model.Review.GetReviewResponse;
 import com.MMAD.model.User.User;
 import com.MMAD.model.User.UserDTOMapper;
 import com.MMAD.model.item.Item;
@@ -77,7 +79,7 @@ public class ReviewService {
         if (reviewRepo.findByUserIdAndItemId(user.getId(), item.getId()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "UserAlreadyReviewed");
         }
-        
+
         Review review = new Review(rating, description, item, user);
         Review savedReview = reviewRepo.save(review);
 
@@ -151,7 +153,7 @@ public class ReviewService {
     public List<GetReviewResponse> getReviewsByUsername(String username) {
 
         // 1. Fetch the User entity (or throw if not found)
-        Optional <User> user = userService.getUserByUsername(username);
+        Optional<User> user = userService.getUserByUsername(username);
 
         // 2. Fetch Reviews by User ID
         List<Review> reviews = reviewRepo.findByUserId(user.get().getId());
@@ -178,29 +180,17 @@ public class ReviewService {
      * @throws EntityNotFoundException  If the item does not exist.
      */
     @Transactional(readOnly = true)
-    public List<GetReviewResponse> getReviewsByItemId(Long itemId) {
+    public ItemReviewsResponse getReviewsByItemId(Long itemId) {
+
+        // 1. Validate input
         if (itemId == null || itemId <= 0) {
             throw new IllegalArgumentException("Item ID cannot be null or non-positive for retrieving reviews.");
         }
 
-        // 1. Fetch the Item entity (or throw if not found)
-        ItemDTO item = itemService.getItemById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException("Item not found with ID: " + itemId));
+        // 3. Fetch reviews
+        List<ItemReviewResponse> reviewResponses = reviewRepo.findReviewResponsesByItemId(itemId);
 
-        // 2. Fetch Reviews by Item ID
-        List<Review> reviews = reviewRepo.findByItemId(itemId);
-
-        // 3. Convert each Review → ReviewResponse
-        return reviews.stream()
-                .map(review -> new GetReviewResponse(
-                        review.getId(),
-                        review.getRating(),
-                        review.getDescription(),
-                        item,
-                        userDTOMapper.apply(review.getUser()),
-                        review.getCreatedAt(),
-                        review.getUpdatedAt()))
-                .toList();
+        return new ItemReviewsResponse(itemId, reviewResponses);
     }
 
     // UPDATE
@@ -258,6 +248,5 @@ public class ReviewService {
         }
         reviewRepo.deleteById(reviewId); // Delete the review
     }
-
 
 }

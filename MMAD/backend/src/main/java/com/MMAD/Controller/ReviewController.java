@@ -7,9 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.MMAD.Service.ReviewService;
+import com.MMAD.dto.review.GetReviewResponse;
+import com.MMAD.dto.review.ItemReviewsResponse;
 import com.MMAD.dto.review.PostReviewRequest;
 import com.MMAD.dto.review.UpdateReviewRequest;
-import com.MMAD.model.Review.GetReviewResponse;
 
 import org.springframework.dao.DataIntegrityViolationException; // Good for handling unique constraint errors
 
@@ -84,7 +85,7 @@ public class ReviewController {
      * Endpoint to get all reviews by a specific user.
      */
     @GetMapping("/user/{username}")
-    public ResponseEntity<List<GetReviewResponse>> getReviewsByUsername(@PathVariable("username") String username) {
+    public ResponseEntity<List<GetReviewResponse>> getReviewsByUserId(@PathVariable("username") String username) {
         try {
             List<GetReviewResponse> reviews = reviewService.getReviewsByUsername(username);
             return ResponseEntity.ok(reviews); // 200 OK
@@ -95,6 +96,17 @@ public class ReviewController {
      }
     }
 
+    @GetMapping("/item/{itemId}")
+    public ResponseEntity<ItemReviewsResponse> getReviewsByItemId(@PathVariable("itemId") Long itemId) {
+        try {
+            ItemReviewsResponse response = reviewService.getReviewsByItemId(itemId);
+            return ResponseEntity.ok(response);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
     // /**
     // * Endpoint to get all reviews for a specific item.
     // */
