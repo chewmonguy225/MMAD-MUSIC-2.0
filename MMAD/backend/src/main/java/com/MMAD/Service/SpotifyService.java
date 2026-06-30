@@ -1,7 +1,12 @@
 package com.MMAD.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -12,8 +17,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.MMAD.dto.item.AlbumDTO;
 import com.MMAD.dto.item.ArtistDTO;
 import com.MMAD.dto.item.ItemDTO;
-import com.MMAD.dto.item.SongDTO;
-import com.MMAD.model.item.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -26,43 +29,67 @@ public class SpotifyService {
     private static final String TOKEN_URL = "https://accounts.spotify.com/api/token";
     private static final String SEARCH_URL = "https://api.spotify.com/v1/search";
 
-    private static final String CLIENT_ID = "39e68d74ea964fe8b12e4d03f28c817c";
-    private static final String CLIENT_SECRET = "2e4bd1398d6e4e0aa43ed25e0116b4bf";
+    @Value("${spotify.client-id}")
+    private String clientId;
+
+    @Value("${spotify.client-secret}")
+    private String clientSecret;
 
     private String accessToken;
+    private long tokenTimestamp;
 
-    public SpotifyService() {
-        this.accessToken = retrieveAccessToken();
+    public SpotifyService() {}
+
+    // =========================
+    // TOKEN HANDLING
+    // =========================
+
+    private String getAccessToken() {
+        if (accessToken == null || isTokenExpired()) {
+            accessToken = retrieveAccessToken();
+            tokenTimestamp = System.currentTimeMillis();
+        }
+        return accessToken;
     }
 
+    private boolean isTokenExpired() {
+        return System.currentTimeMillis() - tokenTimestamp > 3600_000;
+    }
 
     private String retrieveAccessToken() {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            String auth = CLIENT_ID + ":" + CLIENT_SECRET;
+            String auth = clientId + ":" + clientSecret;
             String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
+
             headers.set("Authorization", "Basic " + encodedAuth);
 
             MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
             body.add("grant_type", "client_credentials");
 
-            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+            HttpEntity<MultiValueMap<String, String>> request =
+                    new HttpEntity<>(body, headers);
 
             ResponseEntity<String> response = restTemplate.exchange(
                     TOKEN_URL,
                     HttpMethod.POST,
                     request,
-                    String.class);
+                    String.class
+            );
 
             JsonNode json = objectMapper.readTree(response.getBody());
-            return json.get("access_token").asText();
+            return json.path("access_token").asText();
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to get Spotify token", e);
         }
     }
+
+    // =========================
+    // PUBLIC SEARCH (FIXED)
+    // =========================
 
     public List<ItemDTO> searchSpotify(String query, List<String> types) {
 
@@ -71,24 +98,73 @@ public class SpotifyService {
         List<ItemDTO> results = new ArrayList<>();
 
         if (types.contains("artist")) {
-            results.addAll(parseArtists(json));
+            for (JsonNode node : json.path("artists").path("items")) {
+                ArtistDTO dto = mapArtist(node);
+                dto.setRelevance(calculateRelevance(node, query, "artist"));
+                results.add(dto);
+            }
         }
+
+        if (types.contains("album")) {
+            for (JsonNode node : json.path("albums").path("items")) {
+                AlbumDTO dto = mapAlbum(node);
+                dto.setRelevance(calculateRelevance(node, query, "album"));
+                results.add(dto);
+            }
+        }
+
+        // ✅ TRUE GLOBAL RELEVANCE SORT
+        results.sort(Comparator.comparingInt(ItemDTO::getRelevance).reversed());
 
         return results;
     }
+
+    // =========================
+    // RELEVANCE ENGINE (REAL FIX)
+    // =========================
+
+    private int calculateRelevance(JsonNode node, String query, String type) {
+
+        String name = node.path("name").asText("").toLowerCase();
+        String q = query.toLowerCase();
+
+        int score = 0;
+
+        // type boost
+        if ("artist".equals(type)) score += 2000;
+        if ("album".equals(type)) score += 1500;
+
+        // exact match
+        if (name.equals(q)) score += 5000;
+
+        // starts with query
+        if (name.startsWith(q)) score += 3000;
+
+        // contains query
+        if (name.contains(q)) score += 1000;
+
+        // Spotify popularity boost (if exists)
+        if (node.has("popularity")) {
+            score += node.path("popularity").asInt();
+        }
+
+        return score;
+    }
+
+    // =========================
+    // SPOTIFY API CALL
+    // =========================
 
     private JsonNode callSpotify(String query, List<String> types) {
 
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + accessToken);
+            headers.setBearerAuth(getAccessToken());
             headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-
-            String typeParam = String.join(",", types);
 
             String url = UriComponentsBuilder.fromUriString(SEARCH_URL)
                     .queryParam("q", query)
-                    .queryParam("type", typeParam)
+                    .queryParam("type", String.join(",", types))
                     .build()
                     .toUriString();
 
@@ -96,7 +172,8 @@ public class SpotifyService {
                     url,
                     HttpMethod.GET,
                     new HttpEntity<>(headers),
-                    String.class);
+                    String.class
+            );
 
             return objectMapper.readTree(response.getBody());
 
@@ -105,31 +182,50 @@ public class SpotifyService {
         }
     }
 
-    private List<ArtistDTO> parseArtists(JsonNode json) {
-        List<ArtistDTO> list = new ArrayList<>();
-        JsonNode nodes = json.path("artists").path("items");
+    // =========================
+    // MAPPERS
+    // =========================
 
-        for (JsonNode n : nodes) {
-            list.add(mapArtist(n));
-        }
-
-        return list;
-    }
-
-    private ArtistDTO mapArtist(JsonNode n) {
+    private ArtistDTO mapArtist(JsonNode node) {
         return new ArtistDTO(
                 null,
-                n.path("id").asText(),
-                n.path("name").asText(),
-                extractImage(n)
-            );
+                node.path("id").asText(),
+                node.path("name").asText(),
+                extractImage(node)
+        );
     }
+
+    private AlbumDTO mapAlbum(JsonNode node) {
+
+        List<ArtistDTO> artists = new ArrayList<>();
+
+        for (JsonNode artist : node.path("artists")) {
+            artists.add(new ArtistDTO(
+                    null,
+                    artist.path("id").asText(),
+                    artist.path("name").asText(),
+                    "default"
+            ));
+        }
+
+        return new AlbumDTO(
+                null,
+                node.path("id").asText(),
+                node.path("name").asText(),
+                extractImage(node),
+                artists
+        );
+    }
+
+    // =========================
+    // IMAGE HELPER
+    // =========================
 
     private String extractImage(JsonNode node) {
 
         JsonNode images = node.path("images");
 
-        if (images.isArray() && images.size() > 0) {
+        if (images.isArray() && !images.isEmpty()) {
             return images.get(0).path("url").asText();
         }
 

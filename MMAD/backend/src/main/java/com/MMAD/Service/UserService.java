@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.MMAD.dto.item.ItemDTO;
+import com.MMAD.dto.user.UserItemDTO;
 import com.MMAD.exception.UserNotFoundException;
 import com.MMAD.model.User.User;
 import com.MMAD.model.User.UserDTO;
@@ -129,29 +131,29 @@ public class UserService {
             if (username.equals(toUnfollowUsername)) {
                 throw new IllegalArgumentException("Cannot unfollow yourself");
             }
-    
+
             User user = userRepo.findUserByUsername(username)
                     .orElseThrow(() -> new EntityNotFoundException("User not found"));
-    
+
             User toUnfollow = userRepo.findUserByUsername(toUnfollowUsername)
                     .orElseThrow(() -> new EntityNotFoundException("User to unfollow not found"));
-    
+
             if (!user.getFollowing().contains(toUnfollow)) {
                 throw new IllegalArgumentException("Not following this user");
             }
-    
+
             user.getFollowing().remove(toUnfollow);
             toUnfollow.getFollowers().remove(user);
-    
+
             userRepo.save(user);
             userRepo.save(toUnfollow);
-    
+
         } catch (IllegalArgumentException e) {
             System.err.println("Error unfollowing user: " + e.getMessage());
             throw new RuntimeException("Error unfollowing user: " + e.getMessage());
         }
     }
-    
+
     /**
      * Get list of users the user is following.
      */
@@ -188,11 +190,16 @@ public class UserService {
      * Searches for users whose usernames contain the given query string
      * (case-insensitive).
      */
-    public List<UserDTO> searchUsers(String query) {
+    public List<UserItemDTO> searchUsers(String query) {
         List<User> users = userRepo.findByUsernameContainingIgnoreCase(query);
+
         return users.stream()
-                .map(userDTOMapper::apply)
+                .map(user -> new UserItemDTO(
+                        user.getId(),
+                        user.getUsername(),
+                        "https://ui-avatars.com/api/?name=" + user.getUsername()))
                 .collect(Collectors.toList());
+
     }
 
     /**

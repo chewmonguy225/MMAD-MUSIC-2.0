@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.MMAD.Service.UserService;
+import com.MMAD.dto.user.UserItemDTO;
 import com.MMAD.model.User.UserDTO;
 
 import jakarta.transaction.Transactional;
@@ -242,9 +243,9 @@ public class UserController {
      * @return A list of UserDTOs matching the search criteria.
      */
     @GetMapping("/search")
-    public ResponseEntity<List<UserDTO>> searchUsers(@RequestParam("query") String query) {
+    public ResponseEntity<List<UserItemDTO>> searchUsers(@RequestParam("query") String query) {
         try {
-            List<UserDTO> users = userService.searchUsers(query);
+            List<UserItemDTO> users = userService.searchUsers(query);
             // If no users are found, userService.searchUsers returns an empty list,
             // which is a valid success response (HTTP 200 OK with an empty array).
             return ResponseEntity.ok(users);

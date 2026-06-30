@@ -1,26 +1,28 @@
 package com.MMAD.dto.item;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.MMAD.model.item.Album;
-import com.MMAD.model.item.Artist;
+
+import java.util.List;
 
 public class AlbumDTO extends ItemDTO {
 
     private List<ArtistDTO> artists;
 
-    // Constructors
     public AlbumDTO() {
         super();
     }
 
-    public AlbumDTO(Long id, String sourceId, String name, String imageURL, List<ArtistDTO> artists) {
+    public AlbumDTO(
+            Long id,
+            String sourceId,
+            String name,
+            String imageURL,
+            List<ArtistDTO> artists
+    ) {
         super(id, sourceId, name, imageURL);
         this.artists = artists;
     }
 
-    // Getters & Setters
     public List<ArtistDTO> getArtists() {
         return artists;
     }
@@ -29,7 +31,6 @@ public class AlbumDTO extends ItemDTO {
         this.artists = artists;
     }
 
-    // From Album entity to DTO
     public static AlbumDTO fromEntity(Album album) {
         if (album == null) return null;
 
@@ -38,34 +39,28 @@ public class AlbumDTO extends ItemDTO {
                 album.getSourceId(),
                 album.getName(),
                 album.getImageURL(),
-                album.getArtists() == null ? null :
-                        album.getArtists()
-                             .stream()
-                             .map(ArtistDTO::fromEntity)
-                             .collect(Collectors.toList())
+                album.getArtists()
+                        .stream()
+                        .map(ArtistDTO::fromEntity)
+                        .toList()
         );
     }
 
     public static Album toEntity(AlbumDTO dto) {
         if (dto == null) return null;
-    
-        // Convert ArtistDTOs to Artist entities using explicit lambda to avoid ambiguity
-        List<Artist> artistEntities = dto.getArtists() == null ? null :
-            dto.getArtists()
-               .stream()
-               .map(dtoArtist -> ArtistDTO.toEntity(dtoArtist))
-               .collect(Collectors.toList());
-    
-        // Use the constructor that includes imageURL
+
         Album album = new Album(
-            dto.getImageURL(),
-            dto.getSourceId(),
-            dto.getName(),
-            artistEntities
+                dto.getImageURL(),
+                dto.getSourceId(),
+                dto.getName(),
+                dto.getArtists()
+                        .stream()
+                        .map(ArtistDTO::toEntity)
+                        .toList()
         );
-    
-        album.setId(dto.getId()); // Set ID for updates
+
+        album.setId(dto.getId());
+
         return album;
-    }    
-    
+    }
 }

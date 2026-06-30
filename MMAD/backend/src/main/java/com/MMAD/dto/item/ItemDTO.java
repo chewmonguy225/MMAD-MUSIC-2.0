@@ -1,4 +1,3 @@
-// src/main/java/com/MMAD/MMAD/model/Item/ItemDTO.java
 package com.MMAD.dto.item;
 
 import com.MMAD.model.item.Album;
@@ -7,11 +6,12 @@ import com.MMAD.model.item.Item;
 import com.MMAD.model.item.Song;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import java.time.LocalDateTime; // Make sure this is imported if used in entities
 
-import org.hibernate.Hibernate;
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type"
+)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ArtistDTO.class, name = "artist"),
         @JsonSubTypes.Type(value = AlbumDTO.class, name = "album"),
@@ -24,8 +24,10 @@ public class ItemDTO {
     private String name;
     private String imageURL;
 
-    public ItemDTO() {
-    } // Default constructor for Jackson
+    // ⭐ NEW: relevance for sorting search results
+    private int relevance;
+
+    public ItemDTO() {}
 
     public ItemDTO(Long id, String sourceId, String name, String imageURL) {
         this.id = id;
@@ -34,7 +36,10 @@ public class ItemDTO {
         this.imageURL = imageURL;
     }
 
-    // Getters and Setters (ensure they include createdAt and updatedAt)
+    // =========================
+    // Getters / Setters
+    // =========================
+
     public Long getId() {
         return id;
     }
@@ -67,26 +72,36 @@ public class ItemDTO {
         this.imageURL = imageURL;
     }
 
-    // *** THIS IS THE CRITICAL CHANGE FOR fromEntity ***
-    // This method dispatches to the correct specific DTO's fromEntity method.
+    public int getRelevance() {
+        return relevance;
+    }
+
+    public void setRelevance(int relevance) {
+        this.relevance = relevance;
+    }
+
+    // =========================
+    // Polymorphic mapping
+    // =========================
+
     public static ItemDTO fromEntity(Item item) {
 
-        if (item == null)
-            return null;
+        if (item == null) return null;
 
         if (item instanceof Artist artist) {
             return ArtistDTO.fromEntity(artist);
-        }
-
-        if (item instanceof Song song) {
-            return SongDTO.fromEntity(song);
         }
 
         if (item instanceof Album album) {
             return AlbumDTO.fromEntity(album);
         }
 
+        if (item instanceof Song song) {
+            return SongDTO.fromEntity(song);
+        }
+
         throw new IllegalArgumentException(
-                "Unsupported Item type: " + item.getClass());
+                "Unsupported Item type: " + item.getClass()
+        );
     }
 }
