@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import jakarta.persistence.EntityNotFoundException;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,9 +15,9 @@ import com.MMAD.dto.item.ItemDTO;
 import com.MMAD.dto.review.GetReviewResponse;
 import com.MMAD.dto.review.ItemReviewResponse;
 import com.MMAD.dto.review.ItemReviewsResponse;
+import com.MMAD.dto.user.UserDTOMapper;
 import com.MMAD.model.Review.Review;
 import com.MMAD.model.User.User;
-import com.MMAD.model.User.UserDTOMapper;
 import com.MMAD.model.item.Item;
 import com.MMAD.repo.ReviewRepo;
 
@@ -55,20 +56,24 @@ public class ReviewService {
      * @return The newly created Review'd DTO.
      */
     @Transactional
-    public GetReviewResponse createReview(String username, Long itemId, int rating, String description) {
-        // Input Validation for parameters
-        if (username == null || username.trim().isEmpty()) {
-            throw new IllegalArgumentException("Username cannot be null or empty.");
-        }
+    public GetReviewResponse createReview(Long itemId, int rating, String description) {
+
+        // Input Validation
         if (itemId == null || itemId <= 0) {
             throw new IllegalArgumentException("Item ID cannot be null or non-positive.");
         }
-        if (rating < 1 || rating > 5) { // Assuming rating is between 1 and 5
+        if (rating < 1 || rating > 5) {
             throw new IllegalArgumentException("Rating must be between 1 and 5.");
         }
         if (description == null || description.trim().isEmpty()) {
             throw new IllegalArgumentException("Review description cannot be null or empty.");
         }
+
+        // 🔐 GET USER FROM JWT CONTEXT (NOT FROM PARAMETER)
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
 
         User user = userService.getUserByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
@@ -83,7 +88,6 @@ public class ReviewService {
         Review review = new Review(rating, description, item, user);
         Review savedReview = reviewRepo.save(review);
 
-        // Convert to DTO and return
         return GetReviewResponse.fromEntity(savedReview);
     }
 

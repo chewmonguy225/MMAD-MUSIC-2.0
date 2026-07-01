@@ -1,9 +1,12 @@
-package com.MMAD.model.User;
+package com.MMAD.dto.user;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+
+import com.MMAD.model.User.Playlist;
+import com.MMAD.model.User.User;
 
 @Service
 public class UserDTOMapper implements Function<User, UserDTO> {

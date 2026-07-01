@@ -2,7 +2,7 @@ package com.MMAD.dto.review;
 
 import java.time.LocalDateTime;
 
-import com.MMAD.model.User.UserDTO;
+import com.MMAD.dto.user.UserDTO;
 
 public class ItemReviewResponse {
 

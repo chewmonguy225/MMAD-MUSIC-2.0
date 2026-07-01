@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.MMAD.Security.JWTService;
 import com.MMAD.Service.UserService;
+import com.MMAD.dto.user.LoginResponse;
+import com.MMAD.dto.user.UserDTO;
 import com.MMAD.dto.user.UserItemDTO;
-import com.MMAD.model.User.UserDTO;
 
 import jakarta.transaction.Transactional;
 
@@ -24,14 +26,16 @@ import jakarta.transaction.Transactional;
 public class UserController {
 
     private final UserService userService;
+    private final JWTService jwtService;
 
     /**
      * Constructor for UserResource.
      * 
      * @param userService The UserService to be used.
      */
-    public UserController(UserService userService) {
+    public UserController(UserService userService, JWTService jwtService) {
         this.userService = userService;
+        this.jwtService = jwtService;
     }
 
     /**
@@ -43,7 +47,7 @@ public class UserController {
     @GetMapping("/id/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable("id") Long id) {
         try {
-            UserDTO user = userService.findUserById(id);
+            UserDTO user = userService.getUserDTOById(id);
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
@@ -59,7 +63,7 @@ public class UserController {
     @GetMapping("/username/{username}")
     public ResponseEntity<UserDTO> getUserByUsername(@PathVariable("username") String username) {
         try {
-            UserDTO user = userService.findUserByUsername(username);
+            UserDTO user = userService.getUserDTOByUsername(username);
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
@@ -74,16 +78,12 @@ public class UserController {
      * @return The user with the given username and password.
      */
     @PostMapping("/login")
-    public ResponseEntity<UserDTO> login(@RequestBody Map<String, String> credentials) {
-        try {
-            String username = credentials.get("username");
-            String password = credentials.get("password");
-
-            UserDTO user = userService.findUserByUsernameAndPassword(username, password);
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    public ResponseEntity<LoginResponse> login(@RequestBody Map<String, String> credentials) {
+    
+        String username = credentials.get("username");
+        String password = credentials.get("password");
+    
+        return ResponseEntity.ok(userService.login(username, password));
     }
 
     /**
@@ -134,8 +134,8 @@ public class UserController {
     public ResponseEntity<String> followUser(@RequestParam("username") String username,
             @RequestParam("followUsername") String followUsername) {
         try {
-            userService.findUserByUsername(username);
-            userService.findUserByUsername(followUsername);
+            userService.getUserByUsername(username);
+            userService.getUserByUsername(followUsername);
             userService.followUser(username, followUsername); // this method must be updated to accept usernames
             return ResponseEntity.ok("User followed successfully");
         } catch (Exception e) {
@@ -149,8 +149,8 @@ public class UserController {
     public ResponseEntity<String> unfollowUser(@RequestParam("username") String username,
             @RequestParam("unfollowUsername") String unfollowUsername) {
         try {
-            userService.findUserByUsername(username);
-            userService.findUserByUsername(unfollowUsername);
+            userService.getUserByUsername(username);
+            userService.getUserByUsername(unfollowUsername);
             userService.unfollowUser(username, unfollowUsername); // implement this in your service
             return ResponseEntity.ok("User unfollowed successfully");
         } catch (Exception e) {

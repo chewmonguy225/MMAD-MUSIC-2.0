@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid; // For validating @RequestBody
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import com.MMAD.Service.ReviewService;
@@ -34,23 +35,34 @@ public class ReviewController {
      * Requires userId, itemId, rating, and description in the request body.
      */
     @PostMapping("/add")
-    public ResponseEntity<GetReviewResponse> createReview(@Valid @RequestBody PostReviewRequest reviewRequest) {
+    public ResponseEntity<GetReviewResponse> createReview(
+            @Valid @RequestBody PostReviewRequest reviewRequest) {
+
         try {
+            String username = SecurityContextHolder
+                    .getContext()
+                    .getAuthentication()
+                    .getName();
+
             GetReviewResponse savedReview = reviewService.createReview(
-                    reviewRequest.getUsername(),
                     reviewRequest.getItemId(),
                     reviewRequest.getRating(),
                     reviewRequest.getDescription());
+
             return ResponseEntity.status(HttpStatus.CREATED).body(savedReview);
 
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // or send message
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+
         } catch (Exception e) {
             System.err.println("Unexpected error creating review: " + e.getMessage());
             e.printStackTrace();
@@ -92,8 +104,8 @@ public class ReviewController {
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404
         } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); //500
-     }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 500
+        }
     }
 
     @GetMapping("/item/{itemId}")

@@ -1,4 +1,4 @@
-package com.MMAD.model.User;
+package com.MMAD.dto.user;
 
 import java.util.List;
 

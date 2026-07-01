@@ -2,18 +2,22 @@ package com.MMAD.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
-import com.MMAD.dto.item.ItemDTO;
+import com.MMAD.Security.JWTService;
+import com.MMAD.dto.user.LoginResponse;
+import com.MMAD.dto.user.UserDTO;
+import com.MMAD.dto.user.UserDTOMapper;
 import com.MMAD.dto.user.UserItemDTO;
 import com.MMAD.exception.UserNotFoundException;
 import com.MMAD.model.User.User;
-import com.MMAD.model.User.UserDTO;
-import com.MMAD.model.User.UserDTOMapper;
 import com.MMAD.repo.UserRepo;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -24,25 +28,40 @@ public class UserService {
 
     private final UserRepo userRepo;
     private final UserDTOMapper userDTOMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final JWTService jwtService;
 
-    public UserService(UserRepo userRepo, UserDTOMapper userDTOMapper) {
+    public UserService(UserRepo userRepo, UserDTOMapper userDTOMapper,
+            JWTService jwtService, PasswordEncoder passwordEncoder) {
         if (userRepo == null) {
             throw new RuntimeException("userRepo cannot be null");
         } else if (userDTOMapper == null) {
             throw new RuntimeException("userDTOMapper cannot be null");
+        } else if (passwordEncoder == null) {
+            throw new RuntimeException("userDTOMapper cannot be null");
         } else {
             this.userRepo = userRepo;
             this.userDTOMapper = userDTOMapper;
+            this.passwordEncoder = passwordEncoder;
+            this.jwtService = jwtService;
         }
     }
 
-    public UserDTO findUserById(Long id) {
+    @GetMapping("/me")
+    public UserDTO getCurrentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return getUserDTOByUsername(username);
+    }
+
+    @Transactional
+    public UserDTO getUserDTOById(Long id) {
         return userRepo.findUserById(id)
                 .map(userDTOMapper::apply)
                 .orElseThrow(() -> new UserNotFoundException("user with id [%s] not found".formatted(id)));
     }
 
-    public UserDTO findUserByUsername(String username) {
+    @Transactional
+    public UserDTO getUserDTOByUsername(String username) {
         return userRepo.findUserByUsername(username)
                 .map(userDTOMapper::apply)
                 .orElseThrow(() -> new UserNotFoundException("user with username [%s] not found".formatted(username)));
@@ -53,10 +72,18 @@ public class UserService {
         return userRepo.findUserByUsername(username);
     }
 
-    public UserDTO findUserByUsernameAndPassword(String username, String password) {
-        return userRepo.findUserByUsernameAndPassword(username, password)
-                .map(userDTOMapper::apply)
-                .orElseThrow(() -> new UserNotFoundException("credentials do not match"));
+    public LoginResponse login(String username, String password) {
+
+        User user = userRepo.findUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
+        }
+
+        String token = jwtService.generateToken(user.getUsername());
+
+        return new LoginResponse(token, user.getUsername());
     }
 
     public UserDTO createUser(String username, String password) {
@@ -64,7 +91,9 @@ public class UserService {
         if (existingUser.isPresent()) {
             throw new RuntimeException("User already exists");
         } else {
-            User newUser = new User(username, password);
+            User newUser = new User(
+                    username,
+                    passwordEncoder.encode(password));
             userRepo.save(newUser);
             return userDTOMapper.apply(newUser);
         }

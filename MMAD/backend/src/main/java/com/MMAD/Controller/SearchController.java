@@ -7,7 +7,7 @@ import com.MMAD.Service.SpotifyService;
 import com.MMAD.Service.UserService;
 import com.MMAD.dto.SearchResponse;
 import com.MMAD.dto.item.ItemDTO;
-import com.MMAD.model.User.UserDTO;
+import com.MMAD.dto.user.UserDTO;
 import com.MMAD.model.item.*;
 
 import java.util.ArrayList;

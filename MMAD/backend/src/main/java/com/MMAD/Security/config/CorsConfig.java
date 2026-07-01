@@ -1,4 +1,4 @@
-package com.MMAD.config;
+package com.MMAD.Security.config;
 
 import java.util.List;
 

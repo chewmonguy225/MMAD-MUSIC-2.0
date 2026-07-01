@@ -3,9 +3,9 @@ package com.MMAD.dto.review;
 import java.time.LocalDateTime;
 
 import com.MMAD.dto.item.ItemDTO;
+import com.MMAD.dto.user.UserDTO;
+import com.MMAD.dto.user.UserDTOMapper;
 import com.MMAD.model.Review.Review;
-import com.MMAD.model.User.UserDTO;
-import com.MMAD.model.User.UserDTOMapper;
 
 
 

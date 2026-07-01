@@ -6,8 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class PostReviewRequest {
-    @NotNull(message = "username is requried")
-    private String username;
 
     @NotNull(message = "Item ID is required")
     private Long itemId;
@@ -20,25 +18,15 @@ public class PostReviewRequest {
     private String description;
 
     // Constructors
-    public PostReviewRequest() {
-    }
+    public PostReviewRequest() {}
 
-    public PostReviewRequest(String username, Long itemId, int rating, String description) {
-        this.username = username;
+    public PostReviewRequest(Long itemId, int rating, String description) {
         this.itemId = itemId;
         this.rating = rating;
         this.description = description;
     }
 
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
+    // Getters & Setters
     public Long getItemId() {
         return itemId;
     }
@@ -62,5 +50,4 @@ public class PostReviewRequest {
     public void setDescription(String description) {
         this.description = description;
     }
-
 }
