@@ -38,7 +38,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
         System.out.println("🔥 JWT FILTER HIT");
 System.out.println("Auth header: " + request.getHeader("Authorization"));
-
         String path = request.getServletPath();
 
         // ✅ EXCLUDE PUBLIC ENDPOINTS (IMPORTANT FIX)
@@ -85,7 +84,7 @@ System.out.println("Auth header: " + request.getHeader("Authorization"));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-
+        System.out.println("JWT subject: " + username);
         filterChain.doFilter(request, response);
     }
 }

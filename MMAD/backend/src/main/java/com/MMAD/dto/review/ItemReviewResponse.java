@@ -2,8 +2,6 @@ package com.MMAD.dto.review;
 
 import java.time.LocalDateTime;
 
-import com.MMAD.dto.user.UserDTO;
-
 public class ItemReviewResponse {
 
     private Long id;

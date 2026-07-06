@@ -12,11 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
 
 import com.MMAD.Security.JWTService;
 import com.MMAD.Service.UserService;
 import com.MMAD.dto.user.LoginResponse;
-import com.MMAD.dto.user.UserDTO;
+import com.MMAD.dto.item.UserDTO;
 import com.MMAD.dto.user.UserItemDTO;
 
 import jakarta.transaction.Transactional;
@@ -79,10 +80,10 @@ public class UserController {
      */
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody Map<String, String> credentials) {
-    
+
         String username = credentials.get("username");
         String password = credentials.get("password");
-    
+
         return ResponseEntity.ok(userService.login(username, password));
     }
 
@@ -102,6 +103,12 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDTO> getMyProfile(Authentication authentication) {
+        String username = authentication.getName();
+        return ResponseEntity.ok(userService.getUserDTOByUsername(username));
     }
 
     /**
@@ -166,9 +173,9 @@ public class UserController {
      * @return List of UserDTO representing the users being followed.
      */
     @GetMapping("/following/{userId}")
-    public ResponseEntity<List<UserDTO>> getFollowing(@PathVariable("userId") Long userId) {
+    public ResponseEntity<List<String>> getFollowingList(@PathVariable("userId") Long userId) {
         try {
-            List<UserDTO> following = userService.getFollowing(userId);
+            List<String> following = userService.getFollowingList(userId);
             return ResponseEntity.ok(following);
         } catch (Exception e) {
             System.err.println("Error retrieving following list: " + e.getMessage());
@@ -183,7 +190,7 @@ public class UserController {
      * @return List of UserDTO representing the followers.
      */
     @GetMapping("/followers/{userId}")
-    public ResponseEntity<List<UserDTO>> getFollowers(@PathVariable("userId") Long userId) {
+    public ResponseEntity<List<UserDTO>> getFollowersList(@PathVariable("userId") Long userId) {
         try {
             List<UserDTO> followers = userService.getFollowers(userId);
             return ResponseEntity.ok(followers);

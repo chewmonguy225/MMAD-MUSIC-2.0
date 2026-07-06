@@ -1,16 +1,16 @@
 package com.MMAD.dto.user;
+import com.MMAD.dto.item.UserDTO;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.MMAD.model.User.Playlist;
 import com.MMAD.model.User.User;
 
 @Service
 public class UserDTOMapper implements Function<User, UserDTO> {
-    
+
     @Override
     public UserDTO apply(User user) {
         return new UserDTO(
@@ -22,15 +22,7 @@ public class UserDTOMapper implements Function<User, UserDTO> {
             user.getFollowers()
                 .stream()
                 .map(User::getUsername)
-                .collect(Collectors.toList()),
-            user.getPlaylists()
-                .stream()
-                .map(Playlist::getId)
                 .collect(Collectors.toList())
         );
     }
-    
-
-
-
 }

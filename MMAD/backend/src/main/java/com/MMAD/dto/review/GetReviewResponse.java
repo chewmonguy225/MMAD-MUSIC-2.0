@@ -3,7 +3,6 @@ package com.MMAD.dto.review;
 import java.time.LocalDateTime;
 
 import com.MMAD.dto.item.ItemDTO;
-import com.MMAD.dto.user.UserDTO;
 import com.MMAD.dto.user.UserDTOMapper;
 import com.MMAD.model.Review.Review;
 
@@ -11,21 +10,19 @@ import com.MMAD.model.Review.Review;
 
 public class GetReviewResponse {
 
-    private static final UserDTOMapper USER_MAPPER = new UserDTOMapper();
-
     private Long id;
     private int rating;
     private String description;
 
     private ItemDTO item;
-    private UserDTO user;
+    private String username;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public GetReviewResponse(Long id, int rating, String description,
             ItemDTO item,
-            UserDTO user,
+            String username,
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {
 
@@ -33,18 +30,11 @@ public class GetReviewResponse {
         this.rating = rating;
         this.description = description;
         this.item = item;
-        this.user = user;
+        this.username = username;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    // getters/setters unchanged
-
-    // --- Getters and Setters ---
-    // You can generate these using your IDE (Alt+Insert in IntelliJ, Source ->
-    // Generate in Eclipse)
-    // Or use Lombok annotations if you have it set up (@Getter, @Setter,
-    // @AllArgsConstructor, @NoArgsConstructor)
 
     public Long getId() {
         return id;
@@ -78,12 +68,13 @@ public class GetReviewResponse {
         this.item = item;
     }
 
-    public UserDTO getUser() {
-        return user;
+
+    public String getUsername(){
+        return username;
     }
 
-    public void setUser(UserDTO user) {
-        this.user = user;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -105,13 +96,13 @@ public class GetReviewResponse {
     public static GetReviewResponse fromEntity(Review review) {
         if (review == null)
             return null;
-
+    
         return new GetReviewResponse(
                 review.getId(),
                 review.getRating(),
                 review.getDescription(),
                 ItemDTO.fromEntity(review.getItem()),
-                USER_MAPPER.apply(review.getUser()),
+                review.getUser().getUsername(),
                 review.getCreatedAt(),
                 review.getUpdatedAt());
     }

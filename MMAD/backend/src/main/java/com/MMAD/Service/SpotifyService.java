@@ -38,8 +38,6 @@ public class SpotifyService {
     private String accessToken;
     private long tokenTimestamp;
 
-    public SpotifyService() {}
-
     // =========================
     // TOKEN HANDLING
     // =========================
@@ -69,15 +67,13 @@ public class SpotifyService {
             MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
             body.add("grant_type", "client_credentials");
 
-            HttpEntity<MultiValueMap<String, String>> request =
-                    new HttpEntity<>(body, headers);
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
             ResponseEntity<String> response = restTemplate.exchange(
                     TOKEN_URL,
                     HttpMethod.POST,
                     request,
-                    String.class
-            );
+                    String.class);
 
             JsonNode json = objectMapper.readTree(response.getBody());
             return json.path("access_token").asText();
@@ -88,7 +84,7 @@ public class SpotifyService {
     }
 
     // =========================
-    // PUBLIC SEARCH (FIXED)
+    // SEARCH
     // =========================
 
     public List<ItemDTO> searchSpotify(String query, List<String> types) {
@@ -100,59 +96,114 @@ public class SpotifyService {
         if (types.contains("artist")) {
             for (JsonNode node : json.path("artists").path("items")) {
                 ArtistDTO dto = mapArtist(node);
-                dto.setRelevance(calculateRelevance(node, query, "artist"));
                 results.add(dto);
             }
         }
 
         if (types.contains("album")) {
-            for (JsonNode node : json.path("albums").path("items")) {
-                AlbumDTO dto = mapAlbum(node);
-                dto.setRelevance(calculateRelevance(node, query, "album"));
-                results.add(dto);
-            }
+        for (JsonNode node : json.path("albums").path("items")) {
+        AlbumDTO dto = mapAlbum(node);
+        results.add(dto);
+        }
         }
 
-        // ✅ TRUE GLOBAL RELEVANCE SORT
-        results.sort(Comparator.comparingInt(ItemDTO::getRelevance).reversed());
-
+        results.forEach(item -> item.setRelevance(scoreItem(query, item)));
         return results;
     }
 
-    // =========================
-    // RELEVANCE ENGINE (REAL FIX)
-    // =========================
+    private int scoreItem(String query, ItemDTO item) {
 
-    private int calculateRelevance(JsonNode node, String query, String type) {
-
-        String name = node.path("name").asText("").toLowerCase();
-        String q = query.toLowerCase();
-
+        String q = normalize(query);
+        String name = normalize(item.getName());
+    
         int score = 0;
-
-        // type boost
-        if ("artist".equals(type)) score += 2000;
-        if ("album".equals(type)) score += 1500;
-
-        // exact match
-        if (name.equals(q)) score += 5000;
-
-        // starts with query
-        if (name.startsWith(q)) score += 3000;
-
-        // contains query
-        if (name.contains(q)) score += 1000;
-
-        // Spotify popularity boost (if exists)
-        if (node.has("popularity")) {
-            score += node.path("popularity").asInt();
+    
+        // -------------------
+        // EXACT MATCH
+        // -------------------
+        if (name.equals(q)) {
+            return 1_000_000;
         }
-
+    
+        // -------------------
+        // PREFIX MATCH
+        // -------------------
+        if (name.startsWith(q)) {
+            score += 500_000;
+        }
+    
+        // -------------------
+        // CONTAINS MATCH
+        // -------------------
+        else if (name.contains(q)) {
+            score += 100_000;
+        }
+    
+        // -------------------
+        // TYPE BOOST (via instanceof)
+        // -------------------
+        if (item instanceof ArtistDTO) {
+            score += 50_000;
+        }
+    
+        if (item instanceof AlbumDTO album) {
+            score += 40_000;
+    
+            // -------------------
+            // ALBUM ARTIST BOOST
+            // -------------------
+            for (ArtistDTO artist : album.getArtists()) {
+    
+                String artistName = normalize(artist.getName());
+    
+                if (artistName.equals(q)) {
+                    score += 300_000;
+                }
+                else if (artistName.contains(q)) {
+                    score += 150_000;
+                }
+            }
+        }
+    
         return score;
     }
 
+    private String normalize(String input) {
+        if (input == null) return "";
+    
+        return input
+                .toLowerCase()
+                .trim()
+                .replaceAll("\\s+", " "); // collapses multiple spaces
+    }
+
+    private int levenshtein(String a, String b) {
+
+        int[][] dp = new int[a.length() + 1][b.length() + 1];
+
+        for (int i = 0; i <= a.length(); i++) {
+            for (int j = 0; j <= b.length(); j++) {
+
+                if (i == 0)
+                    dp[i][j] = j;
+                else if (j == 0)
+                    dp[i][j] = i;
+
+                else if (a.charAt(i - 1) == b.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = 1 + Math.min(
+                            dp[i - 1][j],
+                            Math.min(dp[i][j - 1], dp[i - 1][j - 1]));
+                }
+            }
+        }
+
+        return dp[a.length()][b.length()];
+    }
+
     // =========================
-    // SPOTIFY API CALL
+    // API CALL
     // =========================
 
     private JsonNode callSpotify(String query, List<String> types) {
@@ -172,8 +223,7 @@ public class SpotifyService {
                     url,
                     HttpMethod.GET,
                     new HttpEntity<>(headers),
-                    String.class
-            );
+                    String.class);
 
             return objectMapper.readTree(response.getBody());
 
@@ -191,8 +241,7 @@ public class SpotifyService {
                 null,
                 node.path("id").asText(),
                 node.path("name").asText(),
-                extractImage(node)
-        );
+                extractImage(node));
     }
 
     private AlbumDTO mapAlbum(JsonNode node) {
@@ -204,8 +253,7 @@ public class SpotifyService {
                     null,
                     artist.path("id").asText(),
                     artist.path("name").asText(),
-                    "default"
-            ));
+                    "default"));
         }
 
         return new AlbumDTO(
@@ -213,12 +261,11 @@ public class SpotifyService {
                 node.path("id").asText(),
                 node.path("name").asText(),
                 extractImage(node),
-                artists
-        );
+                artists);
     }
 
     // =========================
-    // IMAGE HELPER
+    // IMAGE
     // =========================
 
     private String extractImage(JsonNode node) {

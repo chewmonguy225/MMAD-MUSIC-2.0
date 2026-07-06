@@ -7,13 +7,12 @@ import com.MMAD.Service.SpotifyService;
 import com.MMAD.Service.UserService;
 import com.MMAD.dto.SearchResponse;
 import com.MMAD.dto.item.ItemDTO;
-import com.MMAD.dto.user.UserDTO;
-import com.MMAD.model.item.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/search")
@@ -57,9 +56,16 @@ public class SearchController {
                 }
 
                 // -------------------------
-                // RELEVANCE SORT (GLOBAL)
+                // GLOBAL RELEVANCE SORT
                 // -------------------------
-                results.sort(Comparator.comparingInt(ItemDTO::getRelevance));
+                results.sort(
+                                Comparator.comparingInt(ItemDTO::getRelevance).reversed());
+
+                int MIN_SCORE = 50_000;
+
+                results = results.stream()
+                                .filter(item -> item.getRelevance() >= MIN_SCORE)
+                                .collect(Collectors.toList());
 
                 return ResponseEntity.ok(new SearchResponse(results));
         }

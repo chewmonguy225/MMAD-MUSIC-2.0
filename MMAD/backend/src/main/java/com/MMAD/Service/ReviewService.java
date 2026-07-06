@@ -16,6 +16,7 @@ import com.MMAD.dto.review.GetReviewResponse;
 import com.MMAD.dto.review.ItemReviewResponse;
 import com.MMAD.dto.review.ItemReviewsResponse;
 import com.MMAD.dto.user.UserDTOMapper;
+import com.MMAD.exception.UserNotFoundException;
 import com.MMAD.model.Review.Review;
 import com.MMAD.model.User.User;
 import com.MMAD.model.item.Item;
@@ -100,28 +101,17 @@ public class ReviewService {
      */
     @Transactional(readOnly = true)
     public List<GetReviewResponse> getAllReviews() {
-        return reviewRepo.findAll(Sort.by(Sort.Direction.DESC, "createdAt")).stream()
-                .map(review -> {
-                    ItemDTO itemDto = ItemDTO.fromEntity(review.getItem());
 
-                    if (itemDto != null) {
-                        System.out.println("Mapping Review ID: " + review.getId() +
-                                ", Item type: " + itemDto.getClass().getSimpleName() +
-                                " (Name: " + itemDto.getName() + ")");
-                    } else {
-                        System.out.println("Mapping Review ID: " + review.getId() +
-                                ", Item is null or couldn't be mapped to a DTO.");
-                    }
-
-                    return new GetReviewResponse(
-                            review.getId(),
-                            review.getRating(),
-                            review.getDescription(),
-                            itemDto,
-                            userDTOMapper.apply(review.getUser()),
-                            review.getCreatedAt(),
-                            review.getUpdatedAt());
-                })
+        return reviewRepo.findAll(Sort.by(Sort.Direction.DESC, "createdAt"))
+                .stream()
+                .map(review -> new GetReviewResponse(
+                        review.getId(),
+                        review.getRating(),
+                        review.getDescription(),
+                        ItemDTO.fromEntity(review.getItem()),
+                        review.getUser().getUsername(),
+                        review.getCreatedAt(),
+                        review.getUpdatedAt()))
                 .toList();
     }
 
@@ -156,20 +146,21 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public List<GetReviewResponse> getReviewsByUsername(String username) {
 
-        // 1. Fetch the User entity (or throw if not found)
-        Optional<User> user = userService.getUserByUsername(username);
+        // Fetch the User entity (or throw if not found)
+        User user = userService.getUserByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User with username [%s] not found".formatted(username)));
 
-        // 2. Fetch Reviews by User ID
-        List<Review> reviews = reviewRepo.findByUserId(user.get().getId());
+        // Fetch Reviews by User ID
+        List<Review> reviews = reviewRepo.findByUserId(user.getId());
 
-        // 3. Convert each Review → ReviewResponse
+        // Convert each Review → GetReviewResponse
         return reviews.stream()
                 .map(review -> new GetReviewResponse(
                         review.getId(),
                         review.getRating(),
                         review.getDescription(),
-                        ItemDTO.fromEntity(review.getItem()), // get and map item
-                        userDTOMapper.apply(user.get()), // same user for all reviews
+                        ItemDTO.fromEntity(review.getItem()),
+                        user.getUsername(),
                         review.getCreatedAt(),
                         review.getUpdatedAt()))
                 .toList();

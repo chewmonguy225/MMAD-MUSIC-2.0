@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import com.MMAD.Security.JWTService;
 import com.MMAD.dto.user.LoginResponse;
-import com.MMAD.dto.user.UserDTO;
+import com.MMAD.dto.item.UserDTO;
 import com.MMAD.dto.user.UserDTOMapper;
 import com.MMAD.dto.user.UserItemDTO;
 import com.MMAD.exception.UserNotFoundException;
@@ -27,23 +27,23 @@ import jakarta.transaction.Transactional;
 public class UserService {
 
     private final UserRepo userRepo;
-    private final UserDTOMapper userDTOMapper;
     private final PasswordEncoder passwordEncoder;
     private final JWTService jwtService;
+    private final UserDTOMapper userDTOMapper;
 
-    public UserService(UserRepo userRepo, UserDTOMapper userDTOMapper,
-            JWTService jwtService, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepo userRepo,
+            JWTService jwtService, 
+            PasswordEncoder passwordEncoder,
+            UserDTOMapper userDTOMapper) {
         if (userRepo == null) {
             throw new RuntimeException("userRepo cannot be null");
-        } else if (userDTOMapper == null) {
-            throw new RuntimeException("userDTOMapper cannot be null");
         } else if (passwordEncoder == null) {
             throw new RuntimeException("userDTOMapper cannot be null");
         } else {
             this.userRepo = userRepo;
-            this.userDTOMapper = userDTOMapper;
             this.passwordEncoder = passwordEncoder;
             this.jwtService = jwtService;
+            this.userDTOMapper = userDTOMapper;
         }
     }
 
@@ -186,12 +186,12 @@ public class UserService {
     /**
      * Get list of users the user is following.
      */
-    public List<UserDTO> getFollowing(Long userId) {
+    public List<String> getFollowingList(Long userId) {
         try {
             User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
             return user.getFollowing()
                     .stream()
-                    .map(userDTOMapper::apply)
+                    .map(User::getUsername)
                     .collect(Collectors.toList());
         } catch (Exception e) {
             System.err.println("Error getting following list: " + e.getMessage());
