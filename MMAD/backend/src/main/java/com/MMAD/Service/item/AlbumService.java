@@ -26,52 +26,52 @@ public class AlbumService {
         this.artistService = artistService;
     }
 
-    public AlbumDTO addAlbum(Album album) {
-        if (album.getSourceId() == null || album.getSourceId().trim().isEmpty()) {
-            throw new IllegalArgumentException("Source ID cannot be empty or null for a new album.");
-        }
+    // public AlbumDTO addAlbum(Album album) {
+    //     if (album.getSourceId() == null || album.getSourceId().trim().isEmpty()) {
+    //         throw new IllegalArgumentException("Source ID cannot be empty or null for a new album.");
+    //     }
 
-        Optional<Album> existingAlbumOpt = albumRepo.findBySourceId(album.getSourceId());
+    //     Optional<Album> existingAlbumOpt = albumRepo.findBySourceId(album.getSourceId());
 
-        Album savedAlbum;
+    //     Album savedAlbum;
 
-        if (existingAlbumOpt.isPresent()) {
-            // Update existing album
-            Album existingAlbum = existingAlbumOpt.get();
+    //     if (existingAlbumOpt.isPresent()) {
+    //         // Update existing album
+    //         Album existingAlbum = existingAlbumOpt.get();
 
-            existingAlbum.setName(album.getName());
-            existingAlbum.setImageURL(album.getImageURL());
+    //         existingAlbum.setName(album.getName());
+    //         existingAlbum.setImageURL(album.getImageURL());
 
-            // Step 1: Save/update artists and get DTOs
-            List<ArtistDTO> artistDTOs = album.getArtists().stream()
-                    .map(artist -> artistService.addArtist(artist))
-                    .collect(Collectors.toList());
+    //         // Step 1: Save/update artists and get DTOs
+    //         List<ArtistDTO> artistDTOs = album.getArtists().stream()
+    //                 .map(artist -> artistService.addArtist(artist))
+    //                 .collect(Collectors.toList());
 
-            // Step 2: Convert DTOs back to entities (mutable list!)
-            List<Artist> managedArtists = artistDTOs.stream()
-                    .map(dto -> ArtistDTO.toEntity(dto))
-                    .collect(Collectors.toCollection(ArrayList::new));
+    //         // Step 2: Convert DTOs back to entities (mutable list!)
+    //         List<Artist> managedArtists = artistDTOs.stream()
+    //                 .map(dto -> ArtistDTO.toEntity(dto))
+    //                 .collect(Collectors.toCollection(ArrayList::new));
 
-            existingAlbum.setArtists(managedArtists);
+    //         existingAlbum.setArtists(managedArtists);
 
-            savedAlbum = albumRepo.save(existingAlbum);
-        } else {
-            // For new album, do the same with artists
-            List<ArtistDTO> artistDTOs = album.getArtists().stream()
-                    .map(artist -> artistService.addArtist(artist))
-                    .collect(Collectors.toList());
+    //         savedAlbum = albumRepo.save(existingAlbum);
+    //     } else {
+    //         // For new album, do the same with artists
+    //         List<ArtistDTO> artistDTOs = album.getArtists().stream()
+    //                 .map(artist -> artistService.addArtist(artist))
+    //                 .collect(Collectors.toList());
 
-            List<Artist> managedArtists = artistDTOs.stream()
-                    .map(dto -> ArtistDTO.toEntity(dto))
-                    .collect(Collectors.toCollection(ArrayList::new));
+    //         List<Artist> managedArtists = artistDTOs.stream()
+    //                 .map(dto -> ArtistDTO.toEntity(dto))
+    //                 .collect(Collectors.toCollection(ArrayList::new));
 
-            album.setArtists(managedArtists);
+    //         album.setArtists(managedArtists);
 
-            savedAlbum = albumRepo.save(album);
-        }
+    //         savedAlbum = albumRepo.save(album);
+    //     }
 
-        return AlbumDTO.fromEntity(savedAlbum);
-    }
+    //     return AlbumDTO.fromEntity(savedAlbum);
+    // }
 
     @Transactional(readOnly = true)
     public Optional<AlbumDTO> getAlbumById(Long id) {

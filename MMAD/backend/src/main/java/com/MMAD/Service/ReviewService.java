@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.MMAD.Service.item.ItemService;
 import com.MMAD.dto.item.ItemDTO;
 import com.MMAD.dto.review.GetReviewResponse;
 import com.MMAD.dto.review.ItemReviewResponse;
@@ -58,7 +57,7 @@ public class ReviewService {
      */
     @Transactional
     public GetReviewResponse createReview(Long itemId, int rating, String description) {
-
+        System.out.println("HERE");
         // Input Validation
         if (itemId == null || itemId <= 0) {
             throw new IllegalArgumentException("Item ID cannot be null or non-positive.");
@@ -78,10 +77,12 @@ public class ReviewService {
 
         User user = userService.getUserByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+        System.out.println("FOUND USER: " + user.getUsername());
 
         Item item = itemService.getItemEntityById(itemId)
                 .orElseThrow(() -> new EntityNotFoundException("Item not found with ID: " + itemId));
 
+        System.out.println("FOUND ITEM: " + item.getName());
         if (reviewRepo.findByUserIdAndItemId(user.getId(), item.getId()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "UserAlreadyReviewed");
         }
@@ -188,6 +189,18 @@ public class ReviewService {
         return new ItemReviewsResponse(itemId, reviewResponses);
     }
 
+    @Transactional(readOnly = true)
+    public List<GetReviewResponse> getFeedReviews(String username) {
+
+        User user = userService.getUserByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        List<Review> reviews = reviewRepo.findFeedReviews(user.getId());
+
+        return reviews.stream()
+                .map(GetReviewResponse::fromEntity)
+                .toList();
+    }
     // UPDATE
 
     /**

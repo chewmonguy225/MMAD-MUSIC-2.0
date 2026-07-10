@@ -34,4 +34,17 @@ public interface ReviewRepo extends JpaRepository<Review, Long> {
 
     Optional<Review> findByUserIdAndItemId(Long userId, Long itemId);
 
+    @Query("""
+                SELECT r
+                FROM Review r
+                WHERE r.user.id = :userId
+                   OR r.user IN (
+                        SELECT f
+                        FROM User u
+                        JOIN u.following f
+                        WHERE u.id = :userId
+                   )
+                ORDER BY r.createdAt DESC
+            """)
+    List<Review> findFeedReviews(@Param("userId") Long userId);
 }

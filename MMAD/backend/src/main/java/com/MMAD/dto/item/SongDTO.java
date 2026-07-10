@@ -1,9 +1,12 @@
 package com.MMAD.dto.item;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.MMAD.model.item.Album;
 import com.MMAD.model.item.Artist;
+import com.MMAD.model.item.MusicProvider;
 import com.MMAD.model.item.Song;
 
 public class SongDTO extends ItemDTO {
@@ -15,9 +18,9 @@ public class SongDTO extends ItemDTO {
         super();
     }
 
-    public SongDTO(Long id, String sourceId, String name, String imageURL,
+    public SongDTO(Long id, String sourceId, MusicProvider provider, String name, String imageURL,
             List<ArtistDTO> artists, AlbumDTO album) {
-        super(id, sourceId, name, imageURL);
+        super(id, sourceId, provider, name, imageURL);
         this.artists = artists;
         this.album = album;
     }
@@ -51,30 +54,37 @@ public class SongDTO extends ItemDTO {
         return new SongDTO(
                 song.getId(),
                 song.getSourceId(),
+                song.getProvider(),
                 song.getName(),
                 song.getImageURL(),
                 artistDTOs,
                 AlbumDTO.fromEntity(song.getAlbum()));
     }
 
-    public static Song toEntity(SongDTO dto) {
-        if (dto == null)
-            return null;
+    @Override
+    public Song toEntity() {
 
-        List<Artist> artistEntities = dto.getArtists() == null ? null
-                : dto.getArtists()
-                        .stream()
-                        .map(artistDto -> ArtistDTO.toEntity(artistDto))
-                        .collect(Collectors.toList());
+        List<Artist> artistEntities = new ArrayList<>();
 
-        Song song = new Song(
-                dto.getImageURL(),
-                dto.getSourceId(),
-                dto.getName(),
+        if (this.getArtists() != null) {
+            artistEntities = this.getArtists()
+                    .stream()
+                    .map(ArtistDTO::toEntity)
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }
+
+        Album albumEntity = null;
+
+        if (this.getAlbum() != null) {
+            albumEntity = this.getAlbum().toEntity();
+        }
+
+        return new Song(
+                this.getSourceId(),
+                this.getProvider(),
+                this.getName(),
+                this.getImageURL(),
                 artistEntities,
-                AlbumDTO.toEntity(dto.getAlbum()));
-
-        song.setId(dto.getId());
-        return song;
+                albumEntity);
     }
 }

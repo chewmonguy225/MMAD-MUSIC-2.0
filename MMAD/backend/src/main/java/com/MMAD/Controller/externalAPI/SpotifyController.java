@@ -1,4 +1,4 @@
-package com.MMAD.Controller.item.externalAPI;
+package com.MMAD.Controller.externalAPI;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,5 +1,7 @@
 package com.MMAD.dto.item;
+
 import com.MMAD.model.item.Artist;
+import com.MMAD.model.item.MusicProvider;
 
 public class ArtistDTO extends ItemDTO {
 
@@ -7,30 +9,28 @@ public class ArtistDTO extends ItemDTO {
         super();
     }
 
-    public ArtistDTO(Long id, String sourceId, String name, String imageURL) {
-        super(id, sourceId, name, imageURL);
+    public ArtistDTO(Long id, String sourceId, MusicProvider provider, String name, String imageURL) {
+        super(id, sourceId, provider, name, imageURL);
     }
 
     public static ArtistDTO fromEntity(Artist artist) {
-        if (artist == null) return null;
+        if (artist == null)
+            return null;
 
         return new ArtistDTO(
-            artist.getId(),
-            artist.getSourceId(),
-            artist.getName(),
-            artist.getImageURL()
-        );
+                artist.getId(),
+                artist.getSourceId(),
+                artist.getProvider(),
+                artist.getName(),
+                artist.getImageURL());
     }
 
-    public static Artist toEntity(ArtistDTO dto) {
-        if (dto == null) return null;
-
-        Artist artist = new Artist(
-            dto.getSourceId(),
-            dto.getName(),
-            dto.getImageURL()
-        );
-        artist.setId(dto.getId()); // for updates
-        return artist;
+    @Override
+    public Artist toEntity() {
+        return new Artist(
+                this.getSourceId(),
+                this.getProvider(),
+                this.getName(),
+                this.getImageURL());
     }
 }

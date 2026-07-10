@@ -1,15 +1,15 @@
-// File: com/MMAD/MMAD/service/item/ItemService.java
-package com.MMAD.Service.item;
+package com.MMAD.Service;
 
 import jakarta.persistence.EntityNotFoundException; // Keep for update/delete/findById/etc. if needed
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.MMAD.Service.item.ItemResolver;
 import com.MMAD.dto.item.ItemDTO;
 import com.MMAD.model.item.Album;
 import com.MMAD.model.item.Artist;
 import com.MMAD.model.item.Item;
-import com.MMAD.model.item.Song;
+import com.MMAD.model.item.MusicProvider;
 import com.MMAD.repo.item.ItemRepo;
 
 import java.util.List;
@@ -19,38 +19,44 @@ import java.util.Optional;
 public class ItemService {
 
     private final ItemRepo itemRepo;
+    private final ItemResolver itemResolver;
 
-    public ItemService(ItemRepo itemRepo) {
+    public ItemService(
+            ItemRepo itemRepo,
+            ItemResolver itemResolver) {
         this.itemRepo = itemRepo;
+        this.itemResolver = itemResolver;
     }
 
     // CREATE
     @Transactional
-    public ItemDTO addItem(Item item) {
-        // 1. Validate that sourceId is provided and not empty
+    public Item addItem(Item item) {
+
         if (item.getSourceId() == null || item.getSourceId().trim().isEmpty()) {
-            throw new IllegalArgumentException("Source ID cannot be empty or null for a new Item.");
+            throw new IllegalArgumentException(
+                    "Source ID cannot be empty or null for a new Item.");
         }
 
-        // 2. Check if an Item with the given sourceId already exists
-        Optional<Item> existingItem = itemRepo.findBySourceId(item.getSourceId());
-        Item savedOrExistingItem;
+        Optional<Item> existingItem = itemRepo.findByProviderAndSourceId(
+                item.getProvider(),
+                item.getSourceId());
 
         if (existingItem.isPresent()) {
-            // --- MODIFIED LOGIC: If an Item with this sourceId already exists, RETURN IT
-            // ---
-            System.out.println("ItemService: Item with source ID '" + item.getSourceId()
-                    + "' already exists. Returning existing item.");
-            savedOrExistingItem = existingItem.get();
-        } else {
-            // If no existing Item found by sourceId, proceed with saving the new Item
-            System.out.println("ItemService: No existing item found with source ID '" + item.getSourceId()
-                    + "'. Saving new item.");
-            itemRepo.save(item);
-            savedOrExistingItem = existingItem.get();
+            System.out.println(
+                    "ItemService: Item with source ID '"
+                            + item.getSourceId()
+                            + "' already exists. Returning existing item.");
+
+            return existingItem.get();
         }
 
-        return ItemDTO.fromEntity(savedOrExistingItem);
+        System.out.println(
+                "ItemService: Saving new item with source ID '"
+                        + item.getSourceId() + "'.");
+
+        Item resolvedItem = itemResolver.resolve(item);
+
+        return itemRepo.save(resolvedItem);
     }
 
     // READ
@@ -81,12 +87,15 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<ItemDTO> getItemBySourceId(String sourceId) { // --- MODIFIED: Return Optional<Item> ---
+    public Optional<ItemDTO> getItemByProviderAndSourceId(MusicProvider provider, String sourceId) { // --- MODIFIED:
+                                                                                                     // Return
+                                                                                                     // Optional<Item>
+                                                                                                     // ---
         // 1. Input validation for sourceId
         if (sourceId == null || sourceId.trim().isEmpty()) {
             throw new IllegalArgumentException("Item Source ID cannot be null or empty for retrieval.");
         }
-        Optional<Item> itemFound = itemRepo.findBySourceId(sourceId);
+        Optional<Item> itemFound = itemRepo.findByProviderAndSourceId(provider, sourceId);
 
         // Map the Optional<Item> to Optional<ItemDTO> using map()
         return itemFound.map(ItemDTO::fromEntity);
@@ -94,7 +103,7 @@ public class ItemService {
 
     // UPDATE
     @Transactional
-    public ItemDTO updateItem(Long id, Item itemDetails) {
+    public ItemDTO updateItem(Long id, ItemDTO itemDetails) {
         // 1. Basic input validation for ID and updated details object
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Item ID cannot be null or non-positive for update.");
@@ -114,7 +123,8 @@ public class ItemService {
 
         // 4. Check for sourceId uniqueness, excluding the current item being updated
         if (!existingItem.getSourceId().equals(itemDetails.getSourceId())) {
-            Optional<Item> duplicateSourceIdItem = itemRepo.findBySourceId(itemDetails.getSourceId());
+            Optional<Item> duplicateSourceIdItem = itemRepo.findByProviderAndSourceId(itemDetails.getProvider(),
+                    itemDetails.getSourceId());
 
             if (duplicateSourceIdItem.isPresent() && !duplicateSourceIdItem.get().getId().equals(id)) {
                 throw new RuntimeException(
@@ -148,4 +158,6 @@ public class ItemService {
         }
         itemRepo.deleteById(id);
     }
+
+
 }

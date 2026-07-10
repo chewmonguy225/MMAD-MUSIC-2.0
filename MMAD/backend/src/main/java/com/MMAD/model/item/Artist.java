@@ -14,15 +14,18 @@ import jakarta.persistence.PrimaryKeyJoinColumn; // NEW IMPORT
 @PrimaryKeyJoinColumn(name = "id")
 
 public class Artist extends Item {
-    
+
     public Artist() {
         super();
     }
-    public Artist(String sourceId, String name, String imageURL) {
-        super(sourceId, name, imageURL); // Call Item's constructor
+
+    public Artist(
+            String sourceId,
+            MusicProvider provider,
+            String name,
+            String imageURL) {
+        super(sourceId, provider, name, imageURL);
     }
-
-
 
     @Override
     public String toString() {

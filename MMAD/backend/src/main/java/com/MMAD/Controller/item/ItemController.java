@@ -5,9 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.MMAD.Service.item.ItemService;
+import com.MMAD.Service.ItemService;
 import com.MMAD.dto.item.ItemDTO;
 import com.MMAD.model.item.Item;
+import com.MMAD.model.item.MusicProvider;
+import com.MMAD.Service.item.ItemMapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,27 +19,42 @@ import java.util.Optional;
 public class ItemController {
 
     private final ItemService itemService;
+    private final ItemMapper itemMapper;
 
-    public ItemController(ItemService itemService) {
+    public ItemController(
+            ItemService itemService,
+            ItemMapper itemMapper) {
         this.itemService = itemService;
+        this.itemMapper = itemMapper;
     }
 
-    // CREATE
     @PostMapping("/add")
-    public ResponseEntity<?> addItem(@RequestBody Item item) {
+    public ResponseEntity<?> addItem(@RequestBody ItemDTO itemDTO) {
+
         try {
-            ItemDTO newItem = itemService.addItem(item);
-            return new ResponseEntity<>(newItem, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            // Catches validation errors (e.g., sourceId empty/null) from service
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+            System.out.println("1");
+
+            Item item = itemMapper.toEntity(itemDTO);
+
+            System.out.println("2");
+
+            Item savedItem = itemService.addItem(item);
+
+            System.out.println("3");
+
+            ItemDTO responseDTO = ItemDTO.fromEntity(savedItem);
+
+            System.out.println("4");
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+
         } catch (RuntimeException e) {
-            // Catches "Item with source ID already exists" from service
-            // A more specific status code for conflicts
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT); // 409 Conflict
-        } catch (Exception e) {
-            // Generic catch-all for other unexpected errors
-            return new ResponseEntity<>("Failed to add item: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(e.getMessage());
         }
     }
 
@@ -65,26 +82,37 @@ public class ItemController {
         }
     }
 
-    @GetMapping("/findSource/{source_id}")
-    public ResponseEntity<?> getItemBySourceId(@PathVariable("source_id") String sourceId) {
+    @GetMapping("/findSource/{provider}/{source_id}")
+    public ResponseEntity<?> getItemBySourceId(
+            @PathVariable("provider") MusicProvider provider,
+            @PathVariable("source_id") String sourceId) {
         try {
-            Optional<ItemDTO> itemDtoOpt = itemService.getItemBySourceId(sourceId);
+
+            Optional<ItemDTO> itemDtoOpt = itemService.getItemByProviderAndSourceId(provider, sourceId);
+
             if (itemDtoOpt.isPresent()) {
                 return new ResponseEntity<>(itemDtoOpt.get(), HttpStatus.OK);
-            } else {
-                return ResponseEntity.notFound().build();
             }
+
+            return ResponseEntity.notFound().build();
+
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(
+                    e.getMessage(),
+                    HttpStatus.BAD_REQUEST);
+
         } catch (Exception e) {
-            return new ResponseEntity<>("Failed to find item by Source ID: " + e.getMessage(),
+            return new ResponseEntity<>(
+                    "Failed to find item by Source ID: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     // UPDATE
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateItem(@PathVariable("id") Long id, @RequestBody Item itemDetails) {
+    public ResponseEntity<?> updateItem(
+            @PathVariable("id") Long id,
+            @RequestBody ItemDTO itemDetails) {
         try {
             ItemDTO updatedItemDto = itemService.updateItem(id, itemDetails);
             return new ResponseEntity<>(updatedItemDto, HttpStatus.OK);

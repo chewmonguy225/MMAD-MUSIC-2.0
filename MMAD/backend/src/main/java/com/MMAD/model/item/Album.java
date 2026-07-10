@@ -11,12 +11,9 @@ import java.util.List;
 public class Album extends Item {
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "album_artists", // Join table name
-        joinColumns = @JoinColumn(name = "album_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "artist_id", referencedColumnName = "id")
-    )
-    //@JsonIgnore // Prevent infinite recursion during serialization
+    @JoinTable(name = "album_artists", // Join table name
+            joinColumns = @JoinColumn(name = "album_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "artist_id", referencedColumnName = "id"))
+    // @JsonIgnore // Prevent infinite recursion during serialization
     private List<Artist> artists = new ArrayList<>();
 
     // Constructors
@@ -24,13 +21,13 @@ public class Album extends Item {
         super();
     }
 
-    public Album(String sourceId, String name, List<Artist> artists) {
-        super(sourceId, name, null);
+    public Album(String sourceId, MusicProvider provider, String name, List<Artist> artists) {
+        super(sourceId, provider, name, null);
         this.artists = artists;
     }
 
-    public Album(String imageURL, String sourceId, String name, List<Artist> artists) {
-        super(sourceId, name, imageURL);
+    public Album(String sourceId, MusicProvider provider, String name, List<Artist> artists, String imageURL) {
+        super(sourceId, provider, name, imageURL);
         this.artists = artists;
     }
 

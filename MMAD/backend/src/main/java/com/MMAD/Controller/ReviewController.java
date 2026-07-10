@@ -6,12 +6,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.MMAD.Service.ReviewService;
 import com.MMAD.dto.review.GetReviewResponse;
 import com.MMAD.dto.review.ItemReviewsResponse;
 import com.MMAD.dto.review.PostReviewRequest;
 import com.MMAD.dto.review.UpdateReviewRequest;
+import com.MMAD.model.Review.Review;
 
 import org.springframework.dao.DataIntegrityViolationException; // Good for handling unique constraint errors
 
@@ -35,38 +37,38 @@ public class ReviewController {
      * Requires userId, itemId, rating, and description in the request body.
      */
     @PostMapping("/add")
-    public ResponseEntity<GetReviewResponse> createReview(
+    public ResponseEntity<?> createReview(
             @Valid @RequestBody PostReviewRequest reviewRequest) {
 
         try {
-            String username = SecurityContextHolder
-                    .getContext()
-                    .getAuthentication()
-                    .getName();
 
             GetReviewResponse savedReview = reviewService.createReview(
                     reviewRequest.getItemId(),
                     reviewRequest.getRating(),
                     reviewRequest.getDescription());
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedReview);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(savedReview);
 
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.notFound().build();
+
+        } catch (ResponseStatusException e) {
+            return ResponseEntity
+                    .status(e.getStatusCode())
+                    .body(e.getReason());
 
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
 
         } catch (Exception e) {
-            System.err.println("Unexpected error creating review: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
         }
     }
 
@@ -108,55 +110,25 @@ public class ReviewController {
         }
     }
 
+    /**
+     * Endpoint to get all reviews for a specific item.
+     */
     @GetMapping("/item/{itemId}")
-    public ResponseEntity<ItemReviewsResponse> getReviewsByItemId(@PathVariable("itemId") Long itemId) {
+    public ResponseEntity<ItemReviewsResponse> getReviewsByItemId(
+            @PathVariable("itemId") Long itemId) {
+
         try {
             ItemReviewsResponse response = reviewService.getReviewsByItemId(itemId);
             return ResponseEntity.ok(response);
+
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    // /**
-    // * Endpoint to get all reviews for a specific item.
-    // */
-    // @GetMapping("/item/{itemId}") // GET to /reviews/item/{itemId}
-    // public ResponseEntity<List<Review>>
-    // getReviewsByItemId(@PathVariable("itemId") Long itemId) {
-    // try {
-    // List<Review> reviews = reviewService.getReviewsByItemId(itemId);
-    // return new ResponseEntity<>(reviews, HttpStatus.OK);
-    // } catch (EntityNotFoundException e) {
-    // // If the item itself is not found
-    // return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
-    // }
-    // }
 
-    // /**
-    // * Endpoint to get the average rating for a specific item.
-    // */
-    // @GetMapping("/item/{itemId}/average-rating") // GET to
-    // /reviews/item/{itemId}/average-rating
-    // public ResponseEntity<Double>
-    // getAverageRatingByItemId(@PathVariable("itemId") Long itemId) {
-    // try {
-    // // The service method should handle EntityNotFoundException internally
-    // // if it retrieves reviews via getReviewsByItemId
-    // double averageRating = reviewService.getAverageRatingByItemId(itemId);
-    // return new ResponseEntity<>(averageRating, HttpStatus.OK);
-    // } catch (EntityNotFoundException e) {
-    // // If the item itself is not found during review retrieval
-    // return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
-    // }
-    // }
-
-    /**
-     * Endpoint to update an existing review.
-     * Note: This assumes you only allow updating rating and description.
-     * If user/item can be changed, you'd need a different DTO.
-     */
     @PutMapping("/{id}") // PUT to /reviews/{id}
     public ResponseEntity<GetReviewResponse> updateReview(
             @PathVariable("id") Long id,
@@ -175,6 +147,19 @@ public class ReviewController {
             e.printStackTrace(); // For full stack trace in console
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // 400 for other issues (e.g., validation)
         }
+    }
+
+    @GetMapping("/feed")
+    public ResponseEntity<List<GetReviewResponse>> getReviewFeed() {
+
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        List<GetReviewResponse> reviews = reviewService.getFeedReviews(username);
+
+        return ResponseEntity.ok(reviews);
     }
 
     /**

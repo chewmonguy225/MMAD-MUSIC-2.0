@@ -3,7 +3,6 @@ package com.MMAD.Service;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +16,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.MMAD.dto.item.AlbumDTO;
 import com.MMAD.dto.item.ArtistDTO;
 import com.MMAD.dto.item.ItemDTO;
+import com.MMAD.dto.item.SongDTO;
+import com.MMAD.dto.page.ItemPageDTO;
+import com.MMAD.model.item.MusicProvider;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -89,88 +91,245 @@ public class SpotifyService {
 
     public List<ItemDTO> searchSpotify(String query, List<String> types) {
 
-        JsonNode json = callSpotify(query, types);
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(getAccessToken());
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
-        List<ItemDTO> results = new ArrayList<>();
+            String url = UriComponentsBuilder.fromUriString(SEARCH_URL)
+                    .queryParam("q", query)
+                    .queryParam("type", String.join(",", types))
+                    .build()
+                    .toUriString();
 
-        if (types.contains("artist")) {
-            for (JsonNode node : json.path("artists").path("items")) {
-                ArtistDTO dto = mapArtist(node);
-                results.add(dto);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    String.class);
+
+            JsonNode json = objectMapper.readTree(response.getBody());
+
+            List<ItemDTO> results = new ArrayList<>();
+
+            if (types.contains("artist")) {
+                for (JsonNode node : json.path("artists").path("items")) {
+                    results.add(mapArtist(node));
+                }
             }
+
+            if (types.contains("album")) {
+                for (JsonNode node : json.path("albums").path("items")) {
+                    results.add(mapAlbum(node));
+                }
+            }
+
+            if (types.contains("track")) {
+                for (JsonNode node : json.path("tracks").path("items")) {
+                    results.add(mapSong(node));
+                }
+            }
+
+            results.forEach(item -> item.setRelevance(scoreItem(query, item)));
+            return results;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Spotify search failed", e);
+        }
+    }
+
+    // GET
+    // ==========================
+    public List<ItemPageDTO.SimplifiedSong> getAlbumTracks(String albumId) {
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(getAccessToken());
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+            String url = "https://api.spotify.com/v1/albums/" + albumId + "/tracks";
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    String.class);
+
+            JsonNode json = objectMapper.readTree(response.getBody());
+
+            List<ItemPageDTO.SimplifiedSong> songs = new ArrayList<>();
+
+            for (JsonNode track : json.path("items")) {
+                songs.add(new ItemPageDTO.SimplifiedSong(
+                        track.path("name").asText(),
+                        track.path("id").asText()));
+            }
+
+            return songs;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Spotify album tracks call failed", e);
+        }
+    }
+
+    public List<AlbumDTO> getArtistAlbums(String artistId) {
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(getAccessToken());
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+            String url = UriComponentsBuilder
+                    .fromUriString("https://api.spotify.com/v1/artists/" + artistId + "/albums")
+                    .queryParam("include_groups", "album")
+                    .queryParam("limit", 50)
+                    .build()
+                    .toUriString();
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    String.class);
+
+            JsonNode json = objectMapper.readTree(response.getBody());
+
+            List<AlbumDTO> albums = new ArrayList<>();
+
+            for (JsonNode node : json.path("items")) {
+                albums.add(mapAlbum(node));
+            }
+
+            return albums;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Spotify artist albums call failed", e);
+        }
+    }
+
+    // =========================
+    // API CALL
+    // =========================
+
+    // =========================
+    // MAPPERS
+    // =========================
+    private ArtistDTO mapArtist(JsonNode node) {
+        return new ArtistDTO(
+                null,
+                node.path("id").asText(),
+                MusicProvider.SPOTIFY,
+                node.path("name").asText(),
+                extractImage(node));
+    }
+
+    private AlbumDTO mapAlbum(JsonNode node) {
+
+        List<ArtistDTO> artists = new ArrayList<>();
+
+        for (JsonNode artist : node.path("artists")) {
+            artists.add(new ArtistDTO(
+                    null,
+                    artist.path("id").asText(),
+                    MusicProvider.SPOTIFY,
+                    artist.path("name").asText(),
+                    "default"));
         }
 
-        if (types.contains("album")) {
-        for (JsonNode node : json.path("albums").path("items")) {
-        AlbumDTO dto = mapAlbum(node);
-        results.add(dto);
-        }
+        return new AlbumDTO(
+                null,
+                node.path("id").asText(),
+                MusicProvider.SPOTIFY,
+                node.path("name").asText(),
+                extractImage(node),
+                artists);
+    }
+
+    private SongDTO mapSong(JsonNode node) {
+
+        List<ArtistDTO> artists = new ArrayList<>();
+
+        for (JsonNode artist : node.path("artists")) {
+            artists.add(new ArtistDTO(
+                    null,
+                    artist.path("id").asText(),
+                    MusicProvider.SPOTIFY,
+                    artist.path("name").asText(),
+                    "default"));
         }
 
-        results.forEach(item -> item.setRelevance(scoreItem(query, item)));
-        return results;
+        AlbumDTO album = mapAlbum(node.path("album"));
+
+        return new SongDTO(
+                null,
+                node.path("id").asText(),
+                MusicProvider.SPOTIFY,
+                node.path("name").asText(),
+                extractImage(node.path("album")),
+                artists,
+                album);
     }
 
     private int scoreItem(String query, ItemDTO item) {
 
         String q = normalize(query);
         String name = normalize(item.getName());
-    
+
         int score = 0;
-    
+
         // -------------------
         // EXACT MATCH
         // -------------------
         if (name.equals(q)) {
             return 1_000_000;
         }
-    
+
         // -------------------
         // PREFIX MATCH
         // -------------------
         if (name.startsWith(q)) {
             score += 500_000;
         }
-    
+
         // -------------------
         // CONTAINS MATCH
         // -------------------
         else if (name.contains(q)) {
             score += 100_000;
         }
-    
+
         // -------------------
         // TYPE BOOST (via instanceof)
         // -------------------
         if (item instanceof ArtistDTO) {
             score += 50_000;
         }
-    
+
         if (item instanceof AlbumDTO album) {
             score += 40_000;
-    
+
             // -------------------
             // ALBUM ARTIST BOOST
             // -------------------
             for (ArtistDTO artist : album.getArtists()) {
-    
+
                 String artistName = normalize(artist.getName());
-    
+
                 if (artistName.equals(q)) {
                     score += 300_000;
-                }
-                else if (artistName.contains(q)) {
+                } else if (artistName.contains(q)) {
                     score += 150_000;
                 }
             }
         }
-    
+
         return score;
     }
 
     private String normalize(String input) {
-        if (input == null) return "";
-    
+        if (input == null)
+            return "";
+
         return input
                 .toLowerCase()
                 .trim()
@@ -200,68 +359,6 @@ public class SpotifyService {
         }
 
         return dp[a.length()][b.length()];
-    }
-
-    // =========================
-    // API CALL
-    // =========================
-
-    private JsonNode callSpotify(String query, List<String> types) {
-
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(getAccessToken());
-            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-
-            String url = UriComponentsBuilder.fromUriString(SEARCH_URL)
-                    .queryParam("q", query)
-                    .queryParam("type", String.join(",", types))
-                    .build()
-                    .toUriString();
-
-            ResponseEntity<String> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    new HttpEntity<>(headers),
-                    String.class);
-
-            return objectMapper.readTree(response.getBody());
-
-        } catch (Exception e) {
-            throw new RuntimeException("Spotify API call failed", e);
-        }
-    }
-
-    // =========================
-    // MAPPERS
-    // =========================
-
-    private ArtistDTO mapArtist(JsonNode node) {
-        return new ArtistDTO(
-                null,
-                node.path("id").asText(),
-                node.path("name").asText(),
-                extractImage(node));
-    }
-
-    private AlbumDTO mapAlbum(JsonNode node) {
-
-        List<ArtistDTO> artists = new ArrayList<>();
-
-        for (JsonNode artist : node.path("artists")) {
-            artists.add(new ArtistDTO(
-                    null,
-                    artist.path("id").asText(),
-                    artist.path("name").asText(),
-                    "default"));
-        }
-
-        return new AlbumDTO(
-                null,
-                node.path("id").asText(),
-                node.path("name").asText(),
-                extractImage(node),
-                artists);
     }
 
     // =========================

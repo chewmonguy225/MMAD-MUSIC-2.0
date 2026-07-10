@@ -3,35 +3,34 @@ package com.MMAD.dto.item;
 import com.MMAD.model.item.Album;
 import com.MMAD.model.item.Artist;
 import com.MMAD.model.item.Item;
+import com.MMAD.model.item.MusicProvider;
 import com.MMAD.model.item.Song;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "type"
-)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ArtistDTO.class, name = "artist"),
         @JsonSubTypes.Type(value = AlbumDTO.class, name = "album"),
         @JsonSubTypes.Type(value = SongDTO.class, name = "song")
 })
-public class ItemDTO {
+public abstract class ItemDTO {
 
     private Long id;
     private String sourceId;
+    private MusicProvider provider;
     private String name;
     private String imageURL;
 
-    // ⭐ NEW: relevance for sorting search results
     private int relevance;
 
-    public ItemDTO() {}
+    public ItemDTO() {
+    }
 
-    public ItemDTO(Long id, String sourceId, String name, String imageURL) {
+    public ItemDTO(Long id, String sourceId, MusicProvider provider, String name, String imageURL) {
         this.id = id;
         this.sourceId = sourceId;
+        this.provider = provider;
         this.name = name;
         this.imageURL = imageURL;
     }
@@ -80,13 +79,28 @@ public class ItemDTO {
         this.relevance = relevance;
     }
 
+    public MusicProvider getProvider() {
+        return provider;
+    }
+
+    public void setProvider(MusicProvider provider) {
+        this.provider = provider;
+    }
+
+    // =========================
+    // Polymorphic mapping
+    // =========================
+    public abstract Item toEntity();
+
     // =========================
     // Polymorphic mapping
     // =========================
 
     public static ItemDTO fromEntity(Item item) {
 
-        if (item == null) return null;
+        if (item == null) {
+            return null;
+        }
 
         if (item instanceof Artist artist) {
             return ArtistDTO.fromEntity(artist);
@@ -101,7 +115,6 @@ public class ItemDTO {
         }
 
         throw new IllegalArgumentException(
-                "Unsupported Item type: " + item.getClass()
-        );
+                "Unsupported Item type: " + item.getClass());
     }
 }

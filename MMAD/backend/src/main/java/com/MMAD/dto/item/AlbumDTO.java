@@ -1,8 +1,12 @@
 package com.MMAD.dto.item;
 
 import com.MMAD.model.item.Album;
+import com.MMAD.model.item.Artist;
+import com.MMAD.model.item.MusicProvider;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AlbumDTO extends ItemDTO {
 
@@ -15,11 +19,11 @@ public class AlbumDTO extends ItemDTO {
     public AlbumDTO(
             Long id,
             String sourceId,
+            MusicProvider provider,
             String name,
             String imageURL,
-            List<ArtistDTO> artists
-    ) {
-        super(id, sourceId, name, imageURL);
+            List<ArtistDTO> artists) {
+        super(id, sourceId, provider, name, imageURL);
         this.artists = artists;
     }
 
@@ -32,35 +36,38 @@ public class AlbumDTO extends ItemDTO {
     }
 
     public static AlbumDTO fromEntity(Album album) {
-        if (album == null) return null;
+        if (album == null)
+            return null;
 
         return new AlbumDTO(
                 album.getId(),
                 album.getSourceId(),
+                album.getProvider(),
                 album.getName(),
                 album.getImageURL(),
                 album.getArtists()
                         .stream()
                         .map(ArtistDTO::fromEntity)
-                        .toList()
-        );
+                        .toList());
     }
 
-    public static Album toEntity(AlbumDTO dto) {
-        if (dto == null) return null;
+    @Override
+    public Album toEntity() {
 
-        Album album = new Album(
-                dto.getImageURL(),
-                dto.getSourceId(),
-                dto.getName(),
-                dto.getArtists()
-                        .stream()
-                        .map(ArtistDTO::toEntity)
-                        .toList()
-        );
+        List<Artist> artistEntities = new ArrayList<>();
 
-        album.setId(dto.getId());
+        if (this.getArtists() != null) {
+            artistEntities = this.getArtists()
+                    .stream()
+                    .map(ArtistDTO::toEntity)
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }
 
-        return album;
+        return new Album(
+                this.getSourceId(),
+                this.getProvider(),
+                this.getName(),
+                artistEntities,
+                this.getImageURL());
     }
 }

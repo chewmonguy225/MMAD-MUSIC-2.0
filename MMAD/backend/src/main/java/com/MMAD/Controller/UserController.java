@@ -18,7 +18,7 @@ import com.MMAD.Security.JWTService;
 import com.MMAD.Service.UserService;
 import com.MMAD.dto.user.LoginResponse;
 import com.MMAD.dto.item.UserDTO;
-import com.MMAD.dto.user.UserItemDTO;
+//import com.MMAD.dto.user.UserItemDTO;
 
 import jakarta.transaction.Transactional;
 
@@ -249,20 +249,20 @@ public class UserController {
      * @param query The string to search for within usernames.
      * @return A list of UserDTOs matching the search criteria.
      */
-    @GetMapping("/search")
-    public ResponseEntity<List<UserItemDTO>> searchUsers(@RequestParam("query") String query) {
-        try {
-            List<UserItemDTO> users = userService.searchUsers(query);
-            // If no users are found, userService.searchUsers returns an empty list,
-            // which is a valid success response (HTTP 200 OK with an empty array).
-            return ResponseEntity.ok(users);
-        } catch (Exception e) {
-            // Catch any unexpected exceptions that might occur during the service call
-            // and return a bad request with the error message, similar to your template.
-            return ResponseEntity.badRequest().body(null); // Returning null body with badRequest indicates an error.
-                                                           // You might prefer to return e.getMessage() here
-                                                           // or a more specific error response.
-        }
-    }
+    // @GetMapping("/search")
+    // public ResponseEntity<List<UserItemDTO>> searchUsers(@RequestParam("query") String query) {
+    //     try {
+    //         List<UserItemDTO> users = userService.searchUsers(query);
+    //         // If no users are found, userService.searchUsers returns an empty list,
+    //         // which is a valid success response (HTTP 200 OK with an empty array).
+    //         return ResponseEntity.ok(users);
+    //     } catch (Exception e) {
+    //         // Catch any unexpected exceptions that might occur during the service call
+    //         // and return a bad request with the error message, similar to your template.
+    //         return ResponseEntity.badRequest().body(null); // Returning null body with badRequest indicates an error.
+    //                                                        // You might prefer to return e.getMessage() here
+    //                                                        // or a more specific error response.
+    //     }
+    // }
 
 }

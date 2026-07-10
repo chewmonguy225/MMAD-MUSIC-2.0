@@ -2,11 +2,10 @@ package com.MMAD.model.item;
 
 import jakarta.persistence.*;
 
-import com.MMAD.dto.item.ItemDTO;
-import com.MMAD.model.item.Item;
-
 @Entity
-@Table(name = "items")
+@Table(name = "items", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_item_provider_source", columnNames = { "provider", "source_id" })
+})
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "item_type")
 public abstract class Item {
@@ -15,28 +14,38 @@ public abstract class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String sourceId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MusicProvider provider;
 
     @Column(nullable = false)
     private String name;
 
     @Column(name = "image_url")
     private String imageURL;
-    
 
     // Constructors
+
     public Item() {
     }
 
-    // Adjust constructor to remove itemType if you remove the field from Item
-    public Item(String sourceId, String name, String imageURL) {
+    public Item(
+            String sourceId,
+            MusicProvider provider,
+            String name,
+            String imageURL) {
+
         this.sourceId = sourceId;
+        this.provider = provider;
         this.name = name;
         this.imageURL = imageURL;
     }
 
-    // Getters and Setters (adjust for itemType removal if you remove the field)
+    // Getters and Setters
+
     public Long getId() {
         return id;
     }
@@ -51,6 +60,14 @@ public abstract class Item {
 
     public void setSourceId(String sourceId) {
         this.sourceId = sourceId;
+    }
+
+    public MusicProvider getProvider() {
+        return provider;
+    }
+
+    public void setProvider(MusicProvider provider) {
+        this.provider = provider;
     }
 
     public String getName() {
@@ -68,5 +85,4 @@ public abstract class Item {
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
     }
-
 }

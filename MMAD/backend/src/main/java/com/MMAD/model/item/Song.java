@@ -1,6 +1,8 @@
 package com.MMAD.model.item;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,29 +15,25 @@ public class Song extends Item {
     private Album album;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "song_artists",
-        joinColumns = @JoinColumn(name = "song_item_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "artist_item_id", referencedColumnName = "id")
-    )
-    private List<Artist> artists;
+    @JoinTable(name = "song_artists", joinColumns = @JoinColumn(name = "song_item_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "artist_item_id", referencedColumnName = "id"))
+    private List<Artist> artists = new ArrayList<>();
 
     public Song() {
         super();
     }
 
-    public Song(String sourceId, String name, List<Artist> artists, Album album) {
-        super(sourceId, name, "default_image_url");  // Use default image if none provided
+    public Song(String sourceId, MusicProvider provider, String name, List<Artist> artists, Album album) {
+        super(sourceId, provider, name, "default_image_url"); // Use default image if none provided
         this.artists = artists;
         this.album = album;
     }
-    
-    public Song(String sourceId, String name, String imageURL, List<Artist> artists, Album album) {
-        super(sourceId, name, imageURL);
+
+    public Song(String sourceId, MusicProvider provider, String name, String imageURL, List<Artist> artists,
+            Album album) {
+        super(sourceId, provider, name, imageURL);
         this.artists = artists;
         this.album = album;
     }
-    
 
     public Album getAlbum() {
         return album;

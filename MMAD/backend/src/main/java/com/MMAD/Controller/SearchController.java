@@ -51,9 +51,9 @@ public class SearchController {
                 // -------------------------
                 // USER RESULTS
                 // -------------------------
-                if (types.contains("user")) {
-                        results.addAll(userService.searchUsers(query));
-                }
+                // if (types.contains("user")) {
+                //         results.addAll(userService.searchUsers(query));
+                // }
 
                 // -------------------------
                 // GLOBAL RELEVANCE SORT

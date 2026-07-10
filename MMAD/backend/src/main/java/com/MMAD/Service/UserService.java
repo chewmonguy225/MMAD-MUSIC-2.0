@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import com.MMAD.Security.JWTService;
 import com.MMAD.dto.user.LoginResponse;
-import com.MMAD.dto.item.UserDTO;
+import com.MMAD.dto.user.UserDTO;
 import com.MMAD.dto.user.UserDTOMapper;
-import com.MMAD.dto.user.UserItemDTO;
+//import com.MMAD.dto.user.UserItemDTO;
 import com.MMAD.exception.UserNotFoundException;
 import com.MMAD.model.User.User;
 import com.MMAD.repo.UserRepo;
@@ -218,18 +218,18 @@ public class UserService {
     /**
      * Searches for users whose usernames contain the given query string
      * (case-insensitive).
-     */
-    public List<UserItemDTO> searchUsers(String query) {
-        List<User> users = userRepo.findByUsernameContainingIgnoreCase(query);
+    //  */
+    // public List<UserItemDTO> searchUsers(String query) {
+    //     List<User> users = userRepo.findByUsernameContainingIgnoreCase(query);
 
-        return users.stream()
-                .map(user -> new UserItemDTO(
-                        user.getId(),
-                        user.getUsername(),
-                        "https://ui-avatars.com/api/?name=" + user.getUsername()))
-                .collect(Collectors.toList());
+    //     return users.stream()
+    //             .map(user -> new UserItemDTO(
+    //                     user.getId(),
+    //                     user.getUsername(),
+    //                     "https://ui-avatars.com/api/?name=" + user.getUsername()))
+    //             .collect(Collectors.toList());
 
-    }
+    // }
 
     /**
      * Remove all users that the given user is following.
