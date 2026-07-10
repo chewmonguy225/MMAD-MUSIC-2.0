@@ -17,8 +17,7 @@ import org.springframework.security.core.Authentication;
 import com.MMAD.Security.JWTService;
 import com.MMAD.Service.UserService;
 import com.MMAD.dto.user.LoginResponse;
-import com.MMAD.dto.item.UserDTO;
-//import com.MMAD.dto.user.UserItemDTO;
+import com.MMAD.dto.user.UserDTO;
 
 import jakarta.transaction.Transactional;
 
