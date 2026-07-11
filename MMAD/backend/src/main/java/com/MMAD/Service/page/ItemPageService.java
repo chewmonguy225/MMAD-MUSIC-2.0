@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.MMAD.Service.ItemService;
 import com.MMAD.Service.ReviewService;
 import com.MMAD.Service.SpotifyService;
 import com.MMAD.Service.item.AlbumService;
+import com.MMAD.Service.item.ItemService;
 import com.MMAD.dto.item.AlbumDTO;
 import com.MMAD.dto.item.ArtistDTO;
 import com.MMAD.dto.item.ItemDTO;

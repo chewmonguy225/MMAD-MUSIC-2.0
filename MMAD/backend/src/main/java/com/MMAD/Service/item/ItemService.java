@@ -1,10 +1,9 @@
-package com.MMAD.Service;
+package com.MMAD.Service.item;
 
 import jakarta.persistence.EntityNotFoundException; // Keep for update/delete/findById/etc. if needed
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.MMAD.Service.item.ItemResolver;
 import com.MMAD.dto.item.ItemDTO;
 import com.MMAD.model.item.Album;
 import com.MMAD.model.item.Artist;

@@ -3,70 +3,29 @@ package com.MMAD.Controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.MMAD.Service.SpotifyService;
-import com.MMAD.Service.UserService;
+import com.MMAD.Service.SearchService;
 import com.MMAD.dto.SearchResponse;
-import com.MMAD.dto.item.ItemDTO;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/search")
 public class SearchController {
 
-        private final SpotifyService spotifyService;
-        private final UserService userService;
+    private final SearchService searchService;
 
-        public SearchController(SpotifyService spotifyService, UserService userService) {
-                this.spotifyService = spotifyService;
-                this.userService = userService;
-        }
 
-        @GetMapping("/{query}")
-        public ResponseEntity<SearchResponse> search(
-                        @PathVariable String query,
-                        @RequestParam(required = false) String type) {
+    public SearchController(SearchService searchService) {
+        this.searchService = searchService;
+    }
 
-                List<String> types = (type == null || type.isBlank())
-                                ? List.of("artist", "album", "track", "user")
-                                : Arrays.asList(type.toLowerCase().split(","));
 
-                // -------------------------
-                // SPOTIFY RESULTS
-                // -------------------------
-                List<ItemDTO> results = new ArrayList<>();
-
-                List<String> spotifyTypes = types.stream()
-                                .filter(t -> !t.equals("user"))
-                                .toList();
-
-                if (!spotifyTypes.isEmpty()) {
-                        results.addAll(spotifyService.searchSpotify(query, spotifyTypes));
-                }
-
-                // -------------------------
-                // USER RESULTS
-                // -------------------------
-                // if (types.contains("user")) {
-                //         results.addAll(userService.searchUsers(query));
-                // }
-
-                // -------------------------
-                // GLOBAL RELEVANCE SORT
-                // -------------------------
-                results.sort(
-                                Comparator.comparingInt(ItemDTO::getRelevance).reversed());
-
-                int MIN_SCORE = 50_000;
-
-                results = results.stream()
-                                .filter(item -> item.getRelevance() >= MIN_SCORE)
-                                .collect(Collectors.toList());
-
-                return ResponseEntity.ok(new SearchResponse(results));
-        }
+    @GetMapping("/{query}")
+    public ResponseEntity<SearchResponse> search(
+            @PathVariable String query,
+            @RequestParam(required = false) String type) {
+                System.out.println("HERE");
+        return ResponseEntity.ok(
+                searchService.search(query, type)
+        );
+    }
 }

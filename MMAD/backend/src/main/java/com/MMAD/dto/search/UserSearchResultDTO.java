@@ -1,6 +1,6 @@
 package com.MMAD.dto.search;
 
-import com.MMAD.model.User.User;
+import com.MMAD.dto.user.UserDTO;
 
 public class UserSearchResultDTO extends SearchResultDTO {
 
@@ -14,12 +14,16 @@ public class UserSearchResultDTO extends SearchResultDTO {
     }
 
 
-    public static UserSearchResultDTO fromEntity(User user) {
+    public static UserSearchResultDTO fromDTO(UserDTO user) {
+
+        if (user == null) {
+            return null;
+        }
 
         return new UserSearchResultDTO(
-                user.getId(),
-                user.getUsername(),
-                "https://ui-avatars.com/api/?name=" + user.getUsername()
+                null,
+                user.username(),
+                "https://ui-avatars.com/api/?name=" + user.username()
         );
     }
 }

@@ -11,8 +11,7 @@ public abstract class SearchResultDTO {
             Long id,
             String name,
             String imageURL,
-            String type
-    ) {
+            String type) {
         this.id = id;
         this.name = name;
         this.imageURL = imageURL;

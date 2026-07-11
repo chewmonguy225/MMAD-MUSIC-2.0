@@ -32,7 +32,7 @@ public class UserService {
     private final UserDTOMapper userDTOMapper;
 
     public UserService(UserRepo userRepo,
-            JWTService jwtService, 
+            JWTService jwtService,
             PasswordEncoder passwordEncoder,
             UserDTOMapper userDTOMapper) {
         if (userRepo == null) {
@@ -215,21 +215,17 @@ public class UserService {
         }
     }
 
-    /**
-     * Searches for users whose usernames contain the given query string
-     * (case-insensitive).
-    //  */
-    // public List<UserItemDTO> searchUsers(String query) {
-    //     List<User> users = userRepo.findByUsernameContainingIgnoreCase(query);
+    public List<UserDTO> searchUsers(String query) {
 
-    //     return users.stream()
-    //             .map(user -> new UserItemDTO(
-    //                     user.getId(),
-    //                     user.getUsername(),
-    //                     "https://ui-avatars.com/api/?name=" + user.getUsername()))
-    //             .collect(Collectors.toList());
+        if (query == null || query.trim().isEmpty()) {
+            return List.of();
+        }
 
-    // }
+        return userRepo.findByUsernameContainingIgnoreCase(query)
+                .stream()
+                .map(userDTOMapper::apply)
+                .collect(Collectors.toList());
+    }
 
     /**
      * Remove all users that the given user is following.

@@ -140,6 +140,83 @@ public class SpotifyService {
 
     // GET
     // ==========================
+
+    // =========================
+    // GET SINGLE ITEM
+    // =========================
+
+    public ArtistDTO getArtist(String artistId) {
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(getAccessToken());
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+            String url = "https://api.spotify.com/v1/artists/" + artistId;
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    String.class);
+
+            JsonNode json = objectMapper.readTree(response.getBody());
+
+            return mapArtist(json);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Spotify artist lookup failed", e);
+        }
+    }
+
+    public AlbumDTO getAlbum(String albumId) {
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(getAccessToken());
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+            String url = "https://api.spotify.com/v1/albums/" + albumId;
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    String.class);
+
+            JsonNode json = objectMapper.readTree(response.getBody());
+
+            return mapAlbum(json);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Spotify album lookup failed", e);
+        }
+    }
+
+    public SongDTO getSong(String songId) {
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(getAccessToken());
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+            String url = "https://api.spotify.com/v1/tracks/" + songId;
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    String.class);
+
+            JsonNode json = objectMapper.readTree(response.getBody());
+
+            return mapSong(json);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Spotify song lookup failed", e);
+        }
+    }
+
     public List<ItemPageDTO.SimplifiedSong> getAlbumTracks(String albumId) {
 
         try {
