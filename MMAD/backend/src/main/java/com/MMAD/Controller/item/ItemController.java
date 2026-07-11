@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.MMAD.dto.item.ItemAddRequestDTO;
 import com.MMAD.dto.item.ItemDTO;
 import com.MMAD.model.item.Item;
 import com.MMAD.model.item.MusicProvider;
@@ -29,33 +30,14 @@ public class ItemController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addItem(@RequestBody ItemDTO itemDTO) {
+    public ResponseEntity<?> addItem(
+            @RequestBody ItemAddRequestDTO request) {
 
-        try {
+        Item saved = itemService.addItem(request);
 
-            System.out.println("1");
-
-            Item item = itemMapper.toEntity(itemDTO);
-
-            System.out.println("2");
-
-            Item savedItem = itemService.addItem(item);
-
-            System.out.println("3");
-
-            ItemDTO responseDTO = ItemDTO.fromEntity(savedItem);
-
-            System.out.println("4");
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
-
-        } catch (RuntimeException e) {
-
-            e.printStackTrace();
-
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(e.getMessage());
-        }
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ItemDTO.fromEntity(saved));
     }
 
     // READ

@@ -8,9 +8,12 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.MMAD.Service.SpotifyService;
+import com.MMAD.dto.item.ArtistDTO;
 import com.MMAD.model.item.Album;
 import com.MMAD.model.item.Artist;
 import com.MMAD.model.item.Item;
+import com.MMAD.model.item.MusicProvider;
 import com.MMAD.model.item.Song;
 import com.MMAD.repo.item.ItemRepo;
 
@@ -18,9 +21,11 @@ import com.MMAD.repo.item.ItemRepo;
 public class ItemResolver {
 
     private final ItemRepo itemRepo;
+    private final SpotifyService spotifyService;
 
-    public ItemResolver(ItemRepo itemRepo) {
+    public ItemResolver(ItemRepo itemRepo, SpotifyService spotifyService) {
         this.itemRepo = itemRepo;
+        this.spotifyService = spotifyService;
     }
 
     @Transactional
@@ -75,7 +80,14 @@ public class ItemResolver {
 
     private Song resolveSong(Song song) {
 
-        // Resolve artists
+        Optional<Item> existingSong = itemRepo.findByProviderAndSourceId(
+                song.getProvider(),
+                song.getSourceId());
+
+        if (existingSong.isPresent()) {
+            return (Song) existingSong.get();
+        }
+
         if (song.getArtists() != null) {
 
             List<Artist> resolvedArtists = song.getArtists()
@@ -86,7 +98,6 @@ public class ItemResolver {
             song.setArtists(resolvedArtists);
         }
 
-        // Resolve album
         if (song.getAlbum() != null) {
 
             Album resolvedAlbum = resolveAlbum(song.getAlbum());
@@ -94,6 +105,118 @@ public class ItemResolver {
             song.setAlbum(resolvedAlbum);
         }
 
-        return song;
+        return itemRepo.save(song);
+    }
+
+    public Item resolveSpotifyItem(
+            String type,
+            String sourceId,
+            MusicProvider provider) {
+
+        if (provider != MusicProvider.SPOTIFY) {
+            throw new RuntimeException(
+                    "Unsupported provider");
+        }
+
+        return switch (type) {
+
+            case "artist" ->
+                spotifyService
+                        .getArtist(sourceId)
+                        .toEntity();
+
+            case "album" ->
+                spotifyService
+                        .getAlbum(sourceId)
+                        .toEntity();
+
+            case "song" ->
+                spotifyService
+                        .getSong(sourceId)
+                        .toEntity();
+
+            default ->
+                throw new RuntimeException(
+                        "Unknown item type");
+        };
+    }
+
+    @Transactional
+    public Item refresh(Item item) {
+
+        if (item instanceof Artist artist) {
+
+            refreshArtist(artist);
+
+            return itemRepo.save(artist);
+        }
+
+        if (item instanceof Album album) {
+
+            refreshAlbum(album);
+
+            if (album.getArtists() != null) {
+
+                album.getArtists()
+                        .forEach(this::refreshArtist);
+
+            }
+
+            return itemRepo.save(album);
+        }
+
+        if (item instanceof Song song) {
+
+            if (song.getAlbum() != null) {
+
+                refreshAlbum(song.getAlbum());
+
+            }
+
+            if (song.getArtists() != null) {
+
+                song.getArtists()
+                        .forEach(this::refreshArtist);
+
+            }
+
+            return itemRepo.save(song);
+        }
+
+        return item;
+    }
+
+    private void refreshArtist(Artist artist) {
+
+        if (artist.getProvider() == MusicProvider.SPOTIFY
+                && (artist.getImageURL() == null
+                        || artist.getImageURL().contains("default"))) {
+
+            Artist spotifyArtist = spotifyService
+                    .getArtist(artist.getSourceId())
+                    .toEntity();
+
+            artist.setImageURL(
+                    spotifyArtist.getImageURL());
+
+            itemRepo.save(artist);
+        }
+    }
+
+    private void refreshAlbum(Album album) {
+
+        if (album.getProvider() == MusicProvider.SPOTIFY
+                && (album.getImageURL() == null
+                        || album.getImageURL().contains("default"))) {
+
+            Album spotifyAlbum = spotifyService
+                    .getAlbum(album.getSourceId())
+                    .toEntity();
+
+            album.setImageURL(
+                    spotifyAlbum.getImageURL());
+
+            itemRepo.save(album);
+        }
     }
 }

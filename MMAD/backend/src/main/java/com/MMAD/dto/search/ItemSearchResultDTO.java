@@ -15,7 +15,6 @@ public class ItemSearchResultDTO extends SearchResultDTO {
     private List<String> artists;
 
     public ItemSearchResultDTO(
-            Long id,
             String sourceId,
             MusicProvider provider,
             String name,
@@ -23,7 +22,7 @@ public class ItemSearchResultDTO extends SearchResultDTO {
             String type,
             List<String> artists) {
 
-        super(id, name, imageURL, type);
+        super(name, imageURL, type);
 
         this.sourceId = sourceId;
         this.provider = provider;
@@ -76,7 +75,6 @@ public class ItemSearchResultDTO extends SearchResultDTO {
         }
 
         return new ItemSearchResultDTO(
-                item.getId(),
                 item.getSourceId(),
                 item.getProvider(),
                 item.getName(),

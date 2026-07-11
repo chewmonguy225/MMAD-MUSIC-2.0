@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import com.MMAD.Service.ReviewService;
 import com.MMAD.Service.SpotifyService;
-import com.MMAD.Service.item.AlbumService;
 import com.MMAD.Service.item.ItemService;
 import com.MMAD.dto.item.AlbumDTO;
 import com.MMAD.dto.item.ArtistDTO;
@@ -25,6 +24,7 @@ public class ItemPageService {
             ItemService itemService,
             SpotifyService spotifyService,
             ReviewService reviewService) {
+
         this.itemService = itemService;
         this.spotifyService = spotifyService;
         this.reviewService = reviewService;
@@ -32,18 +32,23 @@ public class ItemPageService {
 
     public ItemPageDTO getItemPage(Long itemId) {
 
-        ItemDTO item = itemService.getItemById(itemId)
-                .orElseThrow(() -> new RuntimeException("Item not found"));
+        // Refreshes item data from Spotify if needed
+        ItemDTO item = ItemDTO.fromEntity(
+                itemService.getItemWithRefresh(itemId));
 
         List<ItemPageDTO.SimplifiedSong> songs = null;
         List<AlbumDTO> albums = null;
 
         if (item instanceof AlbumDTO album) {
-            songs = spotifyService.getAlbumTracks(album.getSourceId());
+
+            songs = spotifyService.getAlbumTracks(
+                    album.getSourceId());
         }
 
         if (item instanceof ArtistDTO artist) {
-            albums = spotifyService.getArtistAlbums(artist.getSourceId());
+
+            albums = spotifyService.getArtistAlbums(
+                    artist.getSourceId());
         }
 
         ItemReviewsResponse reviewResponse = reviewService.getReviewsByItemId(itemId);
@@ -54,4 +59,5 @@ public class ItemPageService {
                 songs,
                 albums);
     }
+
 }

@@ -347,6 +347,7 @@ public class SpotifyService {
                 album);
     }
 
+    // Helpers
     private int scoreItem(String query, ItemDTO item) {
 
         String q = normalize(query);
@@ -450,6 +451,6 @@ public class SpotifyService {
             return images.get(0).path("url").asText();
         }
 
-        return "default";
+        return null;
     }
 }

@@ -10,7 +10,7 @@ public class UserSearchResultDTO extends SearchResultDTO {
             String username,
             String imageURL
     ) {
-        super(id, username, imageURL, "user");
+        super(username, imageURL, "user");
     }
 
 
