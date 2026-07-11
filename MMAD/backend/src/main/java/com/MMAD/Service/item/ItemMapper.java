@@ -3,7 +3,7 @@ package com.MMAD.Service.item;
 import org.springframework.stereotype.Component;
 
 import com.MMAD.dto.item.ItemDTO;
-import com.MMAD.model.item.Item;
+import com.MMAD.entity.item.Item;
 
 @Component
 public class ItemMapper {

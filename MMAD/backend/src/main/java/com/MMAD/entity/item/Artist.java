@@ -1,6 +1,6 @@
 // File: com/MMAD/MMAD/model/Item/Artist.java
 
-package com.MMAD.model.item;
+package com.MMAD.entity.item;
 
 import jakarta.persistence.DiscriminatorValue;
 // REMOVE THIS: import jakarta.persistence.DiscriminatorValue;

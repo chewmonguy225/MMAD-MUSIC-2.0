@@ -18,7 +18,7 @@ import com.MMAD.dto.item.ArtistDTO;
 import com.MMAD.dto.item.ItemDTO;
 import com.MMAD.dto.item.SongDTO;
 import com.MMAD.dto.page.ItemPageDTO;
-import com.MMAD.model.item.MusicProvider;
+import com.MMAD.entity.item.MusicProvider;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -1,4 +1,4 @@
-package com.MMAD.model.User;
+package com.MMAD.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

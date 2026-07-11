@@ -1,6 +1,7 @@
-package com.MMAD.model.User;
+package com.MMAD.entity.User;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -33,7 +34,23 @@ public class User implements Serializable {
     @Column(nullable = false)
     private boolean verified = false;
 
+    @Column
     private String verificationCode;
+
+    @Column
+    private String passwordResetCode;
+
+    @Column
+    private LocalDateTime verificationCodeSentAt;
+
+    @Column
+    private LocalDateTime verificationCodeExpiry;
+
+    @Column
+    private LocalDateTime passwordResetCodeExpiry;
+
+    @Column
+    private LocalDateTime passwordResetCodeSentAt;
 
     // -----------------------------
     // FOLLOWERS / FOLLOWING Logic
@@ -207,6 +224,66 @@ public class User implements Serializable {
     public void setFollowers(Set<User> followers) {
 
         this.followers = followers;
+
+    }
+
+    public String getPasswordResetCode() {
+
+        return passwordResetCode;
+
+    }
+
+    public void setPasswordResetCode(String passwordResetCode) {
+
+        this.passwordResetCode = passwordResetCode;
+
+    }
+
+    public LocalDateTime getVerificationCodeExpiry() {
+
+        return verificationCodeExpiry;
+
+    }
+
+    public void setVerificationCodeExpiry(LocalDateTime expiry) {
+
+        this.verificationCodeExpiry = expiry;
+
+    }
+
+    public LocalDateTime getPasswordResetCodeExpiry() {
+
+        return passwordResetCodeExpiry;
+
+    }
+
+    public void setPasswordResetCodeExpiry(LocalDateTime expiry) {
+
+        this.passwordResetCodeExpiry = expiry;
+
+    }
+
+    public LocalDateTime getVerificationCodeSentAt() {
+
+        return verificationCodeSentAt;
+
+    }
+
+    public void setVerificationCodeSentAt(LocalDateTime sentAt) {
+
+        this.verificationCodeSentAt = sentAt;
+
+    }
+
+    public LocalDateTime getPasswordResetCodeSentAt() {
+
+        return passwordResetCodeSentAt;
+
+    }
+
+    public void setPasswordResetCodeSentAt(LocalDateTime sentAt) {
+
+        this.passwordResetCodeSentAt = sentAt;
 
     }
 

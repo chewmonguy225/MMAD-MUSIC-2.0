@@ -16,8 +16,11 @@ import org.springframework.security.core.Authentication;
 import com.MMAD.Security.JWTService;
 import com.MMAD.Service.user.UserService;
 import com.MMAD.dto.MessageResponse;
+import com.MMAD.dto.user.ForgotPasswordRequest;
 import com.MMAD.dto.user.LoginRequest;
 import com.MMAD.dto.user.RegisterRequest;
+import com.MMAD.dto.user.ResendCodeRequest;
+import com.MMAD.dto.user.ResetPasswordRequest;
 import com.MMAD.dto.user.UserDTO;
 import com.MMAD.dto.user.VerifyRequest;
 
@@ -157,12 +160,66 @@ public class UserController {
         }
     }
 
-    
+    @PostMapping("/resend-verification")
+    public ResponseEntity<MessageResponse> resendVerification(
+            @RequestBody ResendCodeRequest request) {
+
+        try {
+
+            userService.resendVerificationCode(
+                    request.email());
+
+            return ResponseEntity.ok(
+                    new MessageResponse(
+                            true,
+                            "Verification code sent again."));
+
+        } catch (Exception e) {
+
+            return ResponseEntity.badRequest()
+                    .body(
+                            new MessageResponse(
+                                    false,
+                                    e.getMessage()));
+
+        }
+
+    }
 
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getMyProfile(Authentication authentication) {
         String username = authentication.getName();
         return ResponseEntity.ok(userService.getUserDTOByUsername(username));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<MessageResponse> forgotPassword(
+            @RequestBody ForgotPasswordRequest request) {
+
+        userService.forgotPassword(
+                request.email());
+
+        return ResponseEntity.ok(
+                new MessageResponse(
+                        true,
+                        "Password reset code sent."));
+
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<MessageResponse> resetPassword(
+            @RequestBody ResetPasswordRequest request) {
+
+        userService.resetPassword(
+                request.email(),
+                request.code(),
+                request.newPassword());
+
+        return ResponseEntity.ok(
+                new MessageResponse(
+                        true,
+                        "Password updated successfully."));
+
     }
 
     /**

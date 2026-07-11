@@ -1,10 +1,10 @@
-package com.MMAD.model.Review;
+package com.MMAD.entity.Review;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime; // Use java.time.LocalDateTime for modern timestamp handling
 
-import com.MMAD.model.User.User;
-import com.MMAD.model.item.Item;
+import com.MMAD.entity.User.User;
+import com.MMAD.entity.item.Item;
 
 @Entity
 @Table(name = "reviews") // Matches the plural table name in SQL schema

@@ -6,8 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.MMAD.dto.item.AlbumDTO;
 import com.MMAD.dto.item.ArtistDTO;
-import com.MMAD.model.item.Album;
-import com.MMAD.model.item.Artist;
+import com.MMAD.entity.item.Album;
+import com.MMAD.entity.item.Artist;
 import com.MMAD.repo.item.AlbumRepo;
 
 import java.util.ArrayList;

@@ -13,7 +13,7 @@ import com.MMAD.dto.review.GetReviewResponse;
 import com.MMAD.dto.review.ItemReviewsResponse;
 import com.MMAD.dto.review.PostReviewRequest;
 import com.MMAD.dto.review.UpdateReviewRequest;
-import com.MMAD.model.Review.Review;
+import com.MMAD.entity.Review.Review;
 
 import org.springframework.dao.DataIntegrityViolationException; // Good for handling unique constraint errors
 

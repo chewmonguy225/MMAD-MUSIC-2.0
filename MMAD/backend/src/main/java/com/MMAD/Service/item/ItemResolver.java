@@ -10,11 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.MMAD.Service.SpotifyService;
 import com.MMAD.dto.item.ArtistDTO;
-import com.MMAD.model.item.Album;
-import com.MMAD.model.item.Artist;
-import com.MMAD.model.item.Item;
-import com.MMAD.model.item.MusicProvider;
-import com.MMAD.model.item.Song;
+import com.MMAD.entity.item.Album;
+import com.MMAD.entity.item.Artist;
+import com.MMAD.entity.item.Item;
+import com.MMAD.entity.item.MusicProvider;
+import com.MMAD.entity.item.Song;
 import com.MMAD.repo.item.ItemRepo;
 
 @Service

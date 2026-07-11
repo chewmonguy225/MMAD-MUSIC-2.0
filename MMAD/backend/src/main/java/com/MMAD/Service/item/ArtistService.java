@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.MMAD.dto.item.ArtistDTO;
-import com.MMAD.model.item.Artist;
+import com.MMAD.entity.item.Artist;
 import com.MMAD.repo.item.ArtistRepo;
 
 import java.util.List;

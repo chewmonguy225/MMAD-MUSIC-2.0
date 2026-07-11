@@ -4,7 +4,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.MMAD.model.User.User;
+import com.MMAD.entity.User.User;
 
 @Service
 public class UserDTOMapper implements Function<User, UserDTO> {

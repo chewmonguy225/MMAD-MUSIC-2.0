@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.MMAD.dto.item.AlbumDTO;
 import com.MMAD.dto.item.ArtistDTO;
 import com.MMAD.dto.item.SongDTO;
-import com.MMAD.model.item.Album;
-import com.MMAD.model.item.Artist;
-import com.MMAD.model.item.Song;
+import com.MMAD.entity.item.Album;
+import com.MMAD.entity.item.Artist;
+import com.MMAD.entity.item.Song;
 import com.MMAD.repo.item.SongRepo;
 
 import java.util.List;

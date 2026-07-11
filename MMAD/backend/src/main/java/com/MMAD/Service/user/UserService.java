@@ -1,5 +1,6 @@
 package com.MMAD.Service.user;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -12,8 +13,8 @@ import com.MMAD.Service.user.EmailService;
 import com.MMAD.dto.user.LoginResponse;
 import com.MMAD.dto.user.UserDTO;
 import com.MMAD.dto.user.UserDTOMapper;
+import com.MMAD.entity.User.User;
 import com.MMAD.exception.UserNotFoundException;
-import com.MMAD.model.User.User;
 import com.MMAD.repo.UserRepo;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -138,11 +139,17 @@ public class UserService {
                                 email);
 
                 newUser.setVerified(false);
-
                 String code = generateVerificationCode();
 
                 newUser.setVerificationCode(code);
 
+                LocalDateTime now = LocalDateTime.now();
+
+                newUser.setVerificationCodeExpiry(
+                                now.plusMinutes(15));
+
+                newUser.setVerificationCodeSentAt(
+                                now);
                 userRepo.save(newUser);
 
                 try {
@@ -173,12 +180,26 @@ public class UserService {
 
                         throw new RuntimeException(
                                         "Invalid verification code");
+
+                }
+
+                if (user.getVerificationCodeExpiry() == null ||
+                                user.getVerificationCodeExpiry()
+                                                .isBefore(LocalDateTime.now())) {
+
+                        throw new RuntimeException(
+                                        "Verification code expired");
+
                 }
 
                 user.setVerified(true);
+
                 user.setVerificationCode(null);
 
+                user.setVerificationCodeExpiry(null);
+
                 userRepo.save(user);
+
         }
 
         public void deleteUser(Long id) {
@@ -291,5 +312,140 @@ public class UserService {
 
                 return String.valueOf(
                                 (int) (Math.random() * 900000) + 100000);
+        }
+
+        public void forgotPassword(String email) {
+
+                User user = userRepo.findUserByEmail(email)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+
+                LocalDateTime now = LocalDateTime.now();
+
+                if (user.getPasswordResetCodeSentAt() != null) {
+
+                        LocalDateTime availableTime = user.getPasswordResetCodeSentAt()
+                                        .plusSeconds(60);
+
+                        if (now.isBefore(availableTime)) {
+
+                                long secondsLeft = java.time.Duration
+                                                .between(now, availableTime)
+                                                .getSeconds();
+
+                                throw new RuntimeException(
+                                                "Please wait "
+                                                                + secondsLeft
+                                                                + " seconds before requesting another reset code.");
+
+                        }
+
+                }
+
+                String code = generateVerificationCode();
+
+                user.setPasswordResetCode(code);
+
+                user.setPasswordResetCodeExpiry(
+                                now.plusMinutes(15));
+
+                user.setPasswordResetCodeSentAt(
+                                now);
+
+                userRepo.save(user);
+
+                emailService.sendPasswordResetEmail(
+                                email,
+                                code);
+
+        }
+
+        public void resetPassword(
+                        String email,
+                        String code,
+                        String newPassword) {
+
+                User user = userRepo.findUserByEmail(email)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+
+                if (user.getPasswordResetCode() == null ||
+                                !user.getPasswordResetCode().equals(code)) {
+
+                        throw new RuntimeException(
+                                        "Invalid reset code");
+
+                }
+
+                if (user.getPasswordResetCodeExpiry() == null ||
+                                user.getPasswordResetCodeExpiry()
+                                                .isBefore(LocalDateTime.now())) {
+
+                        throw new RuntimeException(
+                                        "Password reset code expired");
+
+                }
+
+                user.setPassword(
+                                passwordEncoder.encode(newPassword));
+
+                user.setPasswordResetCode(null);
+
+                user.setPasswordResetCodeExpiry(null);
+
+                user.setPasswordResetCodeSentAt(null);
+
+                userRepo.save(user);
+
+        }
+
+        public void resendVerificationCode(String email) {
+
+                User user = userRepo.findUserByEmail(email)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+
+                if (user.isVerified()) {
+
+                        throw new RuntimeException(
+                                        "Account already verified");
+
+                }
+
+                LocalDateTime now = LocalDateTime.now();
+
+                if (user.getVerificationCodeSentAt() != null) {
+
+                        LocalDateTime availableTime = user.getVerificationCodeSentAt()
+                                        .plusSeconds(60);
+
+                        if (now.isBefore(availableTime)) {
+
+                                long secondsLeft = java.time.Duration
+                                                .between(now, availableTime)
+                                                .getSeconds();
+
+                                throw new RuntimeException(
+                                                "Please wait "
+                                                                + secondsLeft
+                                                                + " seconds before requesting another code.");
+
+                        }
+
+                }
+
+                String code = generateVerificationCode();
+
+                user.setVerificationCode(code);
+
+                user.setVerificationCodeExpiry(
+                                now.plusMinutes(15));
+
+                user.setVerificationCodeSentAt(
+                                now);
+
+                userRepo.save(user);
+
+                emailService.sendVerificationEmail(
+                                email,
+                                code);
+
         }
 }

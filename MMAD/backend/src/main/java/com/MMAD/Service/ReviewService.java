@@ -17,10 +17,10 @@ import com.MMAD.dto.review.GetReviewResponse;
 import com.MMAD.dto.review.ItemReviewResponse;
 import com.MMAD.dto.review.ItemReviewsResponse;
 import com.MMAD.dto.user.UserDTOMapper;
+import com.MMAD.entity.Review.Review;
+import com.MMAD.entity.User.User;
+import com.MMAD.entity.item.Item;
 import com.MMAD.exception.UserNotFoundException;
-import com.MMAD.model.Review.Review;
-import com.MMAD.model.User.User;
-import com.MMAD.model.item.Item;
 import com.MMAD.repo.ReviewRepo;
 
 import java.util.List;

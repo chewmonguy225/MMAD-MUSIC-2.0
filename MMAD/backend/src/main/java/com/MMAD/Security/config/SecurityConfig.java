@@ -36,7 +36,14 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/login", "/user/create", "/user/verify").permitAll()
+                        .requestMatchers(
+                                "/user/create",
+                                "/user/login",
+                                "/user/verify",
+                                "/user/forgot-password",
+                                "/user/reset-password",
+                                "/user/resend-verification")
+                        .permitAll()
                         .requestMatchers("/search/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -48,28 +55,28 @@ public class SecurityConfig {
 // @Configuration
 // public class SecurityConfig {
 
-//     private final CorsConfigurationSource corsConfigurationSource;
+// private final CorsConfigurationSource corsConfigurationSource;
 
-//     public SecurityConfig(CorsConfigurationSource corsConfigurationSource) {
-//         this.corsConfigurationSource = corsConfigurationSource;
-//     }
+// public SecurityConfig(CorsConfigurationSource corsConfigurationSource) {
+// this.corsConfigurationSource = corsConfigurationSource;
+// }
 
-//     @Bean
-//     public PasswordEncoder passwordEncoder() {
-//         return new BCryptPasswordEncoder();
-//     }
+// @Bean
+// public PasswordEncoder passwordEncoder() {
+// return new BCryptPasswordEncoder();
+// }
 
-//     @Bean
-//     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+// @Bean
+// public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-//         http
-//                 .csrf(csrf -> csrf.disable())
-//                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
-//                 .sessionManagement(session -> session
-//                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                 .authorizeHttpRequests(auth -> auth
-//                         .anyRequest().permitAll());
+// http
+// .csrf(csrf -> csrf.disable())
+// .cors(cors -> cors.configurationSource(corsConfigurationSource))
+// .sessionManagement(session -> session
+// .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+// .authorizeHttpRequests(auth -> auth
+// .anyRequest().permitAll());
 
-//         return http.build();
-//     }
+// return http.build();
+// }
 // }

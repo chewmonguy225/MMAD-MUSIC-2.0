@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.MMAD.Service.item.SongService;
 import com.MMAD.dto.item.SongDTO;
-import com.MMAD.model.item.Song;
+import com.MMAD.entity.item.Song;
 
 @RestController
 @RequestMapping("item/songs")

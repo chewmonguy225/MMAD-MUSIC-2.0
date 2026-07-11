@@ -1,6 +1,6 @@
 package com.MMAD.Security;
 
-import com.MMAD.model.User.User;
+import com.MMAD.entity.User.User;
 import com.MMAD.repo.UserRepo;
 
 import org.springframework.security.core.userdetails.UserDetails;

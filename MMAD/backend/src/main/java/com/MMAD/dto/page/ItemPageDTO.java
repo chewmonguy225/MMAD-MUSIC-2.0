@@ -5,7 +5,7 @@ import java.util.List;
 import com.MMAD.dto.item.AlbumDTO;
 import com.MMAD.dto.item.ItemDTO;
 import com.MMAD.dto.review.ItemReviewResponse;
-import com.MMAD.model.item.MusicProvider;
+import com.MMAD.entity.item.MusicProvider;
 
 public class ItemPageDTO {
 

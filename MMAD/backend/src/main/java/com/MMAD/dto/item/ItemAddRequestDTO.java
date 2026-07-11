@@ -1,6 +1,6 @@
 package com.MMAD.dto.item;
 
-import com.MMAD.model.item.MusicProvider;
+import com.MMAD.entity.item.MusicProvider;
 
 public class ItemAddRequestDTO {
 

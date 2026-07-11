@@ -1,4 +1,4 @@
-package com.MMAD.model.item;
+package com.MMAD.entity.item;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;

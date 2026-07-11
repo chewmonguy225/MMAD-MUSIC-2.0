@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.MMAD.Service.item.AlbumService;
 import com.MMAD.dto.item.AlbumDTO;
-import com.MMAD.model.item.Album;
+import com.MMAD.entity.item.Album;
 
 @RestController
 @RequestMapping("item/albums")

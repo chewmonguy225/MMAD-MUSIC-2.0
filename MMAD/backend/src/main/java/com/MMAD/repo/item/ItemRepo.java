@@ -3,8 +3,8 @@ package com.MMAD.repo.item;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.MMAD.model.item.Item;
-import com.MMAD.model.item.MusicProvider;
+import com.MMAD.entity.item.Item;
+import com.MMAD.entity.item.MusicProvider;
 
 import java.util.Optional;
 
