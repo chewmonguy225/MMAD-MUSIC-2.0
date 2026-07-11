@@ -1,7 +1,6 @@
 package com.MMAD.Controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.Authentication;
 
 import com.MMAD.Security.JWTService;
-import com.MMAD.Service.UserService;
-import com.MMAD.dto.user.LoginResponse;
+import com.MMAD.Service.user.UserService;
+import com.MMAD.dto.MessageResponse;
+import com.MMAD.dto.user.LoginRequest;
+import com.MMAD.dto.user.RegisterRequest;
 import com.MMAD.dto.user.UserDTO;
+import com.MMAD.dto.user.VerifyRequest;
 
 import jakarta.transaction.Transactional;
 
@@ -78,12 +80,24 @@ public class UserController {
      * @return The user with the given username and password.
      */
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody Map<String, String> credentials) {
+    public ResponseEntity<?> login(
+            @RequestBody LoginRequest request) {
 
-        String username = credentials.get("username");
-        String password = credentials.get("password");
+        try {
 
-        return ResponseEntity.ok(userService.login(username, password));
+            return ResponseEntity.ok(
+                    userService.login(
+                            request.getUsername(),
+                            request.getPassword()));
+
+        } catch (Exception e) {
+
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse(
+                            false,
+                            e.getMessage()));
+
+        }
     }
 
     /**
@@ -93,16 +107,57 @@ public class UserController {
      * @return The created user DTO if successful.
      */
     @PostMapping("/create")
-    public ResponseEntity<UserDTO> addUser(@RequestBody Map<String, String> credentials) {
-        try {
-            String username = credentials.get("username");
-            String password = credentials.get("password");
+    public ResponseEntity<MessageResponse> addUser(
+            @RequestBody RegisterRequest request) {
 
-            return ResponseEntity.ok().body(userService.createUser(username, password));
+        try {
+
+            userService.createUser(
+                    request.username(),
+                    request.email(),
+                    request.password());
+
+            return ResponseEntity.ok(
+                    new MessageResponse(
+                            true,
+                            "Account created successfully. Please check your email for your verification code."));
+
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
+
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse(
+                            false,
+                            e.getMessage()));
+
         }
     }
+
+    @PostMapping("/verify")
+    public ResponseEntity<MessageResponse> verifyUser(
+            @RequestBody VerifyRequest request) {
+
+        try {
+
+            userService.verifyUser(
+                    request.email(),
+                    request.code());
+
+            return ResponseEntity.ok(
+                    new MessageResponse(
+                            true,
+                            "Account verified successfully"));
+
+        } catch (Exception e) {
+
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse(
+                            false,
+                            e.getMessage()));
+
+        }
+    }
+
+    
 
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getMyProfile(Authentication authentication) {
@@ -199,37 +254,39 @@ public class UserController {
         }
     }
 
-    /**
-     * Remove all followings of a user (stop following everyone).
-     * 
-     * @param userId The id of the user.
-     * @return Success message.
-     */
-    @PostMapping("/following/removeAll/{userId}")
-    public ResponseEntity<String> removeAllFollowing(@PathVariable("userId") Long userId) {
-        try {
-            userService.removeAllFollowing(userId);
-            return ResponseEntity.ok("All followings removed successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
+    // /**
+    // * Remove all followings of a user (stop following everyone).
+    // *
+    // * @param userId The id of the user.
+    // * @return Success message.
+    // */
+    // @PostMapping("/following/removeAll/{userId}")
+    // public ResponseEntity<String> removeAllFollowing(@PathVariable("userId") Long
+    // userId) {
+    // try {
+    // userService.removeAllFollowing(userId);
+    // return ResponseEntity.ok("All followings removed successfully");
+    // } catch (Exception e) {
+    // return ResponseEntity.badRequest().body(e.getMessage());
+    // }
+    // }
 
-    /**
-     * Remove all followers of a user (remove all followers).
-     * 
-     * @param userId The id of the user.
-     * @return Success message.
-     */
-    @PostMapping("/followers/removeAll/{userId}")
-    public ResponseEntity<String> removeAllFollowers(@PathVariable("userId") Long userId) {
-        try {
-            userService.removeAllFollowers(userId);
-            return ResponseEntity.ok("All followers removed successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
+    // /**
+    // * Remove all followers of a user (remove all followers).
+    // *
+    // * @param userId The id of the user.
+    // * @return Success message.
+    // */
+    // @PostMapping("/followers/removeAll/{userId}")
+    // public ResponseEntity<String> removeAllFollowers(@PathVariable("userId") Long
+    // userId) {
+    // try {
+    // userService.removeAllFollowers(userId);
+    // return ResponseEntity.ok("All followers removed successfully");
+    // } catch (Exception e) {
+    // return ResponseEntity.badRequest().body(e.getMessage());
+    // }
+    // }
 
     // --- NEW ENDPOINT FOR SEARCHING USERS ---
     /**
@@ -249,19 +306,21 @@ public class UserController {
      * @return A list of UserDTOs matching the search criteria.
      */
     // @GetMapping("/search")
-    // public ResponseEntity<List<UserItemDTO>> searchUsers(@RequestParam("query") String query) {
-    //     try {
-    //         List<UserItemDTO> users = userService.searchUsers(query);
-    //         // If no users are found, userService.searchUsers returns an empty list,
-    //         // which is a valid success response (HTTP 200 OK with an empty array).
-    //         return ResponseEntity.ok(users);
-    //     } catch (Exception e) {
-    //         // Catch any unexpected exceptions that might occur during the service call
-    //         // and return a bad request with the error message, similar to your template.
-    //         return ResponseEntity.badRequest().body(null); // Returning null body with badRequest indicates an error.
-    //                                                        // You might prefer to return e.getMessage() here
-    //                                                        // or a more specific error response.
-    //     }
+    // public ResponseEntity<List<UserItemDTO>> searchUsers(@RequestParam("query")
+    // String query) {
+    // try {
+    // List<UserItemDTO> users = userService.searchUsers(query);
+    // // If no users are found, userService.searchUsers returns an empty list,
+    // // which is a valid success response (HTTP 200 OK with an empty array).
+    // return ResponseEntity.ok(users);
+    // } catch (Exception e) {
+    // // Catch any unexpected exceptions that might occur during the service call
+    // // and return a bad request with the error message, similar to your template.
+    // return ResponseEntity.badRequest().body(null); // Returning null body with
+    // badRequest indicates an error.
+    // // You might prefer to return e.getMessage() here
+    // // or a more specific error response.
+    // }
     // }
 
 }

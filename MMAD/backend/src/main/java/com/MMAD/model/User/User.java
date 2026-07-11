@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.MMAD.model.User.Playlist;
-
 import jakarta.persistence.*;
 
 @Entity
@@ -26,16 +24,24 @@ public class User implements Serializable {
     private String password;
 
     // -----------------------------
+    // Email Verification
+    // -----------------------------
+
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private boolean verified = false;
+
+    private String verificationCode;
+
+    // -----------------------------
     // FOLLOWERS / FOLLOWING Logic
     // -----------------------------
 
     // Users this user is following
     @ManyToMany
-    @JoinTable(
-        name = "user_following",
-        joinColumns = @JoinColumn(name = "follower_id"),
-        inverseJoinColumns = @JoinColumn(name = "following_id")
-    )
+    @JoinTable(name = "user_following", joinColumns = @JoinColumn(name = "follower_id"), inverseJoinColumns = @JoinColumn(name = "following_id"))
     private Set<User> following = new HashSet<>();
 
     // Users who follow this user
@@ -56,15 +62,27 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(String username, String password) {
+    public User(String username, String password, String email) {
+
         this.username = username;
         this.password = password;
+        this.email = email;
+        this.verified = false;
+
     }
 
-    public User(Long id, String username, String password) {
+    public User(
+            Long id,
+            String username,
+            String password,
+            String email) {
+
         this.id = id;
         this.username = username;
         this.password = password;
+        this.email = email;
+        this.verified = false;
+
     }
 
     // -----------------------------
@@ -84,48 +102,112 @@ public class User implements Serializable {
     }
 
     public void setUsername(String username) {
+
         if (username == null || username.trim().isEmpty()) {
-            throw new IllegalArgumentException("Username cannot be null or empty");
+
+            throw new IllegalArgumentException(
+                    "Username cannot be null or empty");
+
         } else if (username.length() < 3 || username.length() > 20) {
-            throw new IllegalArgumentException("Username length must be between 3 and 20 characters.");
+
+            throw new IllegalArgumentException(
+                    "Username length must be between 3 and 20 characters.");
+
         } else if (!username.matches("[a-zA-Z0-9]+")) {
-            throw new IllegalArgumentException("Username must contain only letters and numbers");
+
+            throw new IllegalArgumentException(
+                    "Username must contain only letters and numbers");
+
         } else {
+
             this.username = username;
+
         }
+
     }
 
     public String getPassword() {
+
         return password;
+
     }
 
     public void setPassword(String password) {
-        // Add validation logic if needed
+
         this.password = password;
+
+    }
+
+    public String getEmail() {
+
+        return email;
+
+    }
+
+    public void setEmail(String email) {
+
+        this.email = email;
+
+    }
+
+    public boolean isVerified() {
+
+        return verified;
+
+    }
+
+    public void setVerified(boolean verified) {
+
+        this.verified = verified;
+
+    }
+
+    public String getVerificationCode() {
+
+        return verificationCode;
+
+    }
+
+    public void setVerificationCode(String verificationCode) {
+
+        this.verificationCode = verificationCode;
+
     }
 
     public List<Playlist> getPlaylists() {
+
         return playlists;
+
     }
 
     public void setPlaylists(List<Playlist> playlists) {
+
         this.playlists = playlists;
+
     }
 
     public Set<User> getFollowing() {
+
         return following;
+
     }
 
     public void setFollowing(Set<User> following) {
+
         this.following = following;
+
     }
 
     public Set<User> getFollowers() {
+
         return followers;
+
     }
 
     public void setFollowers(Set<User> followers) {
+
         this.followers = followers;
+
     }
 
     // -----------------------------
@@ -133,12 +215,17 @@ public class User implements Serializable {
     // -----------------------------
 
     public void follow(User target) {
+
         this.following.add(target);
         target.followers.add(this);
+
     }
 
     public void unfollow(User target) {
+
         this.following.remove(target);
         target.followers.remove(this);
+
     }
+
 }

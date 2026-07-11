@@ -1,4 +1,4 @@
-package com.MMAD.dto;
+package com.MMAD.dto.user;
 
 public class LoginRequest {
 

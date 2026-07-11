@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.MMAD.Service.item.ItemService;
+import com.MMAD.Service.user.UserService;
 import com.MMAD.dto.item.ItemDTO;
 import com.MMAD.dto.review.GetReviewResponse;
 import com.MMAD.dto.review.ItemReviewResponse;

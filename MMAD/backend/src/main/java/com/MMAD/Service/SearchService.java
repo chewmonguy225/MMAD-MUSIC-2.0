@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.MMAD.Service.user.UserService;
 import com.MMAD.dto.SearchResponse;
 import com.MMAD.dto.item.ItemDTO;
 import com.MMAD.dto.search.ItemSearchResultDTO;

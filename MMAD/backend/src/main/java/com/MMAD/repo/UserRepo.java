@@ -11,13 +11,17 @@ import com.MMAD.model.User.User;
 
 import java.util.List;
 
-
 public interface UserRepo extends JpaRepository<User, Long> {
     Optional<User> findUserByUsername(String username);
+
+    Optional<User> findUserByEmail(String email);
+
     Optional<User> findUserById(Long id);
+
     void deleteUserById(Long id);
+
     void deleteByUsernameAndPassword(String username, String password);
-    
+
     Optional<User> findUserByUsernameAndPassword(String username, String password);
 
     List<User> findByUsernameContainingIgnoreCase(String username);
