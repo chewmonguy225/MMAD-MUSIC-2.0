@@ -5,15 +5,13 @@ import java.util.List;
 import com.MMAD.dto.item.AlbumDTO;
 import com.MMAD.dto.item.ItemDTO;
 import com.MMAD.dto.review.ItemReviewResponse;
+import com.MMAD.model.item.MusicProvider;
 
 public class ItemPageDTO {
 
     private ItemDTO item;
-
     private List<ItemReviewResponse> reviews;
-
     private List<SimplifiedSong> songs;
-
     private List<AlbumDTO> albums;
 
     public ItemPageDTO() {
@@ -65,6 +63,7 @@ public class ItemPageDTO {
 
     public record SimplifiedSong(
             String name,
-            String sourceId) {
+            String sourceId,
+            MusicProvider provider) {
     }
 }

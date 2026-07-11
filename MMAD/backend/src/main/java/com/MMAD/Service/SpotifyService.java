@@ -239,7 +239,10 @@ public class SpotifyService {
             for (JsonNode track : json.path("items")) {
                 songs.add(new ItemPageDTO.SimplifiedSong(
                         track.path("name").asText(),
-                        track.path("id").asText()));
+                        track.path("id").asText(),
+                        MusicProvider.SPOTIFY
+                    )
+                );
             }
 
             return songs;
