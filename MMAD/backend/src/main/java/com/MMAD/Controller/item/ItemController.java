@@ -20,13 +20,11 @@ import java.util.Optional;
 public class ItemController {
 
     private final ItemService itemService;
-    private final ItemMapper itemMapper;
 
     public ItemController(
             ItemService itemService,
             ItemMapper itemMapper) {
         this.itemService = itemService;
-        this.itemMapper = itemMapper;
     }
 
     @PostMapping("/add")

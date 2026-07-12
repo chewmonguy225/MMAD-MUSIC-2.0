@@ -4,29 +4,19 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.MMAD.dto.item.AlbumDTO;
-import com.MMAD.dto.item.ArtistDTO;
 import com.MMAD.dto.item.SongDTO;
-import com.MMAD.entity.item.Album;
-import com.MMAD.entity.item.Artist;
-import com.MMAD.entity.item.Song;
 import com.MMAD.repo.item.SongRepo;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class SongService {
 
     private final SongRepo songRepo;
-    private final ArtistService artistService;
-    private final AlbumService albumService;
 
     public SongService(SongRepo songRepo, ArtistService artistService, AlbumService albumService) {
         this.songRepo = songRepo;
-        this.artistService = artistService;
-        this.albumService = albumService;
     }
 
     // // CREATE

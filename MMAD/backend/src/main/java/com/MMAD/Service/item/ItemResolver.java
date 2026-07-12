@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.MMAD.Service.SpotifyService;
-import com.MMAD.dto.item.ArtistDTO;
 import com.MMAD.entity.item.Album;
 import com.MMAD.entity.item.Artist;
 import com.MMAD.entity.item.Item;

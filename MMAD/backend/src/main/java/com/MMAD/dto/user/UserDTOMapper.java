@@ -13,6 +13,7 @@ public class UserDTOMapper implements Function<User, UserDTO> {
     public UserDTO apply(User user) {
         return new UserDTO(
             user.getUsername(),
+            user.getProfilePicUrl(),
             user.getFollowing()
                 .stream()
                 .map(User::getUsername)

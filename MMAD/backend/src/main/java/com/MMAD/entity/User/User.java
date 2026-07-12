@@ -24,6 +24,10 @@ public class User implements Serializable {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String profilePicUrl = "/assets/images/default-profile.png";
+
+
     // -----------------------------
     // Email Verification
     // -----------------------------
@@ -119,172 +123,122 @@ public class User implements Serializable {
     }
 
     public void setUsername(String username) {
-
         if (username == null || username.trim().isEmpty()) {
-
             throw new IllegalArgumentException(
                     "Username cannot be null or empty");
-
         } else if (username.length() < 3 || username.length() > 20) {
-
             throw new IllegalArgumentException(
                     "Username length must be between 3 and 20 characters.");
-
         } else if (!username.matches("[a-zA-Z0-9]+")) {
-
             throw new IllegalArgumentException(
                     "Username must contain only letters and numbers");
-
         } else {
-
             this.username = username;
-
         }
-
     }
 
     public String getPassword() {
-
         return password;
-
     }
 
     public void setPassword(String password) {
-
         this.password = password;
-
     }
 
     public String getEmail() {
-
         return email;
-
     }
 
     public void setEmail(String email) {
-
         this.email = email;
-
     }
 
     public boolean isVerified() {
-
         return verified;
-
     }
 
     public void setVerified(boolean verified) {
-
         this.verified = verified;
-
     }
 
     public String getVerificationCode() {
-
         return verificationCode;
-
     }
 
     public void setVerificationCode(String verificationCode) {
-
         this.verificationCode = verificationCode;
-
     }
 
     public List<Playlist> getPlaylists() {
-
         return playlists;
-
     }
 
     public void setPlaylists(List<Playlist> playlists) {
-
         this.playlists = playlists;
-
     }
 
     public Set<User> getFollowing() {
-
         return following;
-
     }
 
     public void setFollowing(Set<User> following) {
-
         this.following = following;
-
     }
 
     public Set<User> getFollowers() {
-
         return followers;
-
     }
 
     public void setFollowers(Set<User> followers) {
-
         this.followers = followers;
-
     }
 
     public String getPasswordResetCode() {
-
         return passwordResetCode;
-
     }
 
     public void setPasswordResetCode(String passwordResetCode) {
-
         this.passwordResetCode = passwordResetCode;
-
     }
 
     public LocalDateTime getVerificationCodeExpiry() {
-
         return verificationCodeExpiry;
-
     }
 
     public void setVerificationCodeExpiry(LocalDateTime expiry) {
-
         this.verificationCodeExpiry = expiry;
-
     }
 
     public LocalDateTime getPasswordResetCodeExpiry() {
-
         return passwordResetCodeExpiry;
-
     }
 
     public void setPasswordResetCodeExpiry(LocalDateTime expiry) {
-
         this.passwordResetCodeExpiry = expiry;
-
     }
 
     public LocalDateTime getVerificationCodeSentAt() {
-
         return verificationCodeSentAt;
-
     }
 
     public void setVerificationCodeSentAt(LocalDateTime sentAt) {
-
         this.verificationCodeSentAt = sentAt;
-
     }
 
     public LocalDateTime getPasswordResetCodeSentAt() {
-
         return passwordResetCodeSentAt;
-
     }
 
     public void setPasswordResetCodeSentAt(LocalDateTime sentAt) {
-
         this.passwordResetCodeSentAt = sentAt;
+    }
 
+    public String getProfilePicUrl() {
+        return profilePicUrl;
+    }
+    
+    public void setProfilePicUrl(String profilePicUrl) {
+        this.profilePicUrl = profilePicUrl;
     }
 
     // -----------------------------
@@ -292,14 +246,11 @@ public class User implements Serializable {
     // -----------------------------
 
     public void follow(User target) {
-
         this.following.add(target);
         target.followers.add(this);
-
     }
 
     public void unfollow(User target) {
-
         this.following.remove(target);
         target.followers.remove(this);
 

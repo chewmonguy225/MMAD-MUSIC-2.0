@@ -1,16 +1,12 @@
 package com.MMAD.Controller.item;
 
 import java.util.List;
-import java.util.Optional;
-
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.MMAD.Service.item.AlbumService;
 import com.MMAD.dto.item.AlbumDTO;
-import com.MMAD.entity.item.Album;
 
 @RestController
 @RequestMapping("item/albums")

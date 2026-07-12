@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.Authentication;
 
-import com.MMAD.Security.JWTService;
 import com.MMAD.Service.user.UserService;
 import com.MMAD.dto.MessageResponse;
 import com.MMAD.dto.user.ForgotPasswordRequest;
@@ -31,16 +30,14 @@ import jakarta.transaction.Transactional;
 public class UserController {
 
     private final UserService userService;
-    private final JWTService jwtService;
 
     /**
      * Constructor for UserResource.
      * 
      * @param userService The UserService to be used.
      */
-    public UserController(UserService userService, JWTService jwtService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.jwtService = jwtService;
     }
 
     /**
@@ -90,7 +87,7 @@ public class UserController {
 
             return ResponseEntity.ok(
                     userService.login(
-                            request.getUsername(),
+                            request.getLogin(),
                             request.getPassword()));
 
         } catch (Exception e) {

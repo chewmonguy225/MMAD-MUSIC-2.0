@@ -2,18 +2,18 @@ package com.MMAD.dto.user;
 
 public class LoginRequest {
 
-    private String username;
+    private String login;
     private String password;
 
     public LoginRequest() {
     }
 
-    public String getUsername() {
-        return username;
+    public String getLogin() {
+        return login;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getPassword() {

@@ -16,7 +16,6 @@ import com.MMAD.dto.item.ItemDTO;
 import com.MMAD.dto.review.GetReviewResponse;
 import com.MMAD.dto.review.ItemReviewResponse;
 import com.MMAD.dto.review.ItemReviewsResponse;
-import com.MMAD.dto.user.UserDTOMapper;
 import com.MMAD.entity.Review.Review;
 import com.MMAD.entity.User.User;
 import com.MMAD.entity.item.Item;
@@ -24,23 +23,20 @@ import com.MMAD.exception.UserNotFoundException;
 import com.MMAD.repo.ReviewRepo;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class ReviewService {
-    private final UserDTOMapper userDTOMapper;
     private final ReviewRepo reviewRepo;
     private final UserService userService;
     private final ItemService itemService;
 
     // Constructor injection: Spring will automatically provide instances of
     // ReviewRepo, UserService, and ItemService
-    public ReviewService(ReviewRepo reviewRepo, UserService userService, ItemService itemService,
-            UserDTOMapper userDTOMapper) {
+    public ReviewService(ReviewRepo reviewRepo, UserService userService, ItemService itemService) {
         this.reviewRepo = reviewRepo;
         this.userService = userService;
         this.itemService = itemService;
-        this.userDTOMapper = userDTOMapper;
     }
 
     // CREATE

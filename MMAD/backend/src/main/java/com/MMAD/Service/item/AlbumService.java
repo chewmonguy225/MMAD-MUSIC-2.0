@@ -5,25 +5,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.MMAD.dto.item.AlbumDTO;
-import com.MMAD.dto.item.ArtistDTO;
 import com.MMAD.entity.item.Album;
-import com.MMAD.entity.item.Artist;
 import com.MMAD.repo.item.AlbumRepo;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class AlbumService {
 
     private final AlbumRepo albumRepo;
-    private final ArtistService artistService;
 
-    public AlbumService(AlbumRepo albumRepo, ArtistService artistService) {
+    public AlbumService(AlbumRepo albumRepo) {
         this.albumRepo = albumRepo;
-        this.artistService = artistService;
     }
 
     // public AlbumDTO addAlbum(Album album) {

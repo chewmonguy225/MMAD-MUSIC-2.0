@@ -14,6 +14,7 @@ import com.MMAD.dto.user.LoginResponse;
 import com.MMAD.dto.user.UserDTO;
 import com.MMAD.dto.user.UserDTOMapper;
 import com.MMAD.entity.User.User;
+import com.MMAD.exception.InvalidCodeException;
 import com.MMAD.exception.UserNotFoundException;
 import com.MMAD.repo.UserRepo;
 
@@ -39,19 +40,15 @@ public class UserService {
                         PasswordEncoder passwordEncoder,
                         UserDTOMapper userDTOMapper,
                         EmailService emailService) {
-
                 if (userRepo == null) {
                         throw new RuntimeException("userRepo cannot be null");
                 }
-
                 if (passwordEncoder == null) {
                         throw new RuntimeException("passwordEncoder cannot be null");
                 }
-
                 if (emailService == null) {
                         throw new RuntimeException("emailService cannot be null");
                 }
-
                 this.userRepo = userRepo;
                 this.passwordEncoder = passwordEncoder;
                 this.jwtService = jwtService;
@@ -61,7 +58,6 @@ public class UserService {
 
         @GetMapping("/me")
         public UserDTO getCurrentUser() {
-
                 String username = SecurityContextHolder
                                 .getContext()
                                 .getAuthentication()
@@ -72,7 +68,6 @@ public class UserService {
 
         @Transactional
         public UserDTO getUserDTOById(Long id) {
-
                 return userRepo.findUserById(id)
                                 .map(userDTOMapper::apply)
                                 .orElseThrow(() -> new UserNotFoundException(
@@ -81,7 +76,6 @@ public class UserService {
 
         @Transactional
         public UserDTO getUserDTOByUsername(String username) {
-
                 return userRepo.findUserByUsername(username)
                                 .map(userDTOMapper::apply)
                                 .orElseThrow(() -> new UserNotFoundException(
@@ -90,25 +84,20 @@ public class UserService {
 
         @Transactional
         public Optional<User> getUserByUsername(String username) {
-
                 return userRepo.findUserByUsername(username);
         }
 
         public LoginResponse login(String username, String password) {
-
                 User user = userRepo.findUserByUsername(username)
-                                .orElseThrow(() -> new RuntimeException("User not found"));
-
+                                .orElseGet(() -> userRepo.findUserByEmail(username)
+                                                .orElseThrow(() -> new RuntimeException("User not found")));
                 if (!passwordEncoder.matches(password, user.getPassword())) {
                         throw new RuntimeException("Invalid credentials");
                 }
-
                 if (!user.isVerified()) {
                         throw new RuntimeException("Account not verified");
                 }
-
                 String token = jwtService.generateToken(user.getUsername());
-
                 return new LoginResponse(
                                 token,
                                 user.getUsername());
@@ -118,7 +107,6 @@ public class UserService {
                         String username,
                         String email,
                         String password) {
-
                 Optional<User> existingUsername = userRepo.findUserByUsername(username);
 
                 if (existingUsername.isPresent()) {
@@ -127,11 +115,12 @@ public class UserService {
                 }
 
                 Optional<User> existingEmail = userRepo.findUserByEmail(email);
-
                 if (existingEmail.isPresent()) {
                         throw new RuntimeException(
                                         "Email already exists");
                 }
+
+                validatePassword(password);
 
                 User newUser = new User(
                                 username,
@@ -173,12 +162,12 @@ public class UserService {
                         String code) {
 
                 User user = userRepo.findUserByEmail(email)
-                                .orElseThrow(() -> new RuntimeException("User not found"));
+                                .orElseThrow(() -> new RuntimeException("Invalid Credentials"));
 
                 if (user.getVerificationCode() == null ||
                                 !user.getVerificationCode().equals(code)) {
 
-                        throw new RuntimeException(
+                        throw new InvalidCodeException(
                                         "Invalid verification code");
 
                 }
@@ -187,19 +176,14 @@ public class UserService {
                                 user.getVerificationCodeExpiry()
                                                 .isBefore(LocalDateTime.now())) {
 
-                        throw new RuntimeException(
+                        throw new InvalidCodeException(
                                         "Verification code expired");
 
                 }
-
                 user.setVerified(true);
-
                 user.setVerificationCode(null);
-
                 user.setVerificationCodeExpiry(null);
-
                 userRepo.save(user);
-
         }
 
         public void deleteUser(Long id) {
@@ -370,19 +354,20 @@ public class UserService {
                 if (user.getPasswordResetCode() == null ||
                                 !user.getPasswordResetCode().equals(code)) {
 
-                        throw new RuntimeException(
+                        throw new InvalidCodeException(
                                         "Invalid reset code");
 
                 }
-
                 if (user.getPasswordResetCodeExpiry() == null ||
                                 user.getPasswordResetCodeExpiry()
                                                 .isBefore(LocalDateTime.now())) {
 
-                        throw new RuntimeException(
+                        throw new InvalidCodeException(
                                         "Password reset code expired");
 
                 }
+
+                validatePassword(newPassword);
 
                 user.setPassword(
                                 passwordEncoder.encode(newPassword));
@@ -446,6 +431,35 @@ public class UserService {
                 emailService.sendVerificationEmail(
                                 email,
                                 code);
+
+        }
+
+        private void validatePassword(String password) {
+
+                if (password == null || password.isBlank()) {
+                        throw new RuntimeException(
+                                        "Password cannot be empty.");
+                }
+
+                if (password.length() < 8) {
+                        throw new RuntimeException(
+                                        "Password must be at least 8 characters long.");
+                }
+
+                if (!password.matches(".*[A-Z].*")) {
+                        throw new RuntimeException(
+                                        "Password must contain at least one uppercase letter.");
+                }
+
+                if (!password.matches(".*[a-z].*")) {
+                        throw new RuntimeException(
+                                        "Password must contain at least one lowercase letter.");
+                }
+
+                if (!password.matches(".*\\d.*")) {
+                        throw new RuntimeException(
+                                        "Password must contain at least one number.");
+                }
 
         }
 }
