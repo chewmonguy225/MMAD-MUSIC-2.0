@@ -6,7 +6,7 @@ import { Artist } from '../../core/model/item/artist.type';
 import { Album } from '../../core/model/item/album.type';
 import { Song } from '../../core/model/item/song.type';
 import { Item } from '../../core/model/item/item.type';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
