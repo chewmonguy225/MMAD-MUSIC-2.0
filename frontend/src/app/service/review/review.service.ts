@@ -5,13 +5,14 @@ import { ReviewPostRequestPayload } from '../../core/model/review/reviewPostRequ
 import { ItemReviewsResponse } from '../../core/model/review/ItemReviewsResponse';
 
 import { Review } from '../../core/model/review/review.type';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReviewService {
 
-  private apiUrl = 'http://localhost:8080/reviews';
+  protected apiUrl = `${environment.apiUrl}/reviews`;
 
   constructor(private http: HttpClient) { }
 

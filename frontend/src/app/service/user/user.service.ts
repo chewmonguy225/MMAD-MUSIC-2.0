@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 
 import { LoginResponse } from '../../core/dto/login-response.model';
+import { environment } from '../../../environments/environment';
 
 
 export interface RegisterRequest {
@@ -55,7 +56,7 @@ export interface UserDTO {
 })
 export class UserService {
 
-  private apiUrl = 'http://localhost:8080/user';
+  protected apiUrl = `${environment.apiUrl}/user`;
 
 
   constructor(

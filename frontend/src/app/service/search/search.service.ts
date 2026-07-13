@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SearchResponse } from '../../core/dto/search/search-response.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SearchService {
 
-  private baseUrl = 'http://localhost:8080/search';
+  protected apiUrl = `${environment.apiUrl}/search`;
 
   constructor(private http: HttpClient) {}
 
@@ -16,7 +17,7 @@ export class SearchService {
     const typeParam = types?.length ? `?type=${types.join(',')}` : '';
 
     return this.http.get<SearchResponse>(
-      `${this.baseUrl}/${query}${typeParam}`
+      `${this.apiUrl}/${query}${typeParam}`
     );
   }
 }

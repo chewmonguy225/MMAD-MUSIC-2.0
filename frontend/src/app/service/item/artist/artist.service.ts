@@ -3,14 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { Artist } from '../../../core/model/item/artist.type';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ArtistService {
 
-  private apiUrl = 'http://localhost:8080/item';
-  private searchUrl = 'http://localhost:8080/spotify/search/artist';
+  protected apiUrl = `${environment.apiUrl}/item`;
+  protected searchUrl = `${environment.apiUrl}/spotify/search/artist`;
 
   constructor(private http: HttpClient) {}
 
