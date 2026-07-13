@@ -1,0 +1,73 @@
+<div class="review" *ngIf="review">
+
+  <div *ngIf="item as currentItem" class="review-row">
+
+    <!-- IMAGE -->
+    <div class="review-image clickable" [routerLink]="['/item', currentItem.id]">
+      <img [src]="currentItem.imageURL" [alt]="currentItem.name" [class.circle]="currentItem.type === 'artist'"
+        [class.square]="currentItem.type !== 'artist'" />
+    </div>
+
+    <div class="review-body">
+
+      <div class="body-top">
+
+        <!-- ITEM NAME -->
+        <h1 class="item-name clickable" [routerLink]="['/item', currentItem.id]">
+          {{ currentItem.name }}
+        </h1>
+
+        <!-- ITEM TYPE + ARTISTS -->
+        <div class="item-info">
+          <span class="item-type">
+            {{ itemType | titlecase }}
+          </span>
+
+          <span *ngIf="artists.length">
+            •
+            <ng-container *ngFor="let artist of artists; let last = last">
+              <span class="artist-name clickable" [routerLink]="['/item', artist.id]">
+                {{ artist.name }}
+              </span>
+
+              <span *ngIf="!last">, </span>
+            </ng-container>
+          </span>
+        </div>
+
+        <!-- USER -->
+        <h2 class="username clickable" [routerLink]="['/profile', review.username]">
+          {{ review.username }}
+        </h2>
+
+      </div>
+
+      <!-- STARS -->
+      <div class="stars">
+        <span *ngFor="let _ of stars">⭐</span>
+      </div>
+
+      <!-- REVIEW TEXT -->
+      <div class="body-middle">
+        <div class="description">
+          {{ review.description }}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- DATE -->
+    <div class="review-date">
+
+      <span *ngIf="wasUpdated">
+        Updated {{ review.updatedAt | timeAgo }}
+      </span>
+
+      <span *ngIf="!wasUpdated">
+        {{ review.createdAt | timeAgo }}
+      </span>
+
+    </div>
+  </div>
+
+</div>
