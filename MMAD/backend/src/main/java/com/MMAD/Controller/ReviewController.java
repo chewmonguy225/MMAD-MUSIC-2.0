@@ -14,7 +14,6 @@ import com.MMAD.dto.review.ItemReviewsResponse;
 import com.MMAD.dto.review.PostReviewRequest;
 import com.MMAD.dto.review.UpdateReviewRequest;
 
-
 import java.util.List;
 
 @RestController
@@ -106,6 +105,16 @@ public class ReviewController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 500
         }
+    }
+
+    @GetMapping("/me/item/{itemId}")
+    public ResponseEntity<?> getMyReviewForItem(
+            @PathVariable Long itemId) {
+
+        return reviewService
+                .getMyReviewForItem(itemId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     /**

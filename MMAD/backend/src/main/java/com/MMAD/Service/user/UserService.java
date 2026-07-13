@@ -56,7 +56,7 @@ public class UserService {
                 this.emailService = emailService;
         }
 
-        @GetMapping("/me")
+        @Transactional
         public UserDTO getCurrentUser() {
                 String username = SecurityContextHolder
                                 .getContext()
@@ -64,6 +64,18 @@ public class UserService {
                                 .getName();
 
                 return getUserDTOByUsername(username);
+        }
+
+        @Transactional
+        public User getCurrentUserEntity() {
+
+                String username = SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getName();
+                return userRepo.findUserByUsername(username)
+                                .orElseThrow(() -> new EntityNotFoundException(
+                                                "User not found"));
         }
 
         @Transactional

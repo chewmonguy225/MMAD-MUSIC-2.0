@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import com.MMAD.dto.item.ItemDTO;
 import com.MMAD.entity.Review.Review;
 
-
-
 public class GetReviewResponse {
 
     private Long id;
@@ -19,7 +17,10 @@ public class GetReviewResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public GetReviewResponse(Long id, int rating, String description,
+    public GetReviewResponse(
+            Long id,
+            int rating,
+            String description,
             ItemDTO item,
             String username,
             LocalDateTime createdAt,
@@ -33,7 +34,6 @@ public class GetReviewResponse {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-
 
     public Long getId() {
         return id;
@@ -67,8 +67,7 @@ public class GetReviewResponse {
         this.item = item;
     }
 
-
-    public String getUsername(){
+    public String getUsername() {
         return username;
     }
 
@@ -93,9 +92,11 @@ public class GetReviewResponse {
     }
 
     public static GetReviewResponse fromEntity(Review review) {
-        if (review == null)
+
+        if (review == null) {
             return null;
-    
+        }
+
         return new GetReviewResponse(
                 review.getId(),
                 review.getRating(),
@@ -103,7 +104,7 @@ public class GetReviewResponse {
                 ItemDTO.fromEntity(review.getItem()),
                 review.getUser().getUsername(),
                 review.getCreatedAt(),
-                review.getUpdatedAt());
+                review.getUpdatedAt()
+        );
     }
-
 }

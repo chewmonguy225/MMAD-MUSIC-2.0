@@ -18,58 +18,57 @@ import com.MMAD.dto.user.UserDTO;
 @Service
 public class SearchService {
 
-    private final SpotifyService spotifyService;
-    private final UserService userService;
+        private final SpotifyService spotifyService;
+        private final UserService userService;
 
-    public SearchService(
-            SpotifyService spotifyService,
-            UserService userService) {
+        public SearchService(
+                        SpotifyService spotifyService,
+                        UserService userService) {
 
-        this.spotifyService = spotifyService;
-        this.userService = userService;
-    }
-
-    public SearchResponse search(String query, String type) {
-
-        List<String> types = (type == null || type.isBlank())
-                ? List.of("artist", "album", "track", "user")
-                : Arrays.asList(type.toLowerCase().split(","));
-
-        List<SearchResultDTO> results = new ArrayList<>();
-
-        // Spotify
-        List<String> spotifyTypes = types.stream()
-                .filter(t -> !t.equals("user"))
-                .toList();
-
-        if (!spotifyTypes.isEmpty()) {
-
-            results.addAll(
-                    spotifyService.searchSpotify(query, spotifyTypes)
-                            .stream()
-                            .sorted(
-                                    Comparator.comparingInt(ItemDTO::getRelevance)
-                                            .reversed())
-                            .map(ItemSearchResultDTO::fromDTO)
-                            .toList());
+                this.spotifyService = spotifyService;
+                this.userService = userService;
         }
 
-        // Users
-        if (types.contains("user")) {
+        public SearchResponse search(String query, String type) {
 
-            results.addAll(
-                    userService.searchUsers(query)
-                            .stream()
-                            .sorted(
-                                    Comparator.comparingInt((UserDTO user) -> user.username()
-                                            .equalsIgnoreCase(query)
-                                                    ? 1_000_000
-                                                    : 50_000)
-                                            .reversed())
-                            .map(UserSearchResultDTO::fromDTO)
-                            .toList());
+                List<String> types = (type == null || type.isBlank())
+                                ? List.of("artist", "album", "track", "user")
+                                : Arrays.stream(type.toLowerCase().split(","))
+                                                .map(t -> t.equals("song") ? "track" : t)
+                                                .toList();
+
+                List<SearchResultDTO> results = new ArrayList<>();
+
+                List<String> spotifyTypes = types.stream()
+                                .filter(t -> !t.equals("user"))
+                                .toList();
+
+                if (!spotifyTypes.isEmpty()) {
+                        results.addAll(
+                                        spotifyService.searchSpotify(query, spotifyTypes)
+                                                        .stream()
+                                                        .sorted(
+                                                                        Comparator.comparingInt(ItemDTO::getRelevance)
+                                                                                        .reversed())
+                                                        .map(ItemSearchResultDTO::fromDTO)
+                                                        .toList());
+                }
+
+                if (types.contains("user")) {
+                        results.addAll(
+                                        userService.searchUsers(query)
+                                                        .stream()
+                                                        .sorted(
+                                                                        Comparator.comparingInt((UserDTO user) -> user
+                                                                                        .username()
+                                                                                        .equalsIgnoreCase(query)
+                                                                                                        ? 1_000_000
+                                                                                                        : 50_000)
+                                                                                        .reversed())
+                                                        .map(UserSearchResultDTO::fromDTO)
+                                                        .toList());
+                }
+
+                return new SearchResponse(results);
         }
-
-        return new SearchResponse(results);
-    }
 }

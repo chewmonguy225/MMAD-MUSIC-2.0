@@ -35,9 +35,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-
-        System.out.println("🔥 JWT FILTER HIT");
-System.out.println("Auth header: " + request.getHeader("Authorization"));
         String path = request.getServletPath();
 
         // ✅ EXCLUDE PUBLIC ENDPOINTS (IMPORTANT FIX)
@@ -84,7 +81,7 @@ System.out.println("Auth header: " + request.getHeader("Authorization"));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-        System.out.println("JWT subject: " + username);
+        .out.println("JWT subject: " + username);
         filterChain.doFilter(request, response);
     }
 }

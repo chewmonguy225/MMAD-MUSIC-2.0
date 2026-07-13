@@ -23,7 +23,6 @@ public class SearchController {
     public ResponseEntity<SearchResponse> search(
             @PathVariable String query,
             @RequestParam(required = false) String type) {
-                System.out.println("HERE");
         return ResponseEntity.ok(
                 searchService.search(query, type)
         );

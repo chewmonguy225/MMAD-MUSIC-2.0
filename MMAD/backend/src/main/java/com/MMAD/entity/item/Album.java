@@ -12,9 +12,12 @@ public class Album extends Item {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "album_artists", // Join table name
-            joinColumns = @JoinColumn(name = "album_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "artist_id", referencedColumnName = "id"))
+            joinColumns = @JoinColumn(name = "album_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "artist_id", referencedColumnName = "id"))
     // @JsonIgnore // Prevent infinite recursion during serialization
     private List<Artist> artists = new ArrayList<>();
+
+    private String releaseDate;
 
     // Constructors
     public Album() {
@@ -31,6 +34,12 @@ public class Album extends Item {
         this.artists = artists;
     }
 
+    public Album(String sourceId, MusicProvider provider, String name, List<Artist> artists, String imageURL, String releaseDate) {
+        super(sourceId, provider, name, imageURL);
+        this.artists = artists;
+        this.releaseDate = releaseDate;
+    }
+
     // Getter and Setter
     public List<Artist> getArtists() {
         return artists;
@@ -38,6 +47,14 @@ public class Album extends Item {
 
     public void setArtists(List<Artist> artists) {
         this.artists = artists;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
     }
 
     // toString()
@@ -48,6 +65,7 @@ public class Album extends Item {
                 ", sourceId='" + getSourceId() + '\'' +
                 ", name='" + getName() + '\'' +
                 ", imageURL='" + getImageURL() + '\'' +
+                ", releaseDate='" + releaseDate + '\'' +
                 ", artists=" + (artists != null ? artists.stream().map(Artist::getName).toList() : "N/A") +
                 '}';
     }

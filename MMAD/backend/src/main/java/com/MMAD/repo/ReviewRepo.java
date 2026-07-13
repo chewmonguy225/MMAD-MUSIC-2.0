@@ -25,10 +25,11 @@ public interface ReviewRepo extends JpaRepository<Review, Long> {
             )
             FROM Review r
             WHERE r.item.id = :itemId
+            ORDER BY COALESCE(r.updatedAt, r.createdAt) DESC
             """)
     List<ItemReviewResponse> findReviewResponsesByItemId(@Param("itemId") Long itemId);
 
-    List<Review> findByUserId(Long userId);
+    List<Review> findByUserIdOrderByIdDesc(Long userId);
 
     List<Review> findByRatingGreaterThanEqual(int minRating);
 
@@ -44,7 +45,7 @@ public interface ReviewRepo extends JpaRepository<Review, Long> {
                         JOIN u.following f
                         WHERE u.id = :userId
                    )
-                ORDER BY r.createdAt DESC
+                ORDER BY COALESCE(r.updatedAt, r.createdAt) DESC
             """)
     List<Review> findFeedReviews(@Param("userId") Long userId);
 }

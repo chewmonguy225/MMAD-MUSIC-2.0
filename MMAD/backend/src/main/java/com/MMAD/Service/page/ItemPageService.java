@@ -11,6 +11,7 @@ import com.MMAD.dto.item.AlbumDTO;
 import com.MMAD.dto.item.ArtistDTO;
 import com.MMAD.dto.item.ItemDTO;
 import com.MMAD.dto.page.ItemPageDTO;
+import com.MMAD.dto.review.ItemReviewResponse;
 import com.MMAD.dto.review.ItemReviewsResponse;
 
 @Service
@@ -39,10 +40,17 @@ public class ItemPageService {
         List<ItemPageDTO.SimplifiedSong> songs = null;
         List<AlbumDTO> albums = null;
 
+        Integer albumDurationMs = null;
+
         if (item instanceof AlbumDTO album) {
 
             songs = spotifyService.getAlbumTracks(
                     album.getSourceId());
+
+            albumDurationMs = songs.stream()
+                    .filter(song -> song.durationMs() != null)
+                    .mapToInt(ItemPageDTO.SimplifiedSong::durationMs)
+                    .sum();
         }
 
         if (item instanceof ArtistDTO artist) {
@@ -53,11 +61,24 @@ public class ItemPageService {
 
         ItemReviewsResponse reviewResponse = reviewService.getReviewsByItemId(itemId);
 
+        List<ItemReviewResponse> reviews = reviewResponse.getReviews();
+
+        Double averageRating = reviews.isEmpty()
+                ? null
+                : reviews.stream()
+                        .mapToDouble(ItemReviewResponse::getRating)
+                        .average()
+                        .orElseThrow();
+
+        Integer reviewCount = reviews.size();
+
         return new ItemPageDTO(
                 item,
-                reviewResponse.getReviews(),
+                reviews,
                 songs,
-                albums);
+                albums,
+                albumDurationMs,
+                averageRating,
+                reviewCount);
     }
-
 }

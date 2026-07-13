@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -119,15 +121,27 @@ public class SpotifyService {
             }
 
             if (types.contains("album")) {
+
+                List<AlbumDTO> albums = new ArrayList<>();
+
                 for (JsonNode node : json.path("albums").path("items")) {
-                    results.add(mapAlbum(node));
+                    albums.add(mapAlbum(node));
                 }
+
+                results.addAll(
+                        removeDuplicateAlbums(albums));
             }
 
             if (types.contains("track")) {
+
+                List<SongDTO> songs = new ArrayList<>();
+
                 for (JsonNode node : json.path("tracks").path("items")) {
-                    results.add(mapSong(node));
+                    songs.add(mapSong(node));
                 }
+
+                results.addAll(
+                        removeDuplicateSongs(songs));
             }
 
             results.forEach(item -> item.setRelevance(scoreItem(query, item)));
@@ -237,12 +251,24 @@ public class SpotifyService {
             List<ItemPageDTO.SimplifiedSong> songs = new ArrayList<>();
 
             for (JsonNode track : json.path("items")) {
+
+                Integer durationMs = track.path("duration_ms").isMissingNode()
+                        ? null
+                        : track.path("duration_ms").asInt();
+
+                List<String> artists = new ArrayList<>();
+
+                for (JsonNode artist : track.path("artists")) {
+                    artists.add(
+                            artist.path("name").asText());
+                }
+
                 songs.add(new ItemPageDTO.SimplifiedSong(
                         track.path("name").asText(),
                         track.path("id").asText(),
-                        MusicProvider.SPOTIFY
-                    )
-                );
+                        MusicProvider.SPOTIFY,
+                        durationMs,
+                        artists));
             }
 
             return songs;
@@ -316,13 +342,16 @@ public class SpotifyService {
                     "default"));
         }
 
+        String releaseDate = node.path("release_date").asText(null);
+
         return new AlbumDTO(
                 null,
                 node.path("id").asText(),
                 MusicProvider.SPOTIFY,
                 node.path("name").asText(),
                 extractImage(node),
-                artists);
+                artists,
+                releaseDate);
     }
 
     private SongDTO mapSong(JsonNode node) {
@@ -338,16 +367,26 @@ public class SpotifyService {
                     "default"));
         }
 
-        AlbumDTO album = mapAlbum(node.path("album"));
+        JsonNode albumNode = node.path("album");
+
+        AlbumDTO album = mapAlbum(albumNode);
+
+        String releaseDate = albumNode.path("release_date").asText(null);
+
+        Integer durationMs = node.path("duration_ms").isMissingNode()
+                ? null
+                : node.path("duration_ms").asInt();
 
         return new SongDTO(
                 null,
                 node.path("id").asText(),
                 MusicProvider.SPOTIFY,
                 node.path("name").asText(),
-                extractImage(node.path("album")),
+                extractImage(albumNode),
                 artists,
-                album);
+                album,
+                releaseDate,
+                durationMs);
     }
 
     // Helpers
@@ -430,5 +469,122 @@ public class SpotifyService {
         }
 
         return null;
+    }
+
+    private List<AlbumDTO> removeDuplicateAlbums(
+            List<AlbumDTO> albums) {
+
+        Map<String, AlbumDTO> unique = new LinkedHashMap<>();
+
+        for (AlbumDTO album : albums) {
+
+            String artist = "";
+
+            if (album.getArtists() != null
+                    && !album.getArtists().isEmpty()) {
+
+                artist = album.getArtists()
+                        .get(0)
+                        .getName();
+            }
+
+            String key = normalizeSpotifyName(album.getName())
+                    + "|"
+                    + normalizeSpotifyName(artist);
+
+            if (!unique.containsKey(key)) {
+
+                unique.put(key, album);
+
+            } else {
+
+                AlbumDTO existing = unique.get(key);
+
+                /*
+                 * Prefer the version Spotify usually considers
+                 * the main release.
+                 *
+                 * Example:
+                 * Existing:
+                 * "Album"
+                 *
+                 * Replacement:
+                 * "Album (Clean)"
+                 *
+                 * Keep existing.
+                 */
+
+                if (existing.getName().length() > album.getName().length()) {
+
+                    unique.put(key, existing);
+
+                } else {
+
+                    unique.put(key, album);
+                }
+            }
+        }
+
+        return new ArrayList<>(unique.values());
+    }
+
+    private List<SongDTO> removeDuplicateSongs(
+            List<SongDTO> songs) {
+
+        Map<String, SongDTO> unique = new LinkedHashMap<>();
+
+        for (SongDTO song : songs) {
+
+            String artist = "";
+
+            if (song.getArtists() != null
+                    && !song.getArtists().isEmpty()) {
+
+                artist = song.getArtists()
+                        .get(0)
+                        .getName();
+            }
+
+            String key = normalizeSpotifyName(song.getName())
+                    + "|"
+                    + normalizeSpotifyName(artist);
+
+            if (!unique.containsKey(key)) {
+
+                unique.put(key, song);
+
+            } else {
+
+                SongDTO existing = unique.get(key);
+
+                /*
+                 * Keep the first Spotify result.
+                 * Spotify search ranking usually puts
+                 * the preferred version first.
+                 */
+
+                unique.put(key, existing);
+            }
+        }
+
+        return new ArrayList<>(unique.values());
+    }
+
+    private String normalizeSpotifyName(String name) {
+
+        if (name == null) {
+            return "";
+        }
+
+        return name
+                .toLowerCase()
+                .replace("(clean)", "")
+                .replace("[clean]", "")
+                .replace("(explicit)", "")
+                .replace("[explicit]", "")
+                .replace("(remastered)", "")
+                .replace("[remastered]", "")
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 }

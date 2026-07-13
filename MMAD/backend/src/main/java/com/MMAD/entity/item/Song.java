@@ -15,24 +15,60 @@ public class Song extends Item {
     private Album album;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "song_artists", joinColumns = @JoinColumn(name = "song_item_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "artist_item_id", referencedColumnName = "id"))
+    @JoinTable(
+            name = "song_artists",
+            joinColumns = @JoinColumn(name = "song_item_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "artist_item_id", referencedColumnName = "id"))
     private List<Artist> artists = new ArrayList<>();
+
+    private String releaseDate;
+
+    private Integer durationMs;
 
     public Song() {
         super();
     }
 
-    public Song(String sourceId, MusicProvider provider, String name, List<Artist> artists, Album album) {
-        super(sourceId, provider, name, "default_image_url"); // Use default image if none provided
+    public Song(
+            String sourceId,
+            MusicProvider provider,
+            String name,
+            List<Artist> artists,
+            Album album) {
+
+        super(sourceId, provider, name, "default_image_url");
         this.artists = artists;
         this.album = album;
     }
 
-    public Song(String sourceId, MusicProvider provider, String name, String imageURL, List<Artist> artists,
+    public Song(
+            String sourceId,
+            MusicProvider provider,
+            String name,
+            String imageURL,
+            List<Artist> artists,
             Album album) {
+
         super(sourceId, provider, name, imageURL);
         this.artists = artists;
         this.album = album;
+    }
+
+    public Song(
+            String sourceId,
+            MusicProvider provider,
+            String name,
+            String imageURL,
+            List<Artist> artists,
+            Album album,
+            String releaseDate,
+            Integer durationMs) {
+
+        super(sourceId, provider, name, imageURL);
+        this.artists = artists;
+        this.album = album;
+        this.releaseDate = releaseDate;
+        this.durationMs = durationMs;
     }
 
     public Album getAlbum() {
@@ -51,6 +87,22 @@ public class Song extends Item {
         this.artists = artists;
     }
 
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public Integer getDurationMs() {
+        return durationMs;
+    }
+
+    public void setDurationMs(Integer durationMs) {
+        this.durationMs = durationMs;
+    }
+
     @Override
     public String toString() {
         return "Song{" +
@@ -58,6 +110,8 @@ public class Song extends Item {
                 ", sourceId='" + getSourceId() + '\'' +
                 ", name='" + getName() + '\'' +
                 ", imageURL='" + getImageURL() + '\'' +
+                ", releaseDate='" + releaseDate + '\'' +
+                ", durationMs=" + durationMs +
                 ", album=" + (album != null ? album.getName() : "N/A") +
                 ", artists=" + (artists != null ? artists.stream().map(Artist::getName).toList() : "[]") +
                 '}';

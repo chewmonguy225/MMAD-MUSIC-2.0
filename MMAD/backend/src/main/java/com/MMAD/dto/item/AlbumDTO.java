@@ -12,6 +12,8 @@ public class AlbumDTO extends ItemDTO {
 
     private List<ArtistDTO> artists;
 
+    private String releaseDate;
+
     public AlbumDTO() {
         super();
     }
@@ -22,9 +24,13 @@ public class AlbumDTO extends ItemDTO {
             MusicProvider provider,
             String name,
             String imageURL,
-            List<ArtistDTO> artists) {
+            List<ArtistDTO> artists,
+            String releaseDate) {
+
         super(id, sourceId, provider, name, imageURL);
+
         this.artists = artists;
+        this.releaseDate = releaseDate;
     }
 
     public List<ArtistDTO> getArtists() {
@@ -35,9 +41,19 @@ public class AlbumDTO extends ItemDTO {
         this.artists = artists;
     }
 
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
     public static AlbumDTO fromEntity(Album album) {
-        if (album == null)
+
+        if (album == null) {
             return null;
+        }
 
         return new AlbumDTO(
                 album.getId(),
@@ -48,7 +64,8 @@ public class AlbumDTO extends ItemDTO {
                 album.getArtists()
                         .stream()
                         .map(ArtistDTO::fromEntity)
-                        .toList());
+                        .toList(),
+                album.getReleaseDate());
     }
 
     @Override
@@ -57,10 +74,12 @@ public class AlbumDTO extends ItemDTO {
         List<Artist> artistEntities = new ArrayList<>();
 
         if (this.getArtists() != null) {
+
             artistEntities = this.getArtists()
                     .stream()
                     .map(ArtistDTO::toEntity)
                     .collect(Collectors.toCollection(ArrayList::new));
+
         }
 
         return new Album(
@@ -68,6 +87,7 @@ public class AlbumDTO extends ItemDTO {
                 this.getProvider(),
                 this.getName(),
                 artistEntities,
-                this.getImageURL());
+                this.getImageURL(),
+                this.getReleaseDate());
     }
 }

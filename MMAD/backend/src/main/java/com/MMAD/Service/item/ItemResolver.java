@@ -22,7 +22,10 @@ public class ItemResolver {
     private final ItemRepo itemRepo;
     private final SpotifyService spotifyService;
 
-    public ItemResolver(ItemRepo itemRepo, SpotifyService spotifyService) {
+    public ItemResolver(
+            ItemRepo itemRepo,
+            SpotifyService spotifyService) {
+
         this.itemRepo = itemRepo;
         this.spotifyService = spotifyService;
     }
@@ -47,21 +50,29 @@ public class ItemResolver {
 
     private Artist resolveArtist(Artist artist) {
 
-        return (Artist) itemRepo
-                .findByProviderAndSourceId(
-                        artist.getProvider(),
-                        artist.getSourceId())
-                .orElseGet(() -> itemRepo.save(artist));
+        Optional<Item> existing = itemRepo.findByProviderAndSourceId(
+                artist.getProvider(),
+                artist.getSourceId());
+
+        if (existing.isPresent()
+                && existing.get() instanceof Artist existingArtist) {
+
+            return existingArtist;
+        }
+
+        return itemRepo.save(artist);
     }
 
     private Album resolveAlbum(Album album) {
 
-        Optional<Item> existingAlbum = itemRepo.findByProviderAndSourceId(
+        Optional<Item> existing = itemRepo.findByProviderAndSourceId(
                 album.getProvider(),
                 album.getSourceId());
 
-        if (existingAlbum.isPresent()) {
-            return (Album) existingAlbum.get();
+        if (existing.isPresent()
+                && existing.get() instanceof Album existingAlbum) {
+
+            return existingAlbum;
         }
 
         if (album.getArtists() != null) {
@@ -79,12 +90,14 @@ public class ItemResolver {
 
     private Song resolveSong(Song song) {
 
-        Optional<Item> existingSong = itemRepo.findByProviderAndSourceId(
+        Optional<Item> existing = itemRepo.findByProviderAndSourceId(
                 song.getProvider(),
                 song.getSourceId());
 
-        if (existingSong.isPresent()) {
-            return (Song) existingSong.get();
+        if (existing.isPresent()
+                && existing.get() instanceof Song existingSong) {
+
+            return existingSong;
         }
 
         if (song.getArtists() != null) {
@@ -113,6 +126,7 @@ public class ItemResolver {
             MusicProvider provider) {
 
         if (provider != MusicProvider.SPOTIFY) {
+
             throw new RuntimeException(
                     "Unsupported provider");
         }
@@ -158,7 +172,6 @@ public class ItemResolver {
 
                 album.getArtists()
                         .forEach(this::refreshArtist);
-
             }
 
             return itemRepo.save(album);
@@ -169,14 +182,12 @@ public class ItemResolver {
             if (song.getAlbum() != null) {
 
                 refreshAlbum(song.getAlbum());
-
             }
 
             if (song.getArtists() != null) {
 
                 song.getArtists()
                         .forEach(this::refreshArtist);
-
             }
 
             return itemRepo.save(song);
@@ -218,4 +229,5 @@ public class ItemResolver {
             itemRepo.save(album);
         }
     }
+
 }

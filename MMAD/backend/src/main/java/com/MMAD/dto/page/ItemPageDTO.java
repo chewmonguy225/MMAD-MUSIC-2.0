@@ -14,6 +14,12 @@ public class ItemPageDTO {
     private List<SimplifiedSong> songs;
     private List<AlbumDTO> albums;
 
+    private Integer albumDurationMs;
+
+    // Review summary
+    private Double averageRating;
+    private Integer reviewCount;
+
     public ItemPageDTO() {
     }
 
@@ -21,12 +27,18 @@ public class ItemPageDTO {
             ItemDTO item,
             List<ItemReviewResponse> reviews,
             List<SimplifiedSong> songs,
-            List<AlbumDTO> albums) {
+            List<AlbumDTO> albums,
+            Integer albumDurationMs,
+            Double averageRating,
+            Integer reviewCount) {
 
         this.item = item;
         this.reviews = reviews;
         this.songs = songs;
         this.albums = albums;
+        this.albumDurationMs = albumDurationMs;
+        this.averageRating = averageRating;
+        this.reviewCount = reviewCount;
     }
 
     public ItemDTO getItem() {
@@ -61,9 +73,35 @@ public class ItemPageDTO {
         this.albums = albums;
     }
 
+    public Integer getAlbumDurationMs() {
+        return albumDurationMs;
+    }
+
+    public void setAlbumDurationMs(Integer albumDurationMs) {
+        this.albumDurationMs = albumDurationMs;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public Integer getReviewCount() {
+        return reviewCount;
+    }
+
+    public void setReviewCount(Integer reviewCount) {
+        this.reviewCount = reviewCount;
+    }
+
     public record SimplifiedSong(
             String name,
             String sourceId,
-            MusicProvider provider) {
+            MusicProvider provider,
+            Integer durationMs,
+            List<String> artists) {
     }
 }
